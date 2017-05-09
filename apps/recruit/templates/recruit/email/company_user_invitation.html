@@ -1,0 +1,14 @@
+{% load i18n %}
+Hello,<br>
+<br>
+You received this email because {{ sender_name }} invited<br>
+you to join {{ company }} on SquareBalloon.<br>
+<br>
+To accept invitation please follow a link below:<br>
+<a href="http://www.squareballoon.com/company-invitation/{{ invite_key }}">
+http://www.squareballoon.com/company-invitation/{{invite_key}}</a>
+After that you will be able to post job offers and search<br> 
+for candidates for {{ company }}.<br>
+<br>
+With best regards,<br>
+SquareBalloon.com

@@ -1,0 +1,11 @@
+#!/bin/bash
+git --work-tree=/var/www/vhosts/recruiter --git-dir=/var/www/vhosts/recruiter/.git checkout -f
+cd /var/www/vhosts/recruiter/
+. ./envi/bin/activate
+pip install -r ./requirements/common.txt
+cp ./deploy_assets/dev/local_settings.py ./recruiter/settings/local_settings.py
+cp ./deploy_assets/dev/wsgi.py ./recruiter/wsgi.py
+which python
+python ./manage.py migrate
+python ./manage.py collectstatic --noinput
+touch ./recruiter/wsgi.py

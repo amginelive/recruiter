@@ -1,0 +1,122 @@
+{% extends 'base.html' %}{% load staticfiles %}{% load i18n %}
+
+{% block head_js %}{{ block.super }}{% endblock %}
+{% block extra_css %}{{ block.super }}{% endblock %}
+
+
+{% block nav %}
+{{ block.super }}
+{% comment %}         <div class="header">
+            <div class="container">
+                <div class="row">
+                    <div class="header_in">
+                        <nav class="navbar">
+                            <div class="navbar-header">
+                                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#expand" aria-expanded="false">
+                                    <span class="sr-only">Toggle navigation</span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                </button>
+                                <div class="logo"><a href="/"> <img src="{% static 'images/logo.png' %}" width="300" height="61" alt="logo"></a>  </div>
+                            </div>
+                            <div class="navbar-collapse collapse" id="expand">
+                                <div class="nav">
+                                    <ul>
+                                        {% if c %}<li{% if menu == 'overview' %} class="active"{% endif %}><a href="{% url 'dashboard' %}"><i class="glyphicon glyphicon-th-large"></i> Overview</a></li>{% endif %}
+                                        <li{% if menu == 'profile_update' %} class="active"{% endif %}><a href="{% url 'panel_update_profile' %}"><i class="glyphicon glyphicon-user"></i> {% trans 'My Profile' %}</a></li>
+                                        {% if c %}<li{% if menu == 'update' %} class="active"{% endif %}><a href="{% url 'panel_update_company' c.id %}"><i class="glyphicon glyphicon-cog"></i> {% trans 'Update Company' %}</a></li>{% endif %}
+                                        {% if c %}<li{% if menu == 'reviews' %} class="active"{% endif %}><a href="{% url 'dashboard_review_list' %}"><i class="glyphicon glyphicon-comment"></i> {% trans 'Manage reviews' %}</a></li>{% endif %}
+                                        <li>{% if user.is_authenticated %}<a href="{% url 'account_logout' %}">Logout</a>
+										{% else %}<a href="{% url 'account_login' %}">Log in</a>{% endif %}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+ {% endcomment %}
+{% endblock %}
+
+{% block top_header %}
+{% endblock %}
+
+{% block heading %}{% endblock %}
+{% block content %}
+<section id="internal-wrap">
+    <!-- internal block -->
+    <section id="account">
+        <div class="container">
+            <h2>{% trans "Your Account" %}</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="text">
+                        <h4>{% trans "Basic Info" %}</h4>
+                        <div class="form">
+                            <form id="account-form" action="{% url 'update_user' %}" method="post" role="form"
+                                  parsley-use-html5-constraints="false" novalidate="" >
+                                {% csrf_token %}
+                                <div class="msg"></div>
+                                <label>{% trans "Email" %}</label>
+                                <input type="email" id="email" name="email" class="form-control" required="" autocomplete="off"
+                                       value={{ user.email }}
+                                       parsley-maxlength="50" parsley-required="true" parsley-type="email"/>
+                                <label>{% trans "Phone" %}</label>
+                                <input type="phone" id="phone" name="phone" class="form-control" required="" autocomplete="off"
+                                       value={{ user.phone }}
+                                       parsley-maxlength="16" parsley-required="true" parsley-type="phone"/>
+                                <label>{% trans "Password" %}</label>
+                                <input type="password" id="password1" name="password1" minlength="8" class="form-control" autocomplete="off">
+                                <label>{% trans "Confirm Password" %}</label>
+                                <input type="password" id="password2" name="password2" minlength="8" class="form-control" autocomplete="off">
+                                <button type="submit" class="btn">{% trans "Update Info" %}</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-offset-2 col-md-6">
+                   <div class="payments">
+                        <h4>{% trans "Photo" %}</h4>
+                        <div class="form">
+                            <form id="account-photo-form" action="/update_photo" method="post" role="form"
+                                  parsley-use-html5-constraints="false" novalidate="" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="msg"></div>
+                                <img id="account-photo" width="200px" height="160px" src="/media/{{user.photo}}">
+                                <br>
+                                <label>{% trans "Email" %}</label>
+                                <input type="hidden" id="email" name="email" class="form-control" required="" autocomplete="off"
+                                       value={{ user.email }}
+                                       parsley-maxlength="50" parsley-required="true" parsley-type="email"/>
+                                <label>{% trans "Photo" %}</label>
+                                <label class="btn btn-default btn-file">
+                                    Browse<input type="file" id="photo" name="image" class="form-control" required="" style="display: none;"/>
+                                </label>
+                                <button type="submit" class="btn">{% trans "Update Photo" %}</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- end internal block -->
+</section>
+<!-- end new admin content -->
+{% endblock %}
+
+{% block footer %}
+{{ block.super }}
+{% endblock %}
+
+{% block js_bottom %} {{ block.super }}
+{% block js_search %}{% endblock %}
+
+<script type='text/javascript'>
+
+</script>
+
+
+{% endblock %}

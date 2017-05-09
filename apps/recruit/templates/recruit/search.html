@@ -1,0 +1,53 @@
+{% extends 'profileme/index.html' %}{% load staticfiles %}{% load i18n %}
+
+{% block head_js %}{{ block.super }}{% endblock %}
+{% block extra_css %}{{ block.super }}{% endblock %}
+
+{% block content %}
+<section id="internal-wrap">
+    <!-- internal block -->
+        <div class="container">
+            <div class="row">
+            	<div class="col-md-10 col-md-offset-1 text-center" style="padding-top:40px;">
+					<div class="row">
+						<div class="col-md-12 search_block">
+							<form action="{% url 'search' %}" method="GET">
+								<input type="text" placeholder="Search..." name="search"/>
+								<button class="btn search-btn" type="submit" value="Search"><i class="glyphicon glyphicon-search"></i> Search</button>
+							</form>
+						</div>
+						<div class="col-md-12 search_results">
+							{% for c in candidates %}
+							<div class="search__candidate" style="width:100%; border:1px solid #dfdfdf; padding:15px;">
+								<a href="#">
+									<img src="{% if c.photo %}{{ c.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:100px; border-radius:50%">
+									<span class="candidate_info">{{ c.user.get_full_name }}</span>
+									{% if c.title %}<span class="candidate_info">Title: {{ c.title }}</span>{% endif %}
+									{% if c.skills %}<span class="candidate_info">Skills: {{ c.skills }}</span>{% endif %}
+									{% if c.phone %}<span class="candidate_info">Phone: {{ c.phone }}</span>{% endif %}
+								</a>
+							</div>
+							{% endfor %}
+							{% if not candidates %}
+							<p>No candidates matching your criteria found.</p>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+            </div>
+        </div>
+    <!-- end internal block -->
+</section>
+<!-- end new admin content -->
+{% endblock %}
+
+{% block footer %}
+{{ block.super }}
+{% endblock %}
+
+{% block js_bottom %}
+{{ block.super }}
+<script>
+
+</script>
+{% endblock %}

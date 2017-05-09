@@ -1,0 +1,14 @@
+{% extends "socialaccount/base.html" %}
+
+{% load i18n %}
+
+{% block inner_content %}
+                    <div class="auth-message-form text-center">
+                          <div class="row">
+                            <div class="col-lg-12 text-center">
+                            	<h3>{% trans "Social Network Login Failure" %}</h3>
+								<p>{% trans "An error occurred while attempting to login via your social network account." %}</p>
+                            </div>
+                          </div>
+                    </div>
+{% endblock %}

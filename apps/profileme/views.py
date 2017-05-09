@@ -1,0 +1,305 @@
+from django.views.generic import View
+from django.http import HttpResponse, Http404, JsonResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.template import RequestContext, loader
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+import re
+import os
+
+from django.conf import settings
+
+from recruit.models import Company, CompanyInvitation
+from profileme.models import Candidate, Agent
+from profileme.forms import (CandidatePhotoUploadForm, AgentPhotoUploadForm,
+                             CandidateCVUploadForm, CandidateUpdateForm, 
+                             AgentUpdateForm, CompanyUpdateForm, CompanyInvitationForm)
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+
+def get_profile_completeness(profile):
+    ''' Calculates candidate profile completeness and 
+        returns data to display progress bar, etc.
+    '''
+        
+    is_complete = False # profile completeness flag for candidate
+    progress = 0.3  # profile progress, 0.3 is default after registration
+    if (profile.title and profile.location and profile.skills and
+        profile.phone and profile.experience and profile.residence_country):
+        is_complete = True
+    
+    # calculate profile progress in %
+    progress += 0.2 if is_complete else 0
+    progress += 0.3 if profile.cv else 0
+    progress += 0.2 if profile.photo else 0
+    progress *= 100
+    
+    return {'is_complete': is_complete,
+            'progress': progress,
+            'photo': True if profile.photo else False,
+            'cv': True if profile.cv else False}
+
+class DashboardView(View):
+    template_name = 'profileme/dashboard.html'
+
+    def get(self, request, **kwargs):
+        company = []
+        f = []
+        # show profile dashboard according to user role
+        # start with candidate profile
+        is_complete = False  # profile completeness flag for candidate
+        completeness = 0.3  # profile completeness, 0.3 is default after registration 
+        if request.user.registered_as == 'c':
+            self.template_name = 'profileme/candidate_dashboard.html'
+            profile = request.user.candidate
+            if (profile.title and profile.location and profile.skills and
+                profile.phone and profile.experience and profile.residence_country):
+                is_complete = True
+            # calculate profile completeness in %
+            completeness += 0.2 if is_complete else 0
+            completeness += 0.3 if profile.cv else 0
+            completeness += 0.2 if profile.photo else 0
+            completeness *= 100
+            
+            # form will be used to generate user profile data
+            f = CandidateUpdateForm(instance=profile)
+
+        # show agent dashboard
+        elif request.user.registered_as == 'a':
+            self.template_name = 'profileme/agent_dashboard.html'
+            profile = request.user.agent
+            company = profile.company
+
+        return render(request, self.template_name, {
+            'profile': profile,
+            'is_complete': is_complete,
+            'profile_completeness': completeness,
+            'company': company,
+            'f': f # form, for candidate
+        })
+        
+    @method_decorator(login_required(login_url='/accounts/login/'))
+    def dispatch(self, *args, **kwargs):
+        return super(DashboardView, self).dispatch(*args, **kwargs)
+
+# profile update for candidate and agent
+class ProfileUpdateView(View):
+    template_name = 'profileme/candidate_update.html'
+
+    def get(self, request, **kwargs):
+        completeness = []
+        profile = []
+        # show profile form according to user role
+        # start with candidate profile
+        form = []
+        if request.user.registered_as == 'c':
+            self.template_name = 'profileme/candidate_update.html'
+            form = CandidateUpdateForm(instance=request.user.candidate)
+            completeness = get_profile_completeness(request.user.candidate)
+        # show agent dashboard
+        elif request.user.registered_as == 'a':
+            self.template_name = 'profileme/agent_update.html'
+            profile = request.user.agent
+            form = AgentUpdateForm(instance=profile)
+
+        return render(request, self.template_name, {
+            'form': form,
+            'completeness': completeness,
+            'profile': profile,
+        })
+
+    def post(self, request, **kwards):
+        form = []
+        completeness = {}
+        form_values = request.POST.copy()
+        form_values['user'] = request.user.id
+        
+        if request.user.registered_as == 'c':
+            self.template_name = 'profileme/candidate_update.html'
+            form = CandidateUpdateForm(form_values, request.FILES, instance=request.user.candidate)
+            completeness = get_profile_completeness(request.user.candidate)
+            
+            if form.is_valid():
+                candidate = form.save(commit=True)
+
+        # show agent dashboard
+        elif request.user.registered_as == 'a':
+            self.template_name = 'profileme/agent_update.html'
+            form = AgentUpdateForm(form_values, request.FILES, instance=request.user.agent)
+            
+            if form.is_valid():
+                agent = form.save(commit=True)
+
+        return render(request, self.template_name, {
+            'form': form,
+            'completeness': completeness
+        })
+
+        
+    @method_decorator(login_required(login_url='/accounts/login/'))
+    def dispatch(self, *args, **kwargs):
+        return super(ProfileUpdateView, self).dispatch(*args, **kwargs)
+
+
+# company update
+class CompanyUpdateView(View):
+    template_name = 'profileme/company_update.html'
+
+    def get(self, request, **kwargs):
+        form = []
+        try:
+            company = Company.objects.get(owner=request.user)
+        except Company.DoesNotExist:
+            raise Http404('You have no rights to edit company details.')
+
+        form = CompanyUpdateForm(instance=company)
+
+        return render(request, self.template_name, {
+            'form': form,
+            'company': company
+        })
+
+    def post(self, request, **kwards):
+        form = []
+        company = []
+        form_values = request.POST.copy()
+        
+        try:
+            company = Company.objects.get(owner=request.user)
+            form_values['owner'] = company.owner
+        except Company.DoesNotExist:
+            raise Http404('You have no rights to edit company details.')
+
+        form = CompanyUpdateForm(form_values, request.FILES, instance=company)
+        
+        if form.is_valid():
+            company = form.save(commit=True)
+
+        return render(request, self.template_name, {
+            'form': form,
+            'company': company
+        })
+
+        
+    @method_decorator(login_required(login_url='/accounts/login/'))
+    def dispatch(self, *args, **kwargs):
+        return super(CompanyUpdateView, self).dispatch(*args, **kwargs)
+
+# invitations to company
+class InviteCompanyUserView(View):
+    template_name = 'profileme/invite_users.html'
+
+    def get(self, request, **kwargs):
+        completeness = []
+
+        form = []
+        if (request.user.registered_as == 'a' and 
+            request.user.agent.company.owner == request.user):
+
+            return render(request, self.template_name, {})
+        else:
+            raise Http404('You are not allowed to access this page')
+
+    def post(self, request, **kwards):
+        form = []
+        success = False
+        
+        if request.user.registered_as == 'a':    
+            form = CompanyInvitationForm(request.POST)
+            # create invitation
+            if form.is_valid():
+                invitation = CompanyInvitation.objects.create(
+                    sent_to = form.cleaned_data['email'],
+                    sent_by = request.user,
+                    company = request.user.agent.company)
+                if invitation.pk > 0:
+                    success = True
+
+        return render(request, self.template_name, {
+            'form': form,
+            'success': success
+        })
+        
+    @method_decorator(login_required(login_url='/accounts/login/'))
+    def dispatch(self, *args, **kwargs):
+        return super(InviteCompanyUserView, self).dispatch(*args, **kwargs)
+    
+# accept invitation
+# invitations to company
+class AcceptInvitationView(View):
+    template_name = 'profileme/invite_users.html'
+
+    def get(self, request, **kwargs):
+        completeness = []
+
+        form = []
+        if (request.user.registered_as == 'a' and 
+            request.user.agent.company.owner == request.user):
+
+            return render(request, self.template_name, {})
+        else:
+            raise Http404('You are not allowed to access this page')
+
+
+        return render(request, self.template_name, {
+            'form': form,
+            'success': success
+        })
+        
+    @method_decorator(login_required(login_url='/accounts/login/'))
+    def dispatch(self, *args, **kwargs):
+        return super(AcceptInvitationView, self).dispatch(*args, **kwargs)
+
+    
+class ProfilePhotoUploadView(View):
+
+    def post(self, request, **kwargs):
+        if request.user.is_authenticated:
+            # show profile dashboard according to user role
+            # start with candidate profile
+            form_values = request.POST.copy()
+            form_values['user'] = request.user.id
+            if request.user.registered_as == 'c':
+                candidate = request.user.candidate
+                form = CandidatePhotoUploadForm(form_values, request.FILES, instance=candidate)
+
+                if form.is_valid():
+                    candidate = form.save(commit=True)
+                    return JsonResponse({'success': True, 'image': candidate.photo.url})
+
+            # show agent dashboard
+            elif request.user.registered_as == 'a':
+                agent = request.user.agent
+                form = AgentPhotoUploadForm(form_values, request.FILES, instance=agent)
+
+                if form.is_valid():
+                    agent = form.save(commit=True)
+                    return JsonResponse({'success': True, 'image': agent.photo.url})
+        else:
+            return JsonResponse({'success': False, 'message': 'Not authorized'})
+        
+# update candidates' CV
+class ProfileCVUploadView(View):
+
+    def post(self, request, **kwargs):
+        if request.user.is_authenticated:
+            # show profile dashboard according to user role
+            # start with candidate profile
+            form_values = request.POST.copy()
+            if request.user.registered_as == 'c':
+                form_values['user'] = request.user.id
+                candidate = request.user.candidate
+                form = CandidateCVUploadForm(form_values, request.FILES, instance=candidate)
+
+                if form.is_valid():
+                    candidate = form.save(commit=True)
+                    return JsonResponse({'success': True, 'cv': candidate.cv.url})
+
+            # restricted for agents
+            else:
+                return JsonResponse({'success': False, 'message': 'Not authorized'})
+        else:
+            return JsonResponse({'success': False, 'message': 'Not authorized'})
