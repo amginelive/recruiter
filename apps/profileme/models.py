@@ -19,7 +19,7 @@ ACC_CHOICES = (
 
 # user profile
 class ProfileBase(models.Model):
-    
+
     # Status choices
     ACTIVE = 'a'
     INACTIVE = 'i'
@@ -31,7 +31,6 @@ class ProfileBase(models.Model):
         (MODERATION, _('moderation'))
     )
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     phone = PhoneNumberField(blank=True, null=True)
     photo = models.FileField(upload_to='images/photo/%Y/',
                               max_length=120,
@@ -106,7 +105,7 @@ class ProfileBase(models.Model):
             # TODO: make alias the same as content_type.model
             filename, file = resize_image(self.photo, settings.THUMBNAIL_ALIASES[content_name]['photo'])
             self.photo.save(filename, file, save=False)
- 
+
         # remember original photo path to delete it later
         to_delete = []
         if self.pk:
@@ -115,7 +114,7 @@ class ProfileBase(models.Model):
                 old_image_path = getattr(self, '_ProfileBase__initial_photo_file_path')
             except AttributeError:
                 old_image_path = ''
- 
+
             # check if filefield clear checkbox was checked
             # in this case self.img_med.name == '' and self.img_med._file == None
             # so, maybe not the best solution, but when everything is empty
@@ -126,7 +125,7 @@ class ProfileBase(models.Model):
                     self.photo.delete()
                 except:
                     pass
- 
+
             if self.photo.name != '' and self.photo_has_changed() is True:
                 # got new image, delete old
                 try:
@@ -164,14 +163,14 @@ class ProfileBase(models.Model):
                 except:
                     pass
                 generate_images(self)
- 
+
         # delete previous versions of profile photo if there are any
         for file in to_delete:
             try:
                 default_storage.delete(file)
             except:
                 pass
- 
+
         # finally save object with new images
         super(ProfileBase, self).save()
 
@@ -188,7 +187,7 @@ class Candidate(ProfileBase):
         (CONTRACTING, _('contract')),
         (PERMANENT, _('permanent')),
     )
-
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='candidate')
     title = models.CharField(blank=True, null=True, max_length=200, verbose_name=_('Job title'))
     skills = models.TextField(blank=True, null=True, max_length=250, verbose_name=('Skills'), help_text="Comma separated skills")
     location = models.CharField(blank=True, null=True, max_length=200, verbose_name=_('Current location'))
@@ -214,7 +213,7 @@ class Candidate(ProfileBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        
+
     # delete old cv file if new is there
     def cv_has_changed(self):
         if getattr(self, 'cv') and getattr(self, '_ProfileBase__initial_cv_file_path') !=  getattr(self, 'cv').path:
@@ -224,12 +223,12 @@ class Candidate(ProfileBase):
                 pass
             return True
         return False
-    
+
     def save(self, *args, **kwargs):
         if self.pk:
             self.cv_has_changed()
         super(Candidate, self).save()
-        
+
     def delete(self, *args, **kwargs):
         if self.cv:
             try:
@@ -242,7 +241,7 @@ class Candidate(ProfileBase):
 
 # Agent / Employer profile
 class Agent(ProfileBase):
-
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='agent')
     company = models.ForeignKey(Company, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_('Company'))
     company_name = models.CharField(blank=True, null=True, max_length=200, verbose_name=_('Company name'), help_text="Company name entered during registration")
     is_charity = models.BooleanField(_("Charity / NPO?"), null=False, default=False)

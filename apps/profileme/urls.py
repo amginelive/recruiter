@@ -9,4 +9,6 @@ urlpatterns = (
     url(r'^profile-update/$', views.ProfileUpdateView.as_view(), name='dashboard_update_profile'),
     url(r'^company-update/$', views.CompanyUpdateView.as_view(), name='dashboard_update_company'),
     url(r'^invite-users/$', views.InviteCompanyUserView.as_view(), name='dashboard_invite_users'),
+
+    url(r'^company/create/$', views.company_create, name='dashboard_company_create'),
 )
