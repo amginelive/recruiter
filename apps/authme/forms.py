@@ -5,7 +5,7 @@ User = get_user_model()
 from django import forms
 from slugify import slugify_url
 from libs.general import COUNTRIES
-from profileme.models import Candidate, Agent 
+from profileme.models import Candidate, Agent
 from phonenumber_field.formfields import PhoneNumberField
 
 
@@ -50,13 +50,12 @@ class CustomSignupForm(forms.Form):
     phone = PhoneNumberField(required=False, label=_('Phone'))
     registered_as = forms.ChoiceField(choices=ACC_CHOICES,
                                       required=True)
-    company_name = forms.CharField(required=False, max_length=200, label=_('Company'))
 
     def signup(self, request, user):
         if type(user).__name__ == 'SocialLogin':
             user = user.user
         user = User.objects.get(pk=user.id)
-    
+
         user.firstname = self.cleaned_data['firstname'].strip()
         user.lastname = self.cleaned_data['lastname'].strip()
         user.email = self.cleaned_data['email'].strip()
@@ -64,7 +63,7 @@ class CustomSignupForm(forms.Form):
 
         if user.firstname and user.lastname:
             user.slug = slugify_url("{} {}".format(user.firstname, user.lastname))
-        
+
         user.save()
 
         data = {
@@ -76,5 +75,4 @@ class CustomSignupForm(forms.Form):
         if user.registered_as == 'c':
             Candidate.objects.create(**data)
         elif user.registered_as == 'a':
-            data['company_name'] = self.cleaned_data['company_name'].strip()
             Agent.objects.create(**data)
