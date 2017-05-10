@@ -2,21 +2,21 @@
 <!doctype html>
 <html class="no-js" lang="en">
 <head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>{% block title %}Find job of your dreams with SquareBalloon{% endblock %}</title>
-	<meta name="description" content="">
-	<meta name="author" content="SquareBalloon">
-	<meta name="robots" content="index, follow">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Find job of your dreams with SquareBalloon{% endblock %}</title>
+    <meta name="description" content="">
+    <meta name="author" content="SquareBalloon">
+    <meta name="robots" content="index, follow">
 
-	<link rel="SHORTCUT ICON" href="/static/img/favicon.ico" />
-	<link rel="canonical" href="http://www.squareballoon.com{{ request.path }}" />
+    <link rel="SHORTCUT ICON" href="/static/img/favicon.ico" />
+    <link rel="canonical" href="http://www.squareballoon.com{{ request.path }}" />
 
-	<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-	<link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
 <!--[if lt IE 9]>
-	<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-	<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 <![endif]-->
 {% block head_js %}{% endblock %}
 {% block extra_css %}{% endblock %}
@@ -24,7 +24,7 @@
 </head>
 <body>
 
-	{% block nav %}
+    {% block nav %}
     <nav class="navbar navbar-fixed-top" role="navigation">
         <div class="container">
             <div class="navbar-header">
@@ -34,7 +34,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a href='/'><img class="logo" src="{% static 'img/logo.png' %}" alt="{% trans 'SquareBalloon Logo' %}"/></a> 
+                <a href='/'><img class="logo" src="{% static 'img/logo.png' %}" alt="{% trans 'SquareBalloon Logo' %}"/></a>
             </div>
 
             <div id="navbar" class="navbar-collapse collapse">
@@ -53,8 +53,8 @@
                         </ul>
                     </li>
                     {% else %}
-            		<li><a href="{% url 'account_signup' %}?registered_as=c"><i class="glyphicon glyphicon-user"></i> Register CV</a></li>
-            		<li><a href="{% url 'account_signup' %}?registered_as=a"><i class="glyphicon glyphicon-briefcase"></i> Recruiter registration</a></li>
+                    <li><a href="{% url 'account_signup' %}?registered_as=c"><i class="glyphicon glyphicon-user"></i> Register CV</a></li>
+                    <li><a href="{% url 'account_signup' %}?registered_as=a"><i class="glyphicon glyphicon-briefcase"></i> Recruiter registration</a></li>
                     <li>
                         <a href="{% url 'account_login' %}"><i class="glyphicon glyphicon-log-in"></i> {% trans "Login" %}</a>
                     </li>
@@ -63,13 +63,13 @@
             </div>
         </div>
     </nav>
-	{% endblock %} 
+    {% endblock %}
 
-	{% block content %}
+    {% block content %}
 
-	{% endblock %}
+    {% endblock %}
 
-	{% block footer %}
+    {% block footer %}
             <section id="footer">
                 <div class="container center">
                     <p>&nbsp;</p>
@@ -82,19 +82,19 @@
                     <p><small>&copy;{% trans "2017 SquareBalloon. All rights reserved." %}</small></p>
                 </div>
             </section>
-	{% endblock %}
+    {% endblock %}
 
 
-	{% block js_bottom %}
+    {% block js_bottom %}
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/csrf-ajax-cookie.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/js.cookie.js' %}"></script>
+    <script src="{% url 'js_reverse' %}" type="text/javascript"></script>
+    <script>
 
-	<script>
+    </script>
 
-	</script>
-
-	{% endblock %}
+    {% endblock %}
 </body>
 </html>

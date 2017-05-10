@@ -71,7 +71,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(_('active'), default=True,
                                     help_text=('Designates whether this user should be treated as '
                                                'active. Unselect this instead of deleting accounts.'))
-    get_ads = models.BooleanField(_('Receive ads by email?'), default=True) 
+    get_ads = models.BooleanField(_('Receive ads by email?'), default=True)
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     registered_as = models.CharField(max_length=1,
                                      choices=ACC_CHOICES,
@@ -112,6 +112,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         send_mail(subject, message, from_email, [self.email])
 
+    @property
+    def domain(self):
+        """
+        Retrieves the domain name from the email address.
+        """
+        return self.email[self.email.find('@') + 1:]
+
     def save(self, *args, **kwargs):
         if not self.pk:
             self.slug = random_string_gen(12, 16)
@@ -121,9 +128,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         super(User, self).save(*args, **kwargs)
 
 
-# 
+#
 # def post_save_user(sender, instance, created, **kwargs):
 #     if created:
 #         Profile.objects.create(user=instance)
-# 
+#
 # post_save.connect(post_save_user, sender=User)

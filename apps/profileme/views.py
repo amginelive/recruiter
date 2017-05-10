@@ -1,42 +1,56 @@
-from django.views.generic import View
-from django.http import HttpResponse, Http404, JsonResponse
-from django.shortcuts import render, get_object_or_404, redirect
-from django.template import RequestContext, loader
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
-import re
-import os
-
-from django.conf import settings
-
-from recruit.models import Company, CompanyInvitation
-from profileme.models import Candidate, Agent
-from profileme.forms import (CandidatePhotoUploadForm, AgentPhotoUploadForm,
-                             CandidateCVUploadForm, CandidateUpdateForm, 
-                             AgentUpdateForm, CompanyUpdateForm, CompanyInvitationForm)
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse_lazy
+from django.http import HttpResponseRedirect, Http404, JsonResponse
+from django.shortcuts import render
+from django.utils.decorators import method_decorator
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    TemplateView,
+    View,
+)
+
+from braces.views import JSONResponseMixin
+
+from profileme.models import Candidate, Agent
+from profileme.forms import (
+    AgentPhotoUploadForm,
+    AgentUpdateForm,
+    CandidateCVUploadForm,
+    CandidatePhotoUploadForm,
+    CandidateUpdateForm,
+    CompanyForm,
+    CompanyInvitationForm,
+    CompanyUpdateForm,
+)
+from recruit.models import (
+    Company,
+    CompanyInvitation,
+    CompanyRequestInvitation
+)
+
+
 User = get_user_model()
 
 
 def get_profile_completeness(profile):
-    ''' Calculates candidate profile completeness and 
+    ''' Calculates candidate profile completeness and
         returns data to display progress bar, etc.
     '''
-        
+
     is_complete = False # profile completeness flag for candidate
     progress = 0.3  # profile progress, 0.3 is default after registration
     if (profile.title and profile.location and profile.skills and
         profile.phone and profile.experience and profile.residence_country):
         is_complete = True
-    
+
     # calculate profile progress in %
     progress += 0.2 if is_complete else 0
     progress += 0.3 if profile.cv else 0
     progress += 0.2 if profile.photo else 0
     progress *= 100
-    
+
     return {'is_complete': is_complete,
             'progress': progress,
             'photo': True if profile.photo else False,
@@ -46,12 +60,32 @@ class DashboardView(View):
     template_name = 'profileme/dashboard.html'
 
     def get(self, request, **kwargs):
+        if request.user.agent and not request.user.agent.company:
+            company = Company.objects.filter(domain=request.user.domain)
+
+            if company.exists():
+                company = company.first()
+                # add user to company if auto invite is activated
+                if company.allow_auto_invite:
+                    request.user.agent.company = company
+                    request.user.agent.save()
+                # create company request invitation and redirect to pending page
+                # if auto invite is not activated
+                else:
+                    if not CompanyRequestInvitation.objects.filter(user=request.user).exists():
+                        CompanyRequestInvitation.objects.create(
+                            user=request.user,
+                            company=company,
+                        )
+                    return HttpResponseRedirect(reverse_lazy('dashboard_company_pending'))
+            return HttpResponseRedirect(reverse_lazy('dashboard_company_create'))
+
         company = []
         f = []
         # show profile dashboard according to user role
         # start with candidate profile
         is_complete = False  # profile completeness flag for candidate
-        completeness = 0.3  # profile completeness, 0.3 is default after registration 
+        completeness = 0.3  # profile completeness, 0.3 is default after registration
         if request.user.registered_as == 'c':
             self.template_name = 'profileme/candidate_dashboard.html'
             profile = request.user.candidate
@@ -63,7 +97,7 @@ class DashboardView(View):
             completeness += 0.3 if profile.cv else 0
             completeness += 0.2 if profile.photo else 0
             completeness *= 100
-            
+
             # form will be used to generate user profile data
             f = CandidateUpdateForm(instance=profile)
 
@@ -78,9 +112,10 @@ class DashboardView(View):
             'is_complete': is_complete,
             'profile_completeness': completeness,
             'company': company,
-            'f': f # form, for candidate
+            'f': f, # form, for candidate
+            'invitation_requests': CompanyRequestInvitation.objects.filter(company=company),
         })
-        
+
     @method_decorator(login_required(login_url='/accounts/login/'))
     def dispatch(self, *args, **kwargs):
         return super(DashboardView, self).dispatch(*args, **kwargs)
@@ -116,12 +151,12 @@ class ProfileUpdateView(View):
         completeness = {}
         form_values = request.POST.copy()
         form_values['user'] = request.user.id
-        
+
         if request.user.registered_as == 'c':
             self.template_name = 'profileme/candidate_update.html'
             form = CandidateUpdateForm(form_values, request.FILES, instance=request.user.candidate)
             completeness = get_profile_completeness(request.user.candidate)
-            
+
             if form.is_valid():
                 candidate = form.save(commit=True)
 
@@ -129,7 +164,7 @@ class ProfileUpdateView(View):
         elif request.user.registered_as == 'a':
             self.template_name = 'profileme/agent_update.html'
             form = AgentUpdateForm(form_values, request.FILES, instance=request.user.agent)
-            
+
             if form.is_valid():
                 agent = form.save(commit=True)
 
@@ -138,7 +173,7 @@ class ProfileUpdateView(View):
             'completeness': completeness
         })
 
-        
+
     @method_decorator(login_required(login_url='/accounts/login/'))
     def dispatch(self, *args, **kwargs):
         return super(ProfileUpdateView, self).dispatch(*args, **kwargs)
@@ -166,7 +201,7 @@ class CompanyUpdateView(View):
         form = []
         company = []
         form_values = request.POST.copy()
-        
+
         try:
             company = Company.objects.get(owner=request.user)
             form_values['owner'] = company.owner
@@ -174,7 +209,7 @@ class CompanyUpdateView(View):
             raise Http404('You have no rights to edit company details.')
 
         form = CompanyUpdateForm(form_values, request.FILES, instance=company)
-        
+
         if form.is_valid():
             company = form.save(commit=True)
 
@@ -183,7 +218,7 @@ class CompanyUpdateView(View):
             'company': company
         })
 
-        
+
     @method_decorator(login_required(login_url='/accounts/login/'))
     def dispatch(self, *args, **kwargs):
         return super(CompanyUpdateView, self).dispatch(*args, **kwargs)
@@ -196,7 +231,7 @@ class InviteCompanyUserView(View):
         completeness = []
 
         form = []
-        if (request.user.registered_as == 'a' and 
+        if (request.user.registered_as == 'a' and
             request.user.agent.company.owner == request.user):
 
             return render(request, self.template_name, {})
@@ -206,8 +241,8 @@ class InviteCompanyUserView(View):
     def post(self, request, **kwards):
         form = []
         success = False
-        
-        if request.user.registered_as == 'a':    
+
+        if request.user.registered_as == 'a':
             form = CompanyInvitationForm(request.POST)
             # create invitation
             if form.is_valid():
@@ -222,11 +257,11 @@ class InviteCompanyUserView(View):
             'form': form,
             'success': success
         })
-        
+
     @method_decorator(login_required(login_url='/accounts/login/'))
     def dispatch(self, *args, **kwargs):
         return super(InviteCompanyUserView, self).dispatch(*args, **kwargs)
-    
+
 # accept invitation
 # invitations to company
 class AcceptInvitationView(View):
@@ -236,7 +271,7 @@ class AcceptInvitationView(View):
         completeness = []
 
         form = []
-        if (request.user.registered_as == 'a' and 
+        if (request.user.registered_as == 'a' and
             request.user.agent.company.owner == request.user):
 
             return render(request, self.template_name, {})
@@ -248,12 +283,12 @@ class AcceptInvitationView(View):
             'form': form,
             'success': success
         })
-        
+
     @method_decorator(login_required(login_url='/accounts/login/'))
     def dispatch(self, *args, **kwargs):
         return super(AcceptInvitationView, self).dispatch(*args, **kwargs)
 
-    
+
 class ProfilePhotoUploadView(View):
 
     def post(self, request, **kwargs):
@@ -280,7 +315,7 @@ class ProfilePhotoUploadView(View):
                     return JsonResponse({'success': True, 'image': agent.photo.url})
         else:
             return JsonResponse({'success': False, 'message': 'Not authorized'})
-        
+
 # update candidates' CV
 class ProfileCVUploadView(View):
 
@@ -303,3 +338,61 @@ class ProfileCVUploadView(View):
                 return JsonResponse({'success': False, 'message': 'Not authorized'})
         else:
             return JsonResponse({'success': False, 'message': 'Not authorized'})
+
+
+class CompanyCreateView(CreateView):
+    """
+    View for creating a company for a new user.
+    """
+    model = Company
+    form_class = CompanyForm
+    template_name = 'profileme/company_create.html'
+
+    def get_success_url(self):
+        return reverse_lazy('dashboard')
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.agent and request.user.agent.company:
+            return HttpResponseRedirect(reverse_lazy('dashboard'))
+        return super(CompanyCreateView, self).dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        return {'user': self.request.user}
+
+company_create = CompanyCreateView.as_view()
+
+
+class CompanyPendingView(TemplateView):
+    """
+    View for requesting an invitation to a company.
+    """
+    template_name = 'profileme/company_pending.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.agent and request.user.agent.company:
+            return HttpResponseRedirect(reverse_lazy('dashboard'))
+        return super(CompanyPendingView, self).dispatch(request, *args, **kwargs)
+
+company_pending = CompanyPendingView.as_view()
+
+
+class CompanyInvitationRequestAPIView(DeleteView, JSONResponseMixin):
+    """
+    View for accepting or rejecting a company invitation request.
+    """
+    model = CompanyRequestInvitation
+
+    def get_object(self):
+        return CompanyRequestInvitation.objects.get(uuid=self.kwargs.get('uuid'))
+
+    def post(self, request, *args, **kwargs):
+        request_invitation = self.get_object()
+        request_invitation.delete()
+
+        if request.POST.get('action') == 'accept':
+            request_invitation.user.agent.company = request_invitation.company
+            request_invitation.user.agent.save()
+
+        return self.render_json_response({})
+
+api_company_invitation_request = CompanyInvitationRequestAPIView.as_view()

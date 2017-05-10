@@ -1,0 +1,40 @@
+{% extends 'profileme/index.html' %}{% load staticfiles %}{% load i18n %}
+
+{% block head_js %}{{ block.super }}{% endblock %}
+{% block extra_css %}{{ block.super }}{% endblock %}
+{% load bootstrap %}
+
+{% block content %}
+<section id="internal-wrap">
+    <!-- internal block -->
+    <section id="account">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2 profile-left">
+                    <div class="row">
+                        <div class="col-md-4 text-left">
+                            <h4>{{ request.user.get_full_name }}</h4>
+                        </div>
+                        <div class="col-md-8 account-actions text-right">
+                            <a class="btn" href="{% url 'account_change_password' %}"><i class="glyphicon glyphicon-lock"></i> {% trans 'Change password' %}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row pending-text">
+                <div class="col-md-8 col-md-offset-2">
+                    <div class="row">
+                        <h4>Pending Invitation. Contact your company owner to accept your request.</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- end internal block -->
+</section>
+<!-- end new admin content -->
+{% endblock %}
+
+{% block footer %}
+{{ block.super }}
+{% endblock %}
