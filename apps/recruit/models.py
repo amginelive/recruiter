@@ -239,15 +239,6 @@ class CompanyRequestInvitation(models.Model):
     def __str__(self):
         return self.user.get_full_name()
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            # create unique key
-            self.key = random_string_gen(12, 18)
-            while CompanyRequestInvitation.objects.filter(key=self.key).exists():
-                self.key = random_string_gen(12, 18)
-
-        super(CompanyRequestInvitation, self).save(*args, **kwargs)
-
 
 # send email to recipient
 def post_save_invitation(sender, instance, created, **kwargs):
