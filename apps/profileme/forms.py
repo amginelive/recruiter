@@ -64,19 +64,3 @@ class CompanyForm(forms.ModelForm):
         self.user.agent.company = company
         self.user.agent.save()
 
-
-class CompanyRequestInvitationForm(forms.ModelForm):
-
-    class Meta:
-        model = CompanyRequestInvitation
-        fields = ('company',)
-
-    def __init__(self, *args, **kwargs):
-        super(CompanyRequestInvitationForm, self).__init__(*args, **kwargs)
-        initial = kwargs.get('initial')
-        self.user = initial.get('user')
-
-    def save(self, *args, **kwargs):
-        company_request_invitation = super(CompanyRequestInvitationForm, self).save(commit=False)
-        company_request_invitation.user = self.user
-        company_request_invitation.save()

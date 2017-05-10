@@ -1,20 +1,36 @@
-from django.http import HttpResponseRedirect, Http404, JsonResponse
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse_lazy
+from django.http import HttpResponseRedirect, Http404, JsonResponse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.generic import (
     CreateView,
+    DeleteView,
     TemplateView,
-    View
+    View,
 )
 
-from recruit.models import Company, CompanyInvitation, CompanyRequestInvitation
+from braces.views import JSONResponseMixin
+
 from profileme.models import Candidate, Agent
-from profileme.forms import (CandidatePhotoUploadForm, AgentPhotoUploadForm,
-                             CandidateCVUploadForm, CandidateUpdateForm,
-                             AgentUpdateForm, CompanyForm, CompanyUpdateForm, CompanyInvitationForm, CompanyRequestInvitationForm)
-from django.contrib.auth import get_user_model
+from profileme.forms import (
+    AgentPhotoUploadForm,
+    AgentUpdateForm,
+    CandidateCVUploadForm,
+    CandidatePhotoUploadForm,
+    CandidateUpdateForm,
+    CompanyForm,
+    CompanyInvitationForm,
+    CompanyUpdateForm,
+)
+from recruit.models import (
+    Company,
+    CompanyInvitation,
+    CompanyRequestInvitation
+)
+
+
 User = get_user_model()
 
 
@@ -96,7 +112,8 @@ class DashboardView(View):
             'is_complete': is_complete,
             'profile_completeness': completeness,
             'company': company,
-            'f': f # form, for candidate
+            'f': f, # form, for candidate
+            'invitation_requests': CompanyRequestInvitation.objects.filter(company=company),
         })
 
     @method_decorator(login_required(login_url='/accounts/login/'))
@@ -357,3 +374,25 @@ class CompanyPendingView(TemplateView):
         return super(CompanyPendingView, self).dispatch(request, *args, **kwargs)
 
 company_pending = CompanyPendingView.as_view()
+
+
+class CompanyInvitationRequestAPIView(DeleteView, JSONResponseMixin):
+    """
+    View for accepting or rejecting a company invitation request.
+    """
+    model = CompanyRequestInvitation
+
+    def get_object(self):
+        return CompanyRequestInvitation.objects.get(uuid=self.kwargs.get('uuid'))
+
+    def post(self, request, *args, **kwargs):
+        request_invitation = self.get_object()
+        request_invitation.delete()
+
+        if request.POST.get('action') == 'accept':
+            request_invitation.user.agent.company = request_invitation.company
+            request_invitation.user.agent.save()
+
+        return self.render_json_response({})
+
+api_company_invitation_request = CompanyInvitationRequestAPIView.as_view()

@@ -5,6 +5,7 @@ from authme.models import User
 import os
 import random
 import string
+import uuid
 from datetime import datetime
 
 from slugify import slugify, slugify_url
@@ -233,7 +234,7 @@ class CompanyRequestInvitation(models.Model):
 
     user = models.ForeignKey(User, blank=True, null=True, related_name='invitation_request')
     company = models.ForeignKey(Company, blank=False, null=False, related_name='invitation_request')
-    key = models.CharField(_('Request Invitation key'), max_length=30, null=False, unique=True)
+    uuid = models.UUIDField(_('Request Invitation key'), default=uuid.uuid4, editable=False)
 
     def __str__(self):
         return self.user.get_full_name()

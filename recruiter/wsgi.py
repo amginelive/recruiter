@@ -21,8 +21,8 @@ sys.path.append('/var/www/vhosts/recruiter/recruiter')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'recruiter.settings.common'
 
 # Activate your virtual env
-# activate_env = os.path.expanduser("/var/www/vhosts/recruiter/envi/bin/activate_this.py")
-# exec(open(activate_env).read())
+activate_env = os.path.expanduser("/var/www/vhosts/recruiter/envi/bin/activate_this.py")
+exec(open(activate_env).read())
 
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()

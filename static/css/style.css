@@ -241,6 +241,10 @@ section#account .pending-text {
     text-align: center;
 }
 
+section#account .request-users {
+    font-size: 17px;
+}
+
 .auth .form-group label {display:none;}
 .auth .form-group .chckbox input {display:inline; width:10px; line-height:20px !important; margin-right:15px !important; margin-bottom:0 !important; padding-bottom:0px !important; height:20px !important; margin-top:10px !important; position:relative;}
 .auth .form-group .chckbox span {display:inline; line-height:20px; vertical-align:middle; padding-bottom:13px; position:relative}

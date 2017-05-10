@@ -1,6 +1,7 @@
-from django.conf.urls import url
+from macrosurl import url
 
 from profileme import views
+
 
 urlpatterns = (
     url(r'^$', views.DashboardView.as_view(), name='dashboard'),
@@ -12,4 +13,5 @@ urlpatterns = (
 
     url(r'^company/create/$', views.company_create, name='dashboard_company_create'),
     url(r'^company/pending/$', views.company_pending, name='dashboard_company_pending'),
+    url(r'^company/invitation/:uuid/update/$', views.api_company_invitation_request, name='api_company_invitation_request'),
 )

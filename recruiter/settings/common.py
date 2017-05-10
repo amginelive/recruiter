@@ -43,23 +43,24 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
-    'authme',
-    'easy_thumbnails',
-    'phonenumber_field',
-#    'djangoseo',
-    'recruit',
-    'profileme',
-    'bootstrapform',  # for allauth templates
-    # allauth
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
 #    'allauth.socialaccount.providers.facebook',
 #    'allauth.socialaccount.providers.google',
-    # end allauth
 #    'snowpenguin.django.recaptcha2',
+    'bootstrapform',
     'debug_toolbar',
     'django_extensions',
+    'django_js_reverse',
+#    'djangoseo',
+    'easy_thumbnails',
+    'phonenumber_field',
+
+    'authme',
+    'recruit',
+    'profileme',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -306,6 +307,9 @@ IMAGINE_USE_TEMP = False
 PHONENUMBER_DB_FORMAT = 'E164'
 
 
+JS_REVERSE_JS_MINIFY = False
+
+
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.
@@ -386,6 +390,8 @@ if DEBUG:
         'debug_toolbar.panels.logging.LoggingPanel',
         # 'debug_toolbar.panels.redirects.RedirectsPanel',
     ]
+
+# JS Reverse Configuration
 
 
 # Settings override
