@@ -15,10 +15,10 @@ SECRET_KEY = ')no_g$60popv3=ki4$omo2kx0++kx)a2*lot@41+2xyup*-&p%'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-ADMINS = (
-    ('Illya Konovalov', 'horbor@horbor.de'),
-)
-MANAGERS = ADMINS + ('Matt Codina', 'mattcodina.work@gmail.com')
+# ADMINS = (
+#     ('Illya Konovalov', 'horbor@horbor.de'),
+# )
+# MANAGERS = ADMINS + ('Matt Codina', 'mattcodina.work@gmail.com')
 
 LANGUAGE_CODE = 'en'
 

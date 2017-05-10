@@ -23,12 +23,12 @@ SECRET_KEY = ')no_g$60popv3=ki4$omo2kx0++kx)a2*lot@41+2xyup*-&p%'
 DEBUG = True
 
 ALLOWED_HOSTS = ['192.168.1.104', '192.168.1.100', '192.168.1.102', '192.168.1.105', '192.168.0.108', '192.168.0.100']
-ADMINS = (
-    ('Illya Konovalov', 'horbor@gmail.com'),
-)
+# ADMINS = (
+#     ('Illya Konovalov', 'horbor@gmail.com'),
+# )
 
 
-MANAGERS = ADMINS
+# MANAGERS = ADMINS
 LANGUAGE_CODE = 'en'
 
 SEO_MODELS = True
@@ -59,6 +59,7 @@ INSTALLED_APPS = (
     # end allauth
 #    'snowpenguin.django.recaptcha2',
     'debug_toolbar',
+    'django_extensions',
 )
 
 MIDDLEWARE_CLASSES = (

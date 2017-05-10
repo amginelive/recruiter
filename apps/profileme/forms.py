@@ -1,7 +1,7 @@
 from django import forms
 
 from profileme.models import Candidate, Agent
-from recruit.models import Company, CompanyInvitation
+from recruit.models import Company, CompanyInvitation, CompanyRequestInvitation
 
 
 class CandidateUpdateForm(forms.ModelForm):
@@ -45,7 +45,6 @@ class CompanyInvitationForm(forms.Form):
     email = forms.EmailField()
 
 
-
 class CompanyForm(forms.ModelForm):
 
     class Meta:
@@ -64,3 +63,20 @@ class CompanyForm(forms.ModelForm):
 
         self.user.agent.company = company
         self.user.agent.save()
+
+
+class CompanyRequestInvitationForm(forms.ModelForm):
+
+    class Meta:
+        model = CompanyRequestInvitation
+        fields = ('company',)
+
+    def __init__(self, *args, **kwargs):
+        super(CompanyRequestInvitationForm, self).__init__(*args, **kwargs)
+        initial = kwargs.get('initial')
+        self.user = initial.get('user')
+
+    def save(self, *args, **kwargs):
+        company_request_invitation = super(CompanyRequestInvitationForm, self).save(commit=False)
+        company_request_invitation.user = self.user
+        company_request_invitation.save()

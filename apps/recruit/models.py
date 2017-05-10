@@ -60,6 +60,7 @@ class Company(models.Model):
     is_charity = models.BooleanField(_("Is it a charity organization?"), null=False, default=False)
     reg_date = models.DateTimeField(auto_now_add=True, editable=False)
     update_date = models.DateTimeField(auto_now=True, editable=False)
+    allow_auto_invite = models.BooleanField(_("Allow auto invite?"), default=False)
     status = models.CharField(max_length=3,
                               choices=STATUS_CHOICES,
                               default=ACTIVE)
@@ -226,6 +227,25 @@ class CompanyInvitation(models.Model):
                 self.invite_key = random_string_gen(12, 18)
 
         super(CompanyInvitation, self).save(*args, **kwargs)
+
+
+class CompanyRequestInvitation(models.Model):
+
+    user = models.ForeignKey(User, blank=True, null=True, related_name='invitation_request')
+    company = models.ForeignKey(Company, blank=False, null=False, related_name='invitation_request')
+    key = models.CharField(_('Request Invitation key'), max_length=30, null=False, unique=True)
+
+    def __str__(self):
+        return self.user.get_full_name()
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            # create unique key
+            self.key = random_string_gen(12, 18)
+            while CompanyRequestInvitation.objects.filter(key=self.key).exists():
+                self.key = random_string_gen(12, 18)
+
+        super(CompanyRequestInvitation, self).save(*args, **kwargs)
 
 
 # send email to recipient

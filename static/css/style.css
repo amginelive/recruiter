@@ -196,7 +196,7 @@ section#account .container form button, .btn.action-btn {
     padding:5px 10px;
 }
 .btn.action-btn {padding:8px; display:block; }
-.btn.action-btn i {margin-right:5px; font-size:1.25rem} 
+.btn.action-btn i {margin-right:5px; font-size:1.25rem}
 
 /* start Illya K. */
 section#account h5 {font-family:PangramRegular; font-size:18px;}
@@ -236,6 +236,10 @@ section#account .agent-job-stats li b, section#account .candidate_profile_data l
 section#account .agent_profile__company_details {background-color:#f8f8f8; padding:5px; font-size:14px; color:#424242; border-radius:5px; padding-bottom:10px; padding-top:10px; margin-bottom:10px;}
 section#account .agent_profile__company_details span {display:block; padding:2px 5px;}
 
+section#account .pending-text {
+    margin-top: 50px;
+    text-align: center;
+}
 
 .auth .form-group label {display:none;}
 .auth .form-group .chckbox input {display:inline; width:10px; line-height:20px !important; margin-right:15px !important; margin-bottom:0 !important; padding-bottom:0px !important; height:20px !important; margin-top:10px !important; position:relative;}

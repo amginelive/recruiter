@@ -1,22 +1,19 @@
-from django.views.generic import CreateView, View
-from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
-from django.shortcuts import render, get_object_or_404, redirect
-from django.template import RequestContext, loader
-from django.utils.decorators import method_decorator
+from django.http import HttpResponseRedirect, Http404, JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.core.urlresolvers import reverse_lazy
+from django.shortcuts import render
+from django.utils.decorators import method_decorator
+from django.views.generic import (
+    CreateView,
+    TemplateView,
+    View
+)
 
-import re
-import os
-
-from django.conf import settings
-
-from recruit.models import Company, CompanyInvitation
+from recruit.models import Company, CompanyInvitation, CompanyRequestInvitation
 from profileme.models import Candidate, Agent
 from profileme.forms import (CandidatePhotoUploadForm, AgentPhotoUploadForm,
                              CandidateCVUploadForm, CandidateUpdateForm,
-                             AgentUpdateForm, CompanyForm, CompanyUpdateForm, CompanyInvitationForm)
+                             AgentUpdateForm, CompanyForm, CompanyUpdateForm, CompanyInvitationForm, CompanyRequestInvitationForm)
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -48,6 +45,23 @@ class DashboardView(View):
 
     def get(self, request, **kwargs):
         if request.user.agent and not request.user.agent.company:
+            company = Company.objects.filter(domain=request.user.domain)
+
+            if company.exists():
+                company = company.first()
+                # add user to company if auto invite is activated
+                if company.allow_auto_invite:
+                    request.user.agent.company = company
+                    request.user.agent.save()
+                # create company request invitation and redirect to pending page
+                # if auto invite is not activated
+                else:
+                    if not CompanyRequestInvitation.objects.filter(user=request.user).exists():
+                        CompanyRequestInvitation.objects.create(
+                            user=request.user,
+                            company=company,
+                        )
+                    return HttpResponseRedirect(reverse_lazy('dashboard_company_pending'))
             return HttpResponseRedirect(reverse_lazy('dashboard_company_create'))
 
         company = []
@@ -329,3 +343,17 @@ class CompanyCreateView(CreateView):
         return {'user': self.request.user}
 
 company_create = CompanyCreateView.as_view()
+
+
+class CompanyPendingView(TemplateView):
+    """
+    View for requesting an invitation to a company.
+    """
+    template_name = 'profileme/company_pending.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.agent and request.user.agent.company:
+            return HttpResponseRedirect(reverse_lazy('dashboard'))
+        return super(CompanyPendingView, self).dispatch(request, *args, **kwargs)
+
+company_pending = CompanyPendingView.as_view()

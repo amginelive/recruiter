@@ -11,4 +11,5 @@ urlpatterns = (
     url(r'^invite-users/$', views.InviteCompanyUserView.as_view(), name='dashboard_invite_users'),
 
     url(r'^company/create/$', views.company_create, name='dashboard_company_create'),
+    url(r'^company/pending/$', views.company_pending, name='dashboard_company_pending'),
 )
