@@ -7,6 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import (
     CreateView,
     DeleteView,
+    DetailView,
     TemplateView,
     View,
 )
@@ -69,6 +70,8 @@ class DashboardView(View):
                 if company.allow_auto_invite:
                     request.user.agent.company = company
                     request.user.agent.save()
+                    return HttpResponseRedirect(reverse_lazy('company_invite_success'))
+
                 # create company request invitation and redirect to pending page
                 # if auto invite is not activated
                 else:
@@ -396,3 +399,16 @@ class CompanyInvitationRequestAPIView(DeleteView, JSONResponseMixin):
         return self.render_json_response({})
 
 api_company_invitation_request = CompanyInvitationRequestAPIView.as_view()
+
+
+class CompanyInviteSuccessView(DetailView):
+    """
+    View for the success page when successfully invited to a company.
+    """
+    model = Company
+    template_name = 'profileme/company_invite_success.html'
+
+    def get_object(self):
+        return self.request.user.agent.company
+
+company_invite_success = CompanyInviteSuccessView.as_view()
