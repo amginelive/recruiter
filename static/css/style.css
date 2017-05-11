@@ -227,6 +227,11 @@ section#account .label.label-success.updated {padding:5px 10px; line-height:25px
 section#account .label.label-success.cv_updated {width:100%; padding:5px 10px; line-height:25px; display:none; font-size:14px; margin-bottom:10px;}
 section#account #current_cv {display:inline-block;}
 section#account #profile_photo {width:180px; border-radius:50%;}
+section#account .agent_photo {
+    width: 40px;
+    border-radius: 50%;
+    margin: 3px;
+}
 
 section#account .agent-job-stats, section#account .candidate_profile_data {padding-left:0px; margin-top:15px; width:80%;}
 section#account .agent-job-stats li, section#account .candidate_profile_data li {font-size:16px; margin-top:8px; background-color:#f8f8f8; border-radius:5px; line-height:24px; padding-left:5px;}

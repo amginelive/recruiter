@@ -60,6 +60,18 @@
                             <hr>
                             <span>Main contact: {{ company.owner.get_full_name }}</span>
                         </div>
+                        <div class="text-center">
+                            {% for agent in company.agents.all %}
+                                {% if agent != user.agent %}
+                                    <img
+                                        class="agent_photo"
+                                        src="{% if agent.photo %}{{ agent.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="{{ agent.user.get_full_name }}">
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                         {% if company.owner == request.user %}
                             <a href="{% url 'dashboard_update_company' %}" class="btn action-btn"><i class="glyphicon glyphicon-briefcase"></i> {% trans 'Update Company Profile' %}</a>
                             <a href="{% url 'dashboard_invite_users' %}" class="btn action-btn"><i class="glyphicon glyphicon-user"></i> {% trans "Add User" %}</a>
@@ -121,6 +133,8 @@
 {{ block.super }}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script>
+    $('[data-toggle="tooltip"]').tooltip();
+
     function updateProfilePhoto(responseText, statusText, xhr, $form){
         if(responseText['success'] == true){
             document.getElementById("profile_photo").src = responseText['image'];
