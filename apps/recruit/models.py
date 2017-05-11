@@ -42,16 +42,21 @@ class Company(models.Model):
 
     id = models.AutoField(primary_key=True)
     owner = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_('Major company representative'))
-    name = models.CharField(blank=False, null=False, max_length=200, verbose_name=_('Company name'))
-    domain = models.CharField(blank=False, null=False, max_length=200, unique=True, verbose_name=_('Domain name'))
+    name = models.CharField(max_length=200, verbose_name=_('Company name'))
+    domain = models.CharField(
+        _('Domain name'),
+        max_length=200,
+        unique=True,
+        help_text='If your email is john@squareballoon.com, your domain name will be squareballon.com'
+    )
     overview = models.CharField(blank=True, null=True, max_length=255, verbose_name=_("Company's short title or short 'about' text"))
-    alias = models.SlugField(blank=False, null=False, max_length=120, verbose_name='Alias / slug')
+    alias = models.SlugField(max_length=120, verbose_name='Alias / slug')
     description = models.TextField(blank=True, null=True, max_length=4000)
     logo = models.FileField(upload_to='images/company/logo/%Y', max_length=100, editable=True, blank=True, null=True, help_text=_('Logo size 600x200px, .jpg, .png, .gif formats'))
     address_1 = models.CharField(blank=True, null=True, max_length=80, verbose_name=_('Address line') + ' 1')
     address_2 = models.CharField(blank=True, null=True, max_length=80, verbose_name=_('Address line') + ' 2')
     zip = models.CharField(blank=True, null=True, max_length=10, verbose_name=_('Postal code / ZIP'))
-    city = models.CharField(blank=False, null=False, max_length=80)
+    city = models.CharField(max_length=80)
     country = models.CharField('Country',
                                max_length=2,
                                choices=COUNTRIES,
@@ -205,7 +210,7 @@ class CompanyInvitation(models.Model):
     sent_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='+')
     sent_to = models.EmailField(_('Email of recipient'), blank=False, null=False)
     sent_to_user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='+')
-    company = models.ForeignKey(Company, blank=False, null=False, on_delete=models.CASCADE, related_name='+')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='+')
     invite_key = models.CharField(_('Invitation key'), max_length=30, null=False, unique=True)
     sent_date = models.DateTimeField(auto_now_add=True, editable=False)
     accepted_date = models.DateTimeField(editable=False, null=True, blank=True)
@@ -233,7 +238,7 @@ class CompanyInvitation(models.Model):
 class CompanyRequestInvitation(models.Model):
 
     user = models.ForeignKey(User, blank=True, null=True, related_name='invitation_request')
-    company = models.ForeignKey(Company, blank=False, null=False, related_name='invitation_request')
+    company = models.ForeignKey(Company, related_name='invitation_request')
     uuid = models.UUIDField(_('Request Invitation key'), default=uuid.uuid4, editable=False)
 
     def __str__(self):
