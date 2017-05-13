@@ -22,7 +22,14 @@ SECRET_KEY = ')no_g$60popv3=ki4$omo2kx0++kx)a2*lot@41+2xyup*-&p%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.104', '192.168.1.100', '192.168.1.102', '192.168.1.105', '192.168.0.108', '192.168.0.100']
+ALLOWED_HOSTS = [
+    '192.168.1.104',
+    '192.168.1.100',
+    '192.168.1.102',
+    '192.168.1.105',
+    '192.168.0.108',
+    '192.168.0.100',
+]
 # ADMINS = (
 #     ('Illya Konovalov', 'horbor@gmail.com'),
 # )
@@ -75,7 +82,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'recruiter.urls'
+ROOT_URLCONF = 'conf.urls'
 
 TEMPLATES = [
     {
