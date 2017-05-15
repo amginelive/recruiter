@@ -11,9 +11,10 @@ import os
 import sys
 import site
 
-# previously hardcoded to: /var/www/vhosts/recruiter/envi
-venv_path = os.environ.setdefault('ENVPATH', '/var/www/vhosts/recruiter/envi')
-vact_path = os.path.expanduser(os.path.join(venv_path, 'bin', 'activate_this.py'))
+
+root_path = '/var/www/vhosts/recruiter'
+venv_path = os.environ.setdefault('ENVPATH', root_path, 'envi')
+vact_path = os.path.join(venv_path, 'bin', 'activate_this.py')
 
 # Activate the virtualenv
 # 
@@ -24,12 +25,12 @@ with open(vact_path) as file:
 
 # Additional paths to PYTHONPATH
 for path in (
-    '/var/www/vhosts/recruiter'
-    '/var/www/vhosts/recruiter/recruiter'
+    os.path.join(root_path),
+    os.path.join(root_path, '/recruiter'),
 ):
     sys.path.append(path)
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'conf.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'conf.settings.prod')
 
 from django.core import wsgi
 application = wsgi.get_wsgi_application()
