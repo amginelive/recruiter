@@ -11,7 +11,7 @@ TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 PROJECT_DIR = os.path.dirname(os.path.dirname(__file__))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
 APP_DIR = os.path.join(BASE_DIR, 'apps')
-LOG_DIR = os.path.join(BASE_DIR, 'logs')
+LOG_DIR = os.path.join(BASE_DIR, 'var', 'logs')
 
 # App/Library Paths
 sys.path.append(APP_DIR)
@@ -82,8 +82,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'conf.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -112,8 +110,8 @@ TEMPLATES = [
     },
 ]
 
-ROOT_URLCONF = 'recruiter.urls'
-WSGI_APPLICATION = 'recruiter.wsgi.application'
+ROOT_URLCONF = 'conf.urls'
+WSGI_APPLICATION = 'conf.wsgi.application'
 
 
 # Database
@@ -202,6 +200,7 @@ STATICFILES_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     '/var/www/vhosts/upwork/recruiter/static/',
+    os.path.join(BASE_DIR, 'static'),
 )
 
 # AUTHENTICATION_BACKENDS list has been added later
