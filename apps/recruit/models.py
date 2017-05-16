@@ -247,6 +247,7 @@ class JobPost(AbstractTimeStampedModel):
     city = models.CharField(_('City'), max_length=80)
     country = models.CharField(_('Country'), max_length=2, choices=COUNTRIES)
     skills = models.ManyToManyField('recruit.Skill', related_name='job_posts', verbose_name=_('Skills'))
+    uuid = models.SlugField(_('UUID'), default=uuid.uuid4, editable=False)
 
     class Meta:
         verbose_name = _('Job Post')
