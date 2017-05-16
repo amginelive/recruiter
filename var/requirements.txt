@@ -1,0 +1,18 @@
+Django==1.11
+django-debug-toolbar
+psycopg2>=2.6.1
+Pillow==3.1.1
+awesome-slugify==1.6.4
+easy-thumbnails==2.4.1
+django-allauth==0.31.0
+django-phonenumber-field
+django-bootstrap-form==3.2.1
+#-e git+https://github.com/whyflyru/django-seo.git#egg=djangoseo
+#django-bootstrap-breadcrumbs==0.7.1
+#django-mptt==0.8.3
+#django-mptt-urls==2.0.3
+#django-recaptcha2==0.1.7
+#django-seo==2.0
+
+# setup
+#fabtools
