@@ -1,25 +1,18 @@
-from django.db import models
-from django.conf import settings
-from authme.models import User
-
 import os
-import random
-import string
 import uuid
-from datetime import datetime
 
-from slugify import slugify, slugify_url
-from django.utils.translation import get_language, ugettext_lazy as _
-from django.core.urlresolvers import reverse
-from django.db.models.signals import post_save, post_delete
-
-# email, messages
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.core.validators import MinLengthValidator
+from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
+from django.db import models
+from django.db.models.signals import post_save
+from authme.models import User
+from django.template.loader import render_to_string
+from django.utils.translation import ugettext_lazy as _
 
-from phonenumber_field.modelfields import PhoneNumberField
+from slugify import slugify_url
+
+from core.models import AbstractTimeStampedModel
 from libs.general import COUNTRIES
 from libs.tools import resize_image, random_string_gen
 
@@ -243,6 +236,36 @@ class CompanyRequestInvitation(models.Model):
 
     def __str__(self):
         return self.user.get_full_name()
+
+
+class JobPost(AbstractTimeStampedModel):
+
+    company = models.ForeignKey(Company, related_name='job_posts')
+    title = models.CharField(_('Title'), max_length=255)
+    description = models.TextField(_('Description'))
+    contract = models.TextField(_('Contract'))
+    city = models.CharField(_('City'), max_length=80)
+    country = models.CharField(_('Country'), max_length=2, choices=COUNTRIES)
+    skills = models.ManyToManyField('recruit.Skill', related_name='job_posts', verbose_name=_('Skills'))
+
+    class Meta:
+        verbose_name = _('Job Post')
+        verbose_name_plural = _('Job Posts')
+
+    def __str__(self):
+        return self.title
+
+
+class Skill(AbstractTimeStampedModel):
+
+    name = models.CharField(_('Name'), max_length=100)
+
+    class Meta:
+        verbose_name = _('Skill')
+        verbose_name_plural = _('Skills')
+
+    def __str__(self):
+        return self.name
 
 
 # send email to recipient
