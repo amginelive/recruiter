@@ -28,7 +28,7 @@ register = template.Library()
 def calculate_age(born):
     today = date.today()
 
-    return oday.year - born.year - ((today.month, today.day) < (born.month, born.day))
+    return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
 register.filter('age', calculate_age)
 
