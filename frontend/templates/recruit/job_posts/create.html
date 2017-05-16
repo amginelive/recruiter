@@ -16,7 +16,7 @@
                             <div class="text-center">
                                 <h5 style="margin:20px 0px;">{% trans 'My Company' %}</h5>
                             </div>
-                            <form action="{% url 'job_post_create' %}" method="POST">
+                            <form action="" method="POST">
                                 {% csrf_token %}
                                 {{ form|bootstrap }}
                                 <div class="form-group text-center">

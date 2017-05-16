@@ -8,6 +8,7 @@ from django.views.generic import (
     CreateView,
     ListView,
     TemplateView,
+    UpdateView,
     View,
 )
 
@@ -71,3 +72,18 @@ class JobPostCreateView(CreateView, LoginRequiredMixin):
         return {'company': self.request.user.agent.company}
 
 job_post_create = JobPostCreateView.as_view()
+
+
+class JobPostUpdateView(UpdateView, LoginRequiredMixin):
+    """
+    View for updating a job post.
+    """
+    model = JobPost
+    form_class = JobPostForm
+    template_name = 'recruit/job_posts/create.html'
+    success_url = reverse_lazy('job_post_list')
+
+    def get_object(self):
+        return JobPost.objects.get(uuid=self.kwargs.get('uuid'))
+
+job_post_update = JobPostUpdateView.as_view()
