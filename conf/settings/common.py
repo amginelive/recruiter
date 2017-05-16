@@ -396,18 +396,3 @@ if DEBUG:
         'debug_toolbar.panels.logging.LoggingPanel',
         # 'debug_toolbar.panels.redirects.RedirectsPanel',
     ]
-
-# JS Reverse Configuration
-
-
-# Settings override
-try:
-    from .local_settings import *
-except ImportError as e:
-    pass
-
-try:
-    from .local_settings import modify
-    modify(globals())
-except ImportError:
-    pass

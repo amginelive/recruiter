@@ -13,6 +13,8 @@ ALLOWED_HOSTS = (
     '*',
 )
 
+WSGI_APPLICATION = 'conf.wsgi.devt.application'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',   # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
