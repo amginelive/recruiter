@@ -12,7 +12,7 @@ import sys
 
 
 root_path = '/var/www/vhosts/recruiter'
-venv_path = os.environ.setdefault('ENVPATH', root_path, 'envi')
+venv_path = os.environ.setdefault('ENVPATH', os.path.join(root_path, 'envi'))
 vact_path = os.path.join(venv_path, 'bin', 'activate_this.py')
 
 # Activate the virtualenv
