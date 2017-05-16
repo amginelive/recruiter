@@ -15,15 +15,15 @@
                         <div class="col-md-12">
                             <div class="text-center">
                                 <h2>{% trans 'Job Posts' %}</h2>
-                                <a href="" class="btn btn-success">Create</a>
+                                <a href="{% url 'job_post_create' %}" class="btn btn-success">Create</a>
                             </div>
                         </div>
                         <div class="col-md-12">
                             {% for job_post in job_posts %}
                                 <div class="row job-post-detail">
                                     <div class="pull-right">
-                                        <a href="" class="btn btn-default">Edit</a>
-                                        <a href="" class="btn btn-danger">Delete</a>
+                                        <a href="{% url 'job_post_update' job_post.uuid %}" class="btn btn-default">Edit</a>
+                                        <a href="{% url 'job_post_delete' job_post.uuid %}" class="btn btn-danger">Delete</a>
                                     </div>
                                     <h3>{{ job_post.title }}</h3>
                                     <h5>{{ job_post.city }}, {{ job_post.get_country_display }}</h5>

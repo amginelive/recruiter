@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.generic import (
     CreateView,
+    DeleteView,
     ListView,
     TemplateView,
     UpdateView,
@@ -65,7 +66,7 @@ class JobPostCreateView(CreateView, LoginRequiredMixin):
     """
     model = JobPost
     form_class = JobPostForm
-    template_name = 'recruit/job_posts/create.html'
+    template_name = 'recruit/job_posts/create_update.html'
     success_url = reverse_lazy('job_post_list')
 
     def get_initial(self):
@@ -79,11 +80,27 @@ class JobPostUpdateView(UpdateView, LoginRequiredMixin):
     View for updating a job post.
     """
     model = JobPost
+    context_object_name = 'job_posts'
     form_class = JobPostForm
-    template_name = 'recruit/job_posts/create.html'
+    template_name = 'recruit/job_posts/create_update.html'
     success_url = reverse_lazy('job_post_list')
 
     def get_object(self):
         return JobPost.objects.get(uuid=self.kwargs.get('uuid'))
 
 job_post_update = JobPostUpdateView.as_view()
+
+
+class JobPostDeleteView(DeleteView, LoginRequiredMixin):
+    """
+    View for deleting a job post.
+    """
+    model = JobPost
+    context_object_name = 'job_post'
+    template_name = 'recruit/job_posts/delete.html'
+    success_url = reverse_lazy('job_post_list')
+
+    def get_object(self):
+        return JobPost.objects.get(uuid=self.kwargs.get('uuid'))
+
+job_post_delete = JobPostDeleteView.as_view()
