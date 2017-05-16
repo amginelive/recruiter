@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/1.11/howto/deployment/wsgi/
 
 import os
 import sys
-import site
 
 
 root_path = '/var/www/vhosts/recruiter'
@@ -17,7 +16,7 @@ venv_path = os.environ.setdefault('ENVPATH', root_path, 'envi')
 vact_path = os.path.join(venv_path, 'bin', 'activate_this.py')
 
 # Activate the virtualenv
-# 
+#
 # previous implementation:
 #     site.addsitedir('/var/www/vhosts/recruiter/envi/lib/python3.5/site-packages')
 with open(vact_path) as file:
