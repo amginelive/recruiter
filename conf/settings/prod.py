@@ -1,6 +1,4 @@
-"""
-Django development server settings for squareballoon project.
-"""
+from .common import *
 
 DEBUG = False
 
