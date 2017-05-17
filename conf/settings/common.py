@@ -59,9 +59,10 @@ INSTALLED_APPS = (
     'easy_thumbnails',
     'phonenumber_field',
 
-    'authme',
-    'recruit',
+    'companies',
     'profileme',
+    'users',
+    'recruit',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -192,10 +193,10 @@ JS_REVERSE_JS_MINIFY = False
 # Authentication
 ####################################################################################################
 
-AUTH_USER_MODEL = 'authme.User'
+AUTH_USER_MODEL = 'users.User'
 
 AUTHENTICATION_BACKENDS = (
-        'authme.auth.CustomAuth',
+        'users.auth.CustomAuth',
         # Needed to login by username in Django admin, regardless of `allauth`
         "django.contrib.auth.backends.ModelBackend",
         # `allauth` specific authentication methods, such as login by e-mail
@@ -227,18 +228,18 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 LOGIN_REDIRECT_URL = '/dashboard/'
-#ACCOUNT_ADAPTER = 'authme.account_adapter.NoNewUsersAccountAdapter'
+#ACCOUNT_ADAPTER = 'users.account_adapter.NoNewUsersAccountAdapter'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
 SIGNUP_PASSWORD_ENTER_TWICE = True
 ACCOUNT_SIGNUP_PASSWORD_VERIFICATION = True
-ACCOUNT_SIGNUP_FORM_CLASS = 'authme.forms.CustomSignupForm'
+ACCOUNT_SIGNUP_FORM_CLASS = 'users.forms.CustomSignupForm'
 ACCOUNT_LOGOUT_ON_GET = True  # don't ask on sign out
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'optional'
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 SOCIALACCOUNT_EMAIL_REQUIRED = False
-#SOCIALACCOUNT_ADAPTER = 'authme.account_adapter.CustomSocialAccountAdapter'
-ACCOUNT_ADAPTER = 'authme.account_adapter.CustomAccountAdapter'
+#SOCIALACCOUNT_ADAPTER = 'users.account_adapter.CustomSocialAccountAdapter'
+ACCOUNT_ADAPTER = 'users.account_adapter.CustomAccountAdapter'
 ACCOUNT_USERNAME_BLACKLIST = ['admin', 'squareballoon', 'root']
 ACCOUNT_USERNAME_VALIDATORS = None
 #ACCOUNT_USER_MODEL_EMAIL_FIELD= 'email'

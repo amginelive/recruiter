@@ -73,8 +73,8 @@
                             {% endfor %}
                         </div>
                         {% if company.owner == request.user %}
-                            <a href="{% url 'dashboard_update_company' %}" class="btn action-btn"><i class="glyphicon glyphicon-briefcase"></i> {% trans 'Update Company Profile' %}</a>
-                            <a href="{% url 'dashboard_invite_users' %}" class="btn action-btn"><i class="glyphicon glyphicon-user"></i> {% trans "Add User" %}</a>
+                            <a href="{% url 'companies:company_update' %}" class="btn action-btn"><i class="glyphicon glyphicon-briefcase"></i> {% trans 'Update Company Profile' %}</a>
+                            <a href="{% url 'companies:company_invite' %}" class="btn action-btn"><i class="glyphicon glyphicon-user"></i> {% trans "Add User" %}</a>
                             <div>
                             <h4>{% trans "Invitation Requests" %}</h4>
                             <div class="invitation-request-row">
@@ -163,7 +163,7 @@
         $.ajax({
             context: this,
             type: 'POST',
-            url: Urls['api_company_invitation_request'](uuid),
+            url: Urls['companies:api_company_invitation_request'](uuid),
             data: {
                 action: action,
             },

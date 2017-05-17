@@ -6,7 +6,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from django.core.files.storage import default_storage
 from libs.tools import resize_image
 from libs.general import COUNTRIES
-from recruit.models import Company
+
 
 # user profile types / roles
 CANDIDATE = 'c'
@@ -242,7 +242,7 @@ class Candidate(ProfileBase):
 # Agent / Employer profile
 class Agent(ProfileBase):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='agent')
-    company = models.ForeignKey(Company, blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_('Company'), related_name='agents')
+    company = models.ForeignKey('companies.Company', blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_('Company'), related_name='agents')
     company_name = models.CharField(blank=True, null=True, max_length=200, verbose_name=_('Company name'), help_text="Company name entered during registration")
     is_charity = models.BooleanField(_("Charity / NPO?"), null=False, default=False)
 

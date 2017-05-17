@@ -21,7 +21,7 @@
                     <div class="row">
                         <div class="col-md-12 profile-update">
                             <h5 style="margin:20px 0px;">{% trans 'Company update' %}</h5>
-                            <form action="{% url 'dashboard_update_company' %}" method="POST" enctype="multipart/form-data">
+                            <form action="{% url 'companies:company_update' %}" method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 {{ form|bootstrap }}
                                 <div class="form-group">

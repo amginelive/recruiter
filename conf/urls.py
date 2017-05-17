@@ -8,17 +8,15 @@ import debug_toolbar
 from django_js_reverse.views import urls_js
 from macrosurl import url
 
-from profileme.views import InviteCompanyUserView
-
 
 urlpatterns = [
     url(r'^jsreverse/$', urls_js, name='js_reverse'),
     url(r'^accounts/', include('allauth.urls')),
 
     url(r'^', include('recruit.urls', namespace='recruit')),
+    url(r'^companies/', include('companies.urls', namespace='companies')),
     url(r'^dashboard/', include('profileme.urls')),
     url(r'^recadmin/', include(admin.site.urls)),
-    url(r'^company-invitation/(?P<invite_key>[0-9A-Za-z]+)$', InviteCompanyUserView.as_view(), name='accept-company-invitation'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

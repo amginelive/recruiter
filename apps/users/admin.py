@@ -2,10 +2,9 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 
-#from authme.models import User
 from django.contrib.auth import get_user_model
 User = get_user_model()
-from authme.forms import UserChangeForm, UserCreationForm
+from users.forms import UserChangeForm, UserCreationForm
 
 
 class UserAdmin(UserAdmin):

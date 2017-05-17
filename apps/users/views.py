@@ -12,7 +12,7 @@ def auth_login(request):
     #activate(lang)
     msg = []
     if request.method == 'POST':
-        # try log in user 
+        # try log in user
         username = request.POST['email']
         password = request.POST['password']
         user = authenticate(username=username, password=password)
@@ -27,21 +27,21 @@ def auth_login(request):
         else:
             # Return an 'invalid login' error message.
             return HttpResponse('O_o, invalid login')
-        
-        
+
+
     else:
-        #return render_to_response('authme/login.html')
-        template = loader.get_template('authme/login.html')
-        context = RequestContext(request, 
+        #return render_to_response('users/login.html')
+        template = loader.get_template('users/login.html')
+        context = RequestContext(request,
             { 'errors':msg }
         )
         return HttpResponse(template.render(context))
-    
+
 def auth_logout(request):
     logout(request)
     return redirect('/login/')
     # Redirect to a success page.
-    
+
 # new user registration
 def auth_register(request):
     """ User sign up form """
@@ -50,12 +50,12 @@ def auth_register(request):
 
         # random username
         form = UserCreationForm(data)
-            
+
         if form.is_valid():
             user = form.save()
             return HttpResponseRedirect('/login/')
     else:
         form = UserCreationForm()
 
-    return render_to_response('authme/register.html', {'form':form},
+    return render_to_response('users/register.html', {'form':form},
                               context_instance=RequestContext(request))

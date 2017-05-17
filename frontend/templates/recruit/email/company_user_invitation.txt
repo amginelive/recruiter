@@ -5,8 +5,8 @@ You received this email because {{ sender_name }} invited
 you to join {{ company }} on SquareBalloon.
 
 To accept invitation please follow a link below:
-http://www.squareballoon.com/company-invitation/{{invite_key}}
-After that you will be able to post job offers and search 
+http://www.squareballoon.com{% url 'companies:company_invite' invite_key %}
+After that you will be able to post job offers and search
 for candidates for {{ company }}
 
 With best regards,

@@ -14,7 +14,7 @@
                             <div class="text-center">
                                 <h5 style="margin:20px 0px;">{% trans 'My Company' %}</h5>
                             </div>
-                            <form action="{% url 'dashboard_company_create' %}" method="POST" enctype="multipart/form-data">
+                            <form action="{% url 'companies:company_create' %}" method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 {{ form|bootstrap }}
                                 <div class="form-group text-center">
