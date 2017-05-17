@@ -1,8 +1,6 @@
-{% extends 'profileme/index.html' %}{% load staticfiles %}{% load i18n %}
+{% extends 'profileme/index.html' %}
 
-{% block head_js %}{{ block.super }}{% endblock %}
-{% block extra_css %}{{ block.super }}{% endblock %}
-{% load bootstrap %}
+{% load staticfiles i18n bootstrap %}
 
 {% block content %}
 <section id="internal-wrap">
@@ -10,55 +8,55 @@
     <section id="account">
         <div class="container">
             <div class="row">
-            	<div class="col-md-7 col-md-offset-1 profile-left">
-            	    <div class="row">
-            			<div class="col-md-4 text-left">
-            				<h4>{{ request.user.get_full_name }}</h4>
-            			</div>
-            			<div class="col-md-8 account-actions">
-            				<a class="btn" href="{% url 'dashboard' %}"><i class="glyphicon glyphicon-eye-open"></i> {% trans 'My profile' %}</a>
-            				<a class="btn" href="{% url 'account_change_password' %}"><i class="glyphicon glyphicon-lock"></i> {% trans 'Change password' %}</a>
-            			</div>
-            		</div>
-            		<div class="row">
-            			<div class="col-md-12 profile-update">
-            				<h5 style="margin:20px 0px;">{% trans 'Profile update' %}</h5>
-	            			<form action="{% url 'dashboard_update_profile' %}" method="POST" enctype="multipart/form-data">
-								{% csrf_token %}
-								{{ form|bootstrap }}
-								<div class="form-group">
-    								<label class="control-label" for="id_company_name">{% trans 'Company' %}</label>
-									<div>
-            							<input name="company_name" value="{% if profile.company %}{{ profile.company.name }}{% else %}No company assigned yet{% endif %}" class="form-control" maxlength="200" id="id_company_name" type="text" readonly>
-            							{% if not profile.company %}
-						                <p class="help-block">
-						                    Company will be assigned to you by our <b>Service Manager</b> based on company name
-						                    you entered during sign up process. If another representative of your company is
-						                    already present in our database, please ask her / him to send you invitation
-						                    from her / his <b>Agent dashboard</b>. In this case your company will be attached to your account
-						                    right after you accept invitation sent by email.
-						                </p>
-						                {% endif %}
-            						</div>
-    							</div>
-								<div class="form-group">
-			      					<button type="submit" class="btn btn-primary btn-lg">{% trans 'Save' %}</button>
-			    				</div>
-							</form>
-            			</div>
-            		</div>
-            	</div>
-            	<div class="col-md-3 profile-right">
-            		<h4>Your company</h4>
-            		{% if not profile.company %}<p>{% trans 'No company attached to account yet' %}</p>{% endif %}
-					<!-- <ul class="profile-steps">
-					  <li><i class="glyphicon glyphicon-check"></i> Registration completed</li>
-					  <li><i class="glyphicon glyphicon-{% if completeness.photo %}check{% else %}remove-sign{% endif %}"></i> Photo uploaded</li>
-					  <li><i class="glyphicon glyphicon-{% if completeness.is_complete %}check{% else %}remove-sign{% endif %}"></i> Complete profile</li>
-					  <li><i class="glyphicon glyphicon-{% if completeness.cv %}check{% else %}remove-sign{% endif %}"></i> CV uploaded</li>
-					</ul>
-					 -->
-				</div>
+                <div class="col-md-7 col-md-offset-1 profile-left">
+                    <div class="row">
+                        <div class="col-md-4 text-left">
+                            <h4>{{ request.user.get_full_name }}</h4>
+                        </div>
+                        <div class="col-md-8 account-actions">
+                            <a class="btn" href="{% url 'dashboard' %}"><i class="glyphicon glyphicon-eye-open"></i> {% trans 'My profile' %}</a>
+                            <a class="btn" href="{% url 'account_change_password' %}"><i class="glyphicon glyphicon-lock"></i> {% trans 'Change password' %}</a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 profile-update">
+                            <h5 style="margin:20px 0px;">{% trans 'Profile update' %}</h5>
+                            <form action="{% url 'dashboard_update_profile' %}" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                {{ form|bootstrap }}
+                                <div class="form-group">
+                                    <label class="control-label" for="id_company_name">{% trans 'Company' %}</label>
+                                    <div>
+                                        <input name="company_name" value="{% if profile.company %}{{ profile.company.name }}{% else %}No company assigned yet{% endif %}" class="form-control" maxlength="200" id="id_company_name" type="text" readonly>
+                                        {% if not profile.company %}
+                                        <p class="help-block">
+                                            Company will be assigned to you by our <b>Service Manager</b> based on company name
+                                            you entered during sign up process. If another representative of your company is
+                                            already present in our database, please ask her / him to send you invitation
+                                            from her / his <b>Agent dashboard</b>. In this case your company will be attached to your account
+                                            right after you accept invitation sent by email.
+                                        </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary btn-lg">{% trans 'Save' %}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 profile-right">
+                    <h4>Your company</h4>
+                    {% if not profile.company %}<p>{% trans 'No company attached to account yet' %}</p>{% endif %}
+                    <!-- <ul class="profile-steps">
+                      <li><i class="glyphicon glyphicon-check"></i> Registration completed</li>
+                      <li><i class="glyphicon glyphicon-{% if completeness.photo %}check{% else %}remove-sign{% endif %}"></i> Photo uploaded</li>
+                      <li><i class="glyphicon glyphicon-{% if completeness.is_complete %}check{% else %}remove-sign{% endif %}"></i> Complete profile</li>
+                      <li><i class="glyphicon glyphicon-{% if completeness.cv %}check{% else %}remove-sign{% endif %}"></i> CV uploaded</li>
+                    </ul>
+                     -->
+                </div>
             </div>
         </div>
     </section>
@@ -67,38 +65,33 @@
 <!-- end new admin content -->
 {% endblock %}
 
-{% block footer %}
-{{ block.super }}
-{% endblock %}
-
-{% block js_bottom %}
-{{ block.super }}
+{% block footer_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script>
-	function updateProfilePhoto(responseText, statusText, xhr, $form){
-		if(responseText['success'] == true){
-			document.getElementById("profile_photo").src = responseText['image'];
-		}
-	}
-	function updateCandidateCV(responseText, statusText, xhr, $form){
-		if(responseText['success'] == true){
-			$('#cv_updated').fadeIn().delay(500).fadeOut();
-			document.getElementById("current_cv").href = responseText['cv'];
-		}else{
-			console.log(responseText);
-		}
-	}
-	$("#cv_upload_btn").on("click", function() {
-		$("#cv_upload").trigger("click");
-	});
-	$("#photo_upload_btn").on("click", function() {
-		$("#photo_upload").trigger("click");
-	});
-	$("#photo_upload").change(function(){
-		$("#photo_upload_form").ajaxSubmit({success:updateProfilePhoto});
-	});
-	$("#cv_upload").change(function(){
-		$("#cv_upload_form").ajaxSubmit({success:updateCandidateCV});
-	});
+    function updateProfilePhoto(responseText, statusText, xhr, $form){
+        if(responseText['success'] == true){
+            document.getElementById("profile_photo").src = responseText['image'];
+        }
+    }
+    function updateCandidateCV(responseText, statusText, xhr, $form){
+        if(responseText['success'] == true){
+            $('#cv_updated').fadeIn().delay(500).fadeOut();
+            document.getElementById("current_cv").href = responseText['cv'];
+        }else{
+            console.log(responseText);
+        }
+    }
+    $("#cv_upload_btn").on("click", function() {
+        $("#cv_upload").trigger("click");
+    });
+    $("#photo_upload_btn").on("click", function() {
+        $("#photo_upload").trigger("click");
+    });
+    $("#photo_upload").change(function(){
+        $("#photo_upload_form").ajaxSubmit({success:updateProfilePhoto});
+    });
+    $("#cv_upload").change(function(){
+        $("#cv_upload_form").ajaxSubmit({success:updateCandidateCV});
+    });
 </script>
 {% endblock %}

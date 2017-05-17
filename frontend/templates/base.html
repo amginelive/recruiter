@@ -1,4 +1,7 @@
-{% load staticfiles %}{% load static from staticfiles %}{% load i18n %}
+{% load staticfiles %}
+
+{% load staticfiles i18n bootstrap %}
+
 <!doctype html>
 <html class="no-js" lang="en">
 <head>
@@ -69,18 +72,18 @@
     {% block content %}{% endblock %}
 
     {% block footer %}
-            <section id="footer">
-                <div class="container center">
-                    <p>&nbsp;</p>
-                    <div class="social">
-                        <a href=""><img src="{% static 'img/social-tw.png' %}"></a>
-                        <a href=""><img src="{% static 'img/social-in.png' %}"></a>
-                        <a href=""><img src="{% static 'img/social-gp.png' %}"></a>
-                        <a href=""><img src="{% static 'img/social-fb.png' %}"></a>
-                    </div>
-                    <p><small>&copy;{% trans "2017 SquareBalloon. All rights reserved." %}</small></p>
+        <section id="footer">
+            <div class="container center">
+                <p>&nbsp;</p>
+                <div class="social">
+                    <a href=""><img src="{% static 'img/social-tw.png' %}"></a>
+                    <a href=""><img src="{% static 'img/social-in.png' %}"></a>
+                    <a href=""><img src="{% static 'img/social-gp.png' %}"></a>
+                    <a href=""><img src="{% static 'img/social-fb.png' %}"></a>
                 </div>
-            </section>
+                <p><small>&copy;{% trans "2017 SquareBalloon. All rights reserved." %}</small></p>
+            </div>
+        </section>
     {% endblock %}
 
 

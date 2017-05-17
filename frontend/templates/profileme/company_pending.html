@@ -1,8 +1,6 @@
-{% extends 'profileme/index.html' %}{% load staticfiles %}{% load i18n %}
+{% extends 'profileme/index.html' %}
 
-{% block head_js %}{{ block.super }}{% endblock %}
-{% block extra_css %}{{ block.super }}{% endblock %}
-{% load bootstrap %}
+{% load staticfiles i18n bootstrap %}
 
 {% block content %}
 <section id="internal-wrap">
@@ -33,8 +31,4 @@
     <!-- end internal block -->
 </section>
 <!-- end new admin content -->
-{% endblock %}
-
-{% block footer %}
-{{ block.super }}
 {% endblock %}

@@ -1,4 +1,6 @@
-{% extends 'hatoteka/index_uk.html' %} {% block 'content' %}
+{% extends 'hatoteka/index_uk.html' %}
+
+{% block 'content' %}
 
 <form action="/register/" method="post">
 	{% csrf_token %} {{ form.non_field_errors }} {% for field in form %}

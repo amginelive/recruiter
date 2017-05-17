@@ -1,11 +1,8 @@
 {% extends "account/base.html" %}
 
-{% load i18n %}
-{% load bootstrap %}
-{% load account %}
+{% load i18n bootstrap account %}
 
 {% block head_title %}{% trans "Registration" %}{% endblock %}
-
 
 {% block inner_content %}
 <div class="container login">
@@ -64,50 +61,4 @@
     </div>
 </div>
 
-
-<!--                     <div class="auth-form text-center">
-                       <form id="signup_form" role="form" method="post" action="{% url 'account_signup' %}">
-                          {% csrf_token %}
-                          {% if redirect_field_value %}
-                          <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-                          {% endif %}
-
-                            <input id="id_confirmation_key" maxlength="40" name="confirmation_key" type="hidden" />
-                            <div class="form-group">
-                                <label class="control-label" for="id_username">{% trans 'Your name' %}</label>
-                                <div>
-                                    <input class="form-control" id="id_username" name="username" placeholder="{% trans 'Your name' %}" type="text" required />
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" for="id_email">{% trans 'E-mail' %}</label>
-                                <div>
-                                    <input class="form-control" id="id_email" name="email" placeholder="{% trans 'E-mail address' %}" type="email" required />
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" for="id_password1">{% trans 'Password' %}</label>
-                                <div>
-                                    <input class=" form-control" id="id_password1" name="password1" placeholder="{% trans 'Password' %}" type="password" required />
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" for="id_password2">{% trans 'Password (again)' %}</label>
-                                <div>
-                                    <input class="form-control" id="id_password2" name="password2" placeholder="{% trans 'Password (again)' %}" type="password" required />
-                                </div>
-                            </div>
-                          <div class="row" style="padding-top:15px;">
-                            <div class="col-lg-6 text-center">
-                                <p style="color:#9e9e9e">{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">log in</a>.{% endblocktrans %}</a>
-                                {% block help_text %}
-                                {% endblock help_text %}
-                                </p>
-                            </div>
-                            <div class="col-lg-6 text-center">
-                                <button type="submit" class="btn btn-default" style="background-color:#3498db !important; border:3px solid #3498db; padding:8px 25px !important; width:100%; padding:15px; font-weight:bold; font-size:16px; color:#fff;">{% trans "Sign Up" %}</button>
-                            </div>
-                          </div>
-                        </form>
-                    </div> -->
 {% endblock %}

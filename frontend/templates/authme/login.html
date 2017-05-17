@@ -1,5 +1,6 @@
-{% extends 'hatoteka/index_uk.html' %} {% block 'content' %}
+{% extends 'hatoteka/index_uk.html' %}
 
+{% block 'content' %}
 <form action="/login/" method="post">
 	Login:&nbsp; <input type="text" name="email">{% csrf_token %} <br />
 	Password:&nbsp; <input type="password" name="password"> <input

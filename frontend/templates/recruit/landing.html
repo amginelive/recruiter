@@ -1,30 +1,18 @@
-{% extends 'profileme/index.html' %}{% load staticfiles %}{% load i18n %}
+{% extends 'profileme/index.html' %}
 
-{% block head_js %}{{ block.super }}{% endblock %}
-{% block extra_css %}{{ block.super }}{% endblock %}
+{% load staticfiles i18n %}
 
 {% block content %}
 <section id="internal-wrap">
     <!-- internal block -->
         <div class="container">
             <div class="row">
-            	<div class="col-md-10 col-md-offset-1 text-center" style="padding-top:100px;">
-					<h1>Hiring made easy with SquareBalloon</h1>
-				</div>
+                <div class="col-md-10 col-md-offset-1 text-center" style="padding-top:100px;">
+                    <h1>Hiring made easy with SquareBalloon</h1>
+                </div>
             </div>
         </div>
     <!-- end internal block -->
 </section>
 <!-- end new admin content -->
-{% endblock %}
-
-{% block footer %}
-{{ block.super }}
-{% endblock %}
-
-{% block js_bottom %}
-{{ block.super }}
-<script>
-
-</script>
 {% endblock %}
