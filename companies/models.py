@@ -18,13 +18,12 @@ from libs.tools import resize_image, random_string_gen
 
 class Company(AbstractTimeStampedModel):
 
-    ACTIVE = 0
-    INACTIVE = 1
-    MODERATION = 2
+    STATUS_ACTIVE = 0
+    STATUS_INACTIVE = 1
 
     STATUS_CHOICES = (
-        (ACTIVE, 'active'),
-        (INACTIVE, 'inactive'),
+        (STATUS_ACTIVE, 'active'),
+        (STATUS_INACTIVE, 'inactive'),
     )
 
     id = models.AutoField(primary_key=True)
@@ -54,12 +53,16 @@ class Company(AbstractTimeStampedModel):
     reg_date = models.DateTimeField(auto_now_add=True, editable=False)
     update_date = models.DateTimeField(auto_now=True, editable=False)
     allow_auto_invite = models.BooleanField(_("Allow auto invite?"), default=False)
-    status = models.IntegerField(_("Status"), choices=STATUS_CHOICES, default=ACTIVE)
+    status = models.IntegerField(_("Status"), choices=STATUS_CHOICES, default=STATUS_ACTIVE)
 
     index_together = [
         ["alias", "status"],
         ["name", "status"],
     ]
+
+    class Meta:
+        verbose_name = _('Company')
+        verbose_name_plural = _('Companies')
 
     def get_absolute_url(self):
         return '/company/%s' % self.id
@@ -205,6 +208,10 @@ class CompanyInvitation(AbstractTimeStampedModel):
         ["sent_by", "is_accepted"],
     ]
 
+    class Meta:
+        verbose_name = _('Company Invitation')
+        verbose_name_plural = _('Company Invitations')
+
     def __str__(self):
         return '%s %s' % (self.sent_by, self.sent_to)
 
@@ -224,6 +231,10 @@ class CompanyRequestInvitation(AbstractTimeStampedModel):
     user = models.ForeignKey('users.User', blank=True, null=True, related_name='invitation_request')
     company = models.ForeignKey(Company, related_name='invitation_request')
     uuid = models.UUIDField(_('Request Invitation key'), default=uuid.uuid4, editable=False)
+
+    class Meta:
+        verbose_name = _('Company Request Invitation')
+        verbose_name_plural = _('Company Request Invitations')
 
     def __str__(self):
         return self.user.get_full_name()

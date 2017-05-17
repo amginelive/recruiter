@@ -127,11 +127,11 @@ class CompanyCreateView(CreateView):
     template_name = 'profileme/company_create.html'
 
     def get_success_url(self):
-        return reverse_lazy('dashboard')
+        return reverse_lazy('users:dashboard')
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.agent and request.user.agent.company:
-            return HttpResponseRedirect(reverse_lazy('dashboard'))
+            return HttpResponseRedirect(reverse_lazy('users:dashboard'))
         return super(CompanyCreateView, self).dispatch(request, *args, **kwargs)
 
     def get_initial(self):
@@ -148,7 +148,7 @@ class CompanyPendingView(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.agent and request.user.agent.company:
-            return HttpResponseRedirect(reverse_lazy('dashboard'))
+            return HttpResponseRedirect(reverse_lazy('users:dashboard'))
         return super(CompanyPendingView, self).dispatch(request, *args, **kwargs)
 
 company_pending = CompanyPendingView.as_view()

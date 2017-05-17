@@ -1,12 +1,15 @@
+from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
-User = get_user_model()
-from django import forms
-from slugify import slugify_url
-from libs.general import COUNTRIES
-from profileme.models import Candidate, Agent
+
 from phonenumber_field.formfields import PhoneNumberField
+from slugify import slugify_url
+
+from .models import Candidate, Agent
+
+
+User = get_user_model()
 
 
 class UserCreationForm(UserCreationForm):
@@ -76,3 +79,38 @@ class CustomSignupForm(forms.Form):
             Candidate.objects.create(**data)
         elif user.registered_as == 'a':
             Agent.objects.create(**data)
+
+
+class CandidateUpdateForm(forms.ModelForm):
+
+    class Meta:
+        model = Candidate
+        exclude = ['user', 'date_updated', 'status', 'photo', 'cv']
+
+
+class AgentUpdateForm(forms.ModelForm):
+
+    class Meta:
+        model = Agent
+        exclude = ['user', 'date_updated', 'status', 'photo', 'company']
+
+
+class CandidatePhotoUploadForm(forms.ModelForm):
+
+    class Meta:
+        model = Candidate
+        fields = ['photo',]
+
+
+class CandidateCVUploadForm(forms.ModelForm):
+
+    class Meta:
+        model = Candidate
+        fields = ['cv',]
+
+
+class AgentPhotoUploadForm(forms.ModelForm):
+
+    class Meta:
+        model = Agent
+        fields = ['photo',]

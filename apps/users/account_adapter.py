@@ -1,15 +1,17 @@
+import logging
+
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.shortcuts import redirect
+
+from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.models import EmailAddress
 from allauth.exceptions import ImmediateHttpResponse
-from django.shortcuts import redirect
-from django.contrib import messages
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
-from allauth.account.adapter import DefaultAccountAdapter
 
-from django.contrib.auth import get_user_model
+
+logger = logging.getLogger('console_log')
 User = get_user_model()
-
-import logging
-lgr = logging.getLogger('console_log')
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
@@ -42,25 +44,25 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         # Note: __iexact is used to ignore cases
         ##email_in_db = False  # flag shows email is present in DB
         email = sociallogin.account.extra_data['email'].lower()
-        lgr.info("EMAIL_1: {}".format(email))
+        logger.info("EMAIL_1: {}".format(email))
         try:
             email_address = EmailAddress.objects.get(email__iexact=email)
             email_in_db = True
         # if it does not, let allauth take care of this new social account
         except EmailAddress.DoesNotExist:
-            lgr.info("EmailAddress DoesNotExist")
+            logger.info("EmailAddress DoesNotExist")
             return
             ## pass
 
         # check if email exists in user table, if email found nowhere - ignore
 #         if (email_in_db is False and
 #                 User.objects.filter(email__iexact=email).exists() is False):
-#             lgr.info("EMAIL_IN_DB: {} EMAIL_IN_USER: {}".format(email_in_db, User.objects.filter(email__iexact=email).exists()))
+#             logger.info("EMAIL_IN_DB: {} EMAIL_IN_USER: {}".format(email_in_db, User.objects.filter(email__iexact=email).exists()))
 #             return
 
         # if it does, bounce back to the login page
         account = User.objects.get(email=email).socialaccount_set.first()
-        lgr.info("ACCOUNT: " + str(account))
+        logger.info("ACCOUNT: " + str(account))
         if account:
             provider_name = account.provider.capitalize()
         else:

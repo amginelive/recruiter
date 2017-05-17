@@ -49,7 +49,7 @@
                                 {% trans "Your account" %} <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="account">
-                                <li><a href="{% url 'dashboard' %}">{% trans "Settings" %}</a></li>
+                                <li><a href="{% url 'users:dashboard' %}">{% trans "Settings" %}</a></li>
                                 <li class="divider"></li>
                                 <li>
                                     <a href="{% url 'account_logout' %}">{% trans "Logout" %}</a>

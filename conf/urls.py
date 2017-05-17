@@ -12,11 +12,11 @@ from macrosurl import url
 urlpatterns = [
     url(r'^jsreverse/$', urls_js, name='js_reverse'),
     url(r'^accounts/', include('allauth.urls')),
+    url(r'^recadmin/', include(admin.site.urls)),
 
     url(r'^', include('recruit.urls', namespace='recruit')),
     url(r'^companies/', include('companies.urls', namespace='companies')),
-    url(r'^dashboard/', include('profileme.urls')),
-    url(r'^recadmin/', include(admin.site.urls)),
+    url(r'^users/', include('users.urls', namespace='users')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

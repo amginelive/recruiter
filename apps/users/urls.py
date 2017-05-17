@@ -1,9 +1,10 @@
-from django.conf.urls import patterns, url
+from macrosurl import url
 
 from . import views
 
-urlpatterns = patterns('',
-    url(r'^login/', views.auth_login, name='login'),
-    url(r'^logout/', views.auth_logout, name='logout'),
-    url(r'^register/', views.auth_register, name='register'),
+urlpatterns = (
+    url(r'^$', views.dashboard, name='dashboard'),
+    url(r'^profile/update/$', views.profile_update, name='profile_update'),
+    url(r'^photo/upload/$', views.profile_photo_upload, name='profile_photo_upload'),
+    url(r'^cv/upload/$', views.profile_cv_upload, name='profile_cv_upload'),
 )

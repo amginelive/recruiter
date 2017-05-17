@@ -14,7 +14,7 @@
                             <h4>{{ request.user.get_full_name }}</h4>
                         </div>
                         <div class="col-md-8 account-actions">
-                            <a class="btn" href="{% url 'dashboard_update_profile' %}"><i class="glyphicon glyphicon-edit"></i> Edit profile</a>
+                            <a class="btn" href="{% url 'users:profile_update' %}"><i class="glyphicon glyphicon-edit"></i> Edit profile</a>
                             <a class="btn" href="{% url 'account_change_password' %}"><i class="glyphicon glyphicon-lock"></i> Change password</a>
                         </div>
                     </div>
@@ -22,7 +22,7 @@
                         <div class="col-md-4 text-center">
                             <h5>Photo</h5>
                             <img id="profile_photo" src="{% if profile.photo %}{{ profile.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}">
-                            <form action="{% url 'dashboard_photo_upload' %}" id="photo_upload_form" method="post" role="form" enctype="multipart/form-data">
+                            <form action="{% url 'users:profile_photo_upload' %}" id="photo_upload_form" method="post" role="form" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <input type="file" name="photo" id="photo_upload" style="display:none"/>
                                 <button type="button" class="btn" id="photo_upload_btn" OnClick="javascript:void(0)">{% trans "Update Photo" %}</button>
@@ -64,7 +64,7 @@
                       <li><i class="glyphicon glyphicon-{% if is_complete %}check{% else %}remove-sign{% endif %}"></i> Complete profile</li>
                       <li><i class="glyphicon glyphicon-{% if profile.cv %}check{% else %}remove-sign{% endif %}"></i> CV uploaded</li>
                     </ul>
-                    <form action="{% url 'dashboard_cv_upload' %}" id="cv_upload_form" method="post" role="form" enctype="multipart/form-data">
+                    <form action="{% url 'users:profile_cv_upload' %}" id="cv_upload_form" method="post" role="form" enctype="multipart/form-data">
                         {% csrf_token %}
                         <input type="file" name="cv" id="cv_upload" style="display:none"/>
                         <button type="button" class="btn" id="cv_upload_btn" OnClick="javascript:void(0)">{% trans "Update CV" %}</button>

@@ -1,10 +1,18 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 
-from django.contrib.auth import get_user_model
+from .forms import (
+    UserChangeForm,
+    UserCreationForm
+)
+from .models import (
+    Candidate,
+    Agent,
+)
+
 User = get_user_model()
-from users.forms import UserChangeForm, UserCreationForm
 
 
 class UserAdmin(UserAdmin):
@@ -31,4 +39,7 @@ class UserAdmin(UserAdmin):
     search_fields = ('email', 'firstname', 'lastname')
     ordering = ('email', 'last_login', 'date_joined')
 
+
+admin.site.register(Agent)
+admin.site.register(Candidate)
 admin.site.register(User, UserAdmin)

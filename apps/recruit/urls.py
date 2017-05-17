@@ -1,6 +1,6 @@
 from macrosurl import url
 
-from recruit import views
+from . import views
 
 
 urlpatterns = (

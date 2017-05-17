@@ -17,7 +17,7 @@ from braces.views import LoginRequiredMixin
 
 from .models import JobPost
 from .forms import JobPostForm
-from profileme.models import Candidate
+from users.models import Candidate
 
 
 User = get_user_model()

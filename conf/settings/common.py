@@ -60,9 +60,8 @@ INSTALLED_APPS = (
     'phonenumber_field',
 
     'companies',
-    'profileme',
-    'users',
     'recruit',
+    'users',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -227,7 +226,7 @@ CACHES = {
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
-LOGIN_REDIRECT_URL = '/dashboard/'
+LOGIN_REDIRECT_URL = '/users/'
 #ACCOUNT_ADAPTER = 'users.account_adapter.NoNewUsersAccountAdapter'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
@@ -236,7 +235,7 @@ ACCOUNT_SIGNUP_PASSWORD_VERIFICATION = True
 ACCOUNT_SIGNUP_FORM_CLASS = 'users.forms.CustomSignupForm'
 ACCOUNT_LOGOUT_ON_GET = True  # don't ask on sign out
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'optional'
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 SOCIALACCOUNT_EMAIL_REQUIRED = False
 #SOCIALACCOUNT_ADAPTER = 'users.account_adapter.CustomSocialAccountAdapter'
 ACCOUNT_ADAPTER = 'users.account_adapter.CustomAccountAdapter'

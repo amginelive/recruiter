@@ -14,14 +14,14 @@
                             <h4>{{ request.user.get_full_name }}</h4>
                         </div>
                         <div class="col-md-8 account-actions">
-                            <a class="btn" href="{% url 'dashboard' %}"><i class="glyphicon glyphicon-eye-open"></i> {% trans 'My profile' %}</a>
+                            <a class="btn" href="{% url 'users:dashboard' %}"><i class="glyphicon glyphicon-eye-open"></i> {% trans 'My profile' %}</a>
                             <a class="btn" href="{% url 'account_change_password' %}"><i class="glyphicon glyphicon-lock"></i> {% trans 'Change password' %}</a>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12 profile-update">
                             <h5 style="margin:20px 0px;">{% trans 'Profile update' %}</h5>
-                            <form action="{% url 'dashboard_update_profile' %}" method="POST" enctype="multipart/form-data">
+                            <form action="{% url 'users:profile_update' %}" method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 {{ form|bootstrap }}
                                 <div class="form-group">
