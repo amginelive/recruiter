@@ -19,6 +19,7 @@ from .models import JobPost
 from .forms import JobPostForm
 from profileme.models import Candidate
 
+
 User = get_user_model()
 
 
@@ -67,7 +68,7 @@ class JobPostCreateView(CreateView, LoginRequiredMixin):
     model = JobPost
     form_class = JobPostForm
     template_name = 'recruit/job_posts/create_update.html'
-    success_url = reverse_lazy('job_post_list')
+    success_url = reverse_lazy('recruit:job_post_list')
 
     def get_initial(self):
         return {'company': self.request.user.agent.company}
@@ -83,7 +84,7 @@ class JobPostUpdateView(UpdateView, LoginRequiredMixin):
     context_object_name = 'job_post'
     form_class = JobPostForm
     template_name = 'recruit/job_posts/create_update.html'
-    success_url = reverse_lazy('job_post_list')
+    success_url = reverse_lazy('recruit:job_post_list')
 
     def get_object(self):
         return JobPost.objects.get(uuid=self.kwargs.get('uuid'))
@@ -98,7 +99,7 @@ class JobPostDeleteView(DeleteView, LoginRequiredMixin):
     model = JobPost
     context_object_name = 'job_post'
     template_name = 'recruit/job_posts/delete.html'
-    success_url = reverse_lazy('job_post_list')
+    success_url = reverse_lazy('recruit:job_post_list')
 
     def get_object(self):
         return JobPost.objects.get(uuid=self.kwargs.get('uuid'))

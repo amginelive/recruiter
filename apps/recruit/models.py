@@ -293,4 +293,3 @@ def post_save_invitation(sender, instance, created, **kwargs):
         del msg_html
 
 post_save.connect(post_save_invitation, sender=CompanyInvitation)
-
