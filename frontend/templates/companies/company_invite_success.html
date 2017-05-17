@@ -1,4 +1,4 @@
-{% extends 'profileme/index.html' %}
+{% extends 'users/index.html' %}
 
 {% load staticfiles i18n bootstrap %}
 
@@ -22,7 +22,7 @@
             <div class="row pending-text">
                 <div class="col-md-8 col-md-offset-2">
                     <div class="row">
-                        <h4>You have been added to the company account, {{ company.name }}. <a href="{% url 'users:dashboard' %}">Click here to continue.</a></h4>
+                        <h4>You have been added to the company account, {{ company.name }}. <a href="{% url 'recruit:dashboard' %}">Click here to continue.</a></h4>
                     </div>
                 </div>
             </div>

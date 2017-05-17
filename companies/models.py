@@ -16,8 +16,16 @@ from libs.general import COUNTRIES
 from libs.tools import resize_image, random_string_gen
 
 
-class Company(AbstractTimeStampedModel):
+optional = {
+    'blank': True,
+    'null': True,
+}
 
+
+class Company(AbstractTimeStampedModel):
+    """
+    Model for Company.
+    """
     STATUS_ACTIVE = 0
     STATUS_INACTIVE = 1
 
@@ -26,8 +34,7 @@ class Company(AbstractTimeStampedModel):
         (STATUS_INACTIVE, 'inactive'),
     )
 
-    id = models.AutoField(primary_key=True)
-    owner = models.ForeignKey('users.User', blank=True, null=True, on_delete=models.SET_NULL, verbose_name=_('Major company representative'))
+    owner = models.ForeignKey('users.User', on_delete=models.SET_NULL, verbose_name=_('Major company representative'), **optional)
     name = models.CharField(max_length=200, verbose_name=_('Company name'))
     domain = models.CharField(
         _('Domain name'),
@@ -35,29 +42,28 @@ class Company(AbstractTimeStampedModel):
         unique=True,
         help_text='If your email is john@squareballoon.com, your domain name will be squareballon.com.'
     )
-    overview = models.CharField(blank=True, null=True, max_length=255, verbose_name=_("Company's short title or short 'about' text"))
-    alias = models.SlugField(max_length=120, verbose_name='Alias / slug')
-    description = models.TextField(blank=True, null=True, max_length=4000)
-    logo = models.FileField(upload_to='images/company/logo/%Y', max_length=100, editable=True, blank=True, null=True, help_text=_('Logo size 600x200px, .jpg, .png, .gif formats'))
-    address_1 = models.CharField(blank=True, null=True, max_length=80, verbose_name=_('Address line') + ' 1')
-    address_2 = models.CharField(blank=True, null=True, max_length=80, verbose_name=_('Address line') + ' 2')
-    zip = models.CharField(blank=True, null=True, max_length=10, verbose_name=_('Postal code / ZIP'))
-    city = models.CharField(max_length=80)
-    country = models.CharField('Country',
-                               max_length=2,
-                               choices=COUNTRIES,
-                               blank=False,
-                               null=False)
-    website = models.URLField(blank=True, null=True)
-    is_charity = models.BooleanField(_("Is it a charity organization?"), null=False, default=False)
-    reg_date = models.DateTimeField(auto_now_add=True, editable=False)
-    update_date = models.DateTimeField(auto_now=True, editable=False)
-    allow_auto_invite = models.BooleanField(_("Allow auto invite?"), default=False)
-    status = models.IntegerField(_("Status"), choices=STATUS_CHOICES, default=STATUS_ACTIVE)
+    overview = models.CharField(_('Overview'), max_length=255, **optional)
+    alias = models.SlugField(_('Alias/Slug'), max_length=120)
+    description = models.TextField(_('Description'), **optional)
+    logo = models.ImageField(
+        _('Logo'),
+        upload_to='images/company/logo/%Y',
+        help_text=_('Logo size 600x200px, .jpg, .png, .gif formats'),
+        **optional
+    )
+    address_1 = models.CharField(_('Address line 1'), max_length=80, **optional)
+    address_2 = models.CharField(_('Address line 2'), max_length=80, **optional)
+    zip = models.CharField(_('Postal code / ZIP'), max_length=10, **optional)
+    city = models.CharField(_('City'), max_length=80)
+    country = models.CharField(_('Country'), max_length=2, choices=COUNTRIES)
+    website = models.URLField(_('Website'), **optional)
+    is_charity = models.BooleanField(_('Is it a charity organization?'), default=False)
+    allow_auto_invite = models.BooleanField(_('Allow auto invite?'), default=False)
+    status = models.IntegerField(_('Status'), choices=STATUS_CHOICES, default=STATUS_ACTIVE)
 
     index_together = [
-        ["alias", "status"],
-        ["name", "status"],
+        ['alias', 'status'],
+        ['name', 'status'],
     ]
 
     class Meta:
@@ -191,22 +197,15 @@ class Company(AbstractTimeStampedModel):
         super(Company, self).save(*args, **kwargs)
 
 
-# Invitations company to its agents
 class CompanyInvitation(AbstractTimeStampedModel):
-
-    id = models.AutoField(primary_key=True)
-    sent_by = models.ForeignKey('users.User', blank=True, null=True, on_delete=models.CASCADE, related_name='+')
-    sent_to = models.EmailField(_('Email of recipient'), blank=False, null=False)
-    sent_to_user = models.ForeignKey('users.User', blank=True, null=True, on_delete=models.CASCADE, related_name='+')
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='+')
-    invite_key = models.CharField(_('Invitation key'), max_length=30, null=False, unique=True)
-    sent_date = models.DateTimeField(auto_now_add=True, editable=False)
-    accepted_date = models.DateTimeField(editable=False, null=True, blank=True)
-    is_accepted = models.BooleanField(_('Accepted by receiver?'), default=False)
-
-    index_together = [
-        ["sent_by", "is_accepted"],
-    ]
+    """
+    Model for Company Invitation.
+    """
+    sent_by = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='+', verbose_name=_('Sent By'), **optional)
+    sent_to = models.EmailField(_('Email of recipient'))
+    sent_to_user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='+', verbose_name=_('Sent To'), **optional)
+    company = models.ForeignKey('companies.Company', on_delete=models.CASCADE, related_name='+', verbose_name=_('Company'))
+    invite_key = models.CharField(_('Invitation key'), max_length=30, unique=True)
 
     class Meta:
         verbose_name = _('Company Invitation')
@@ -227,9 +226,11 @@ class CompanyInvitation(AbstractTimeStampedModel):
 
 
 class CompanyRequestInvitation(AbstractTimeStampedModel):
-
-    user = models.ForeignKey('users.User', blank=True, null=True, related_name='invitation_request')
-    company = models.ForeignKey(Company, related_name='invitation_request')
+    """
+    Model for Company Request Invitations.
+    """
+    user = models.ForeignKey('users.User', related_name='invitation_request', verbose_name=('User'))
+    company = models.ForeignKey('companies.Company', related_name='invitation_request', verbose_name=('Company'))
     uuid = models.UUIDField(_('Request Invitation key'), default=uuid.uuid4, editable=False)
 
     class Meta:
@@ -241,18 +242,28 @@ class CompanyRequestInvitation(AbstractTimeStampedModel):
 
 
 def post_save_invitation(sender, instance, created, **kwargs):
-
+    """
+    Signal for sending an email invitation.
+    """
     if created and instance.sent_to:
-        msg_plain = render_to_string('recruit/email/company_user_invitation.txt',
-                                     {'sender_name': instance.sent_by.get_full_name,
-                                      'invite_key': instance.invite_key,
-                                      'company': instance.sent_by.agent.company.name})
-        msg_html = render_to_string('recruit/email/company_user_invitation.html',
-                                    {'sender_name': instance.sent_by.get_full_name,
-                                     'invite_key': instance.invite_key,
-                                     'company': instance.sent_by.agent.company.name})
+        msg_plain = render_to_string(
+            'companies/email/company_invitation.txt',
+            {
+                'sender_name': instance.sent_by.get_full_name,
+                'invite_key': instance.invite_key,
+                'company': instance.sent_by.agent.company.name
+            }
+        )
+        msg_html = render_to_string(
+            'companies/email/company_invitation.html',
+            {
+                'sender_name': instance.sent_by.get_full_name,
+                'invite_key': instance.invite_key,
+                'company': instance.sent_by.agent.company.name
+            }
+        )
         send_mail(
-            _('Recruiter invitation, SquareBalloon'),
+            _('Recruiter Invitation, SquareBalloon'),
             msg_plain,
             settings.NOREPLY_EMAIL,
             [instance.sent_to,],

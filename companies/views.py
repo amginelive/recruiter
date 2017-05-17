@@ -29,7 +29,7 @@ class CompanyUpdateView(View):
     """
     View for updating the company.
     """
-    template_name = 'profileme/company_update.html'
+    template_name = 'companies/company_update.html'
 
     def get(self, request, **kwargs):
         form = []
@@ -78,7 +78,7 @@ class CompanyInviteView(View):
     """
     View for inviting user to the company.
     """
-    template_name = 'profileme/invite_users.html'
+    template_name = 'companies/company_invite.html'
 
     def get(self, request, **kwargs):
         completeness = []
@@ -100,9 +100,10 @@ class CompanyInviteView(View):
             # create invitation
             if form.is_valid():
                 invitation = CompanyInvitation.objects.create(
-                    sent_to = form.cleaned_data['email'],
-                    sent_by = request.user,
-                    company = request.user.agent.company)
+                    sent_to=form.cleaned_data['email'],
+                    sent_by=request.user,
+                    company=request.user.agent.company
+                )
                 if invitation.pk > 0:
                     success = True
 
@@ -124,14 +125,14 @@ class CompanyCreateView(CreateView):
     """
     model = Company
     form_class = CompanyForm
-    template_name = 'profileme/company_create.html'
+    template_name = 'companies/company_create.html'
 
     def get_success_url(self):
-        return reverse_lazy('users:dashboard')
+        return reverse_lazy('recruit:dashboard')
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.agent and request.user.agent.company:
-            return HttpResponseRedirect(reverse_lazy('users:dashboard'))
+            return HttpResponseRedirect(reverse_lazy('recruit:dashboard'))
         return super(CompanyCreateView, self).dispatch(request, *args, **kwargs)
 
     def get_initial(self):
@@ -144,11 +145,11 @@ class CompanyPendingView(TemplateView):
     """
     View for requesting an invitation to a company.
     """
-    template_name = 'profileme/company_pending.html'
+    template_name = 'companies/company_pending.html'
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.agent and request.user.agent.company:
-            return HttpResponseRedirect(reverse_lazy('users:dashboard'))
+            return HttpResponseRedirect(reverse_lazy('recruit:dashboard'))
         return super(CompanyPendingView, self).dispatch(request, *args, **kwargs)
 
 company_pending = CompanyPendingView.as_view()
@@ -181,7 +182,7 @@ class CompanyInviteSuccessView(DetailView):
     View for the success page when successfully invited to a company.
     """
     model = Company
-    template_name = 'profileme/company_invite_success.html'
+    template_name = 'companies/company_invite_success.html'
 
     def get_object(self):
         return self.request.user.agent.company

@@ -1,4 +1,4 @@
-{% extends 'profileme/index.html' %}
+{% extends 'users/index.html' %}
 
 {% load staticfiles i18n bootstrap %}
 
@@ -11,27 +11,28 @@
                 <div class="col-md-7 col-md-offset-1 profile-left">
                     <div class="row">
                         <div class="col-md-4 text-left">
-                            <h4>{{ request.user.get_full_name }}</h4>
+                            <h4>{{ request.user.agent.company.name }}</h4>
                         </div>
                         <div class="col-md-8 account-actions">
-                            <a class="btn" href="{% url 'users:dashboard' %}"><i class="glyphicon glyphicon-eye-open"></i> {% trans 'My profile' %}</a>
+                            <a class="btn" href="{% url 'recruit:dashboard' %}"><i class="glyphicon glyphicon-eye-open"></i> {% trans 'My profile' %}</a>
                             <a class="btn" href="{% url 'account_change_password' %}"><i class="glyphicon glyphicon-lock"></i> {% trans 'Change password' %}</a>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12 profile-update">
-                            <h5 style="margin:20px 0px;">{% trans 'Company update' %}</h5>
-                            <form action="{% url 'companies:company_update' %}" method="POST" enctype="multipart/form-data">
+                            <h5 style="margin:20px 0px;">{% trans 'Invite user by email' %}</h5>
+                            <form action="{% url 'companies:company_invite' %}" method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
-                                {{ form|bootstrap }}
+                                <input type="email" name="email" placeholder="E-mail">
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-primary btn-lg">{% trans 'Save' %}</button>
+                                    <button type="submit" class="btn btn-primary btn-lg">{% trans 'Send invitation' %}</button>
                                 </div>
+                                {% if success %}<div class="label label-success updated">{% trans 'Invitation sent' %}</div>{% endif %}
                             </form>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 profile-right">
+                <!-- <div class="col-md-3 profile-right">
                     <h4>{% trans 'Your company' %}</h4>
                     {% if company %}
                     {% if company.logo %}<img src="{{ company.logo.url }}" style="width:100%; margin-bottom:10px;">{% endif %}
@@ -49,7 +50,7 @@
                         <span>Main contact: {{ company.owner.get_full_name }}</span>
                     </div>
                     {% endif %}
-                </div>
+                </div> -->
             </div>
         </div>
     </section>

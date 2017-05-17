@@ -1,15 +1,30 @@
+import datetime
 import logging
 
 from django.db import models
+from django.conf import settings
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    PermissionsMixin,
+    BaseUserManager,
+)
+from django.core.files.storage import default_storage
 from django.core.mail import send_mail
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from libs.tools import random_string_gen
+from phonenumber_field.modelfields import PhoneNumberField
+
+from core.models import AbstractTimeStampedModel
+from libs.tools import random_string_gen, resize_image
+from libs.general import COUNTRIES
 
 
 logger = logging.getLogger('console_log')
+optional = {
+    'blank': True,
+    'null': True,
+}
 
 
 class UserManager(BaseUserManager):
@@ -17,20 +32,26 @@ class UserManager(BaseUserManager):
     Model for a Custom user Manager
     """
 
-    def _create_user(self, email, firstname, lastname, password,
-                     is_staff, is_superuser, **extra_fields):
+    def _create_user(self, email, firstname, lastname, password, is_staff, is_superuser, **extra_fields):
         """
-        Creates and saves a User with the given email and password.l
+        Creates and saves a User with the given email and password.
         """
         now = timezone.now()
         if not email:
             raise ValueError('Email must be set')
 
         email = self.normalize_email(email)
-        user = self.model(email=email, firstname=firstname, lastname=lastname,
-                          is_staff=is_staff, is_active=True,
-                          is_superuser=is_superuser, last_login=now,
-                          date_joined=now, **extra_fields)
+        user = self.model(
+            email=email,
+            firstname=firstname,
+            lastname=lastname,
+            is_staff=is_staff,
+            is_active=True,
+            is_superuser=is_superuser,
+            last_login=now,
+            date_joined=now,
+            **extra_fields
+        )
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -58,21 +79,30 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
 
     email = models.EmailField(_('email address'), max_length=254, unique=True)
-    firstname = models.CharField(_('First name'), max_length=30, blank=False, null=False)
-    lastname = models.CharField(_('Last name'), max_length=30, blank=False, null=False)
-    slug = models.SlugField(_('Alias / slug'), blank=True, null=False, unique=False)
-    is_staff = models.BooleanField(_('staff status'), default=False,
-                                   help_text=('Designates whether the user can log into this admin site.'))
-    is_active = models.BooleanField(_('active'), default=True,
-                                    help_text=('Designates whether this user should be treated as '
-                                               'active. Unselect this instead of deleting accounts.'))
+    firstname = models.CharField(_('First name'), max_length=30)
+    lastname = models.CharField(_('Last name'), max_length=30)
+    slug = models.SlugField(_('Alias/Slug'), **optional)
+    is_staff = models.BooleanField(
+        _('staff status'),
+        default=False,
+        help_text=_('Designates whether the user can log into this admin site.')
+    )
+    is_active = models.BooleanField(
+        _('active'),
+        default=True,
+        help_text=('Designates whether this user should be treated as '
+                   'active. Unselect this instead of deleting accounts.')
+    )
     get_ads = models.BooleanField(_('Receive ads by email?'), default=True)
-    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-    registered_as = models.CharField(max_length=1,
-                                     choices=ACC_CHOICES,
-                                     default=CANDIDATE,
-                                     editable=True,
-                                     help_text='User role selected during registration')
+    date_joined = models.DateTimeField(_('Date Joined'), default=timezone.now)
+    registered_as = models.CharField(
+        _('Registered As'),
+        max_length=1,
+        choices=ACC_CHOICES,
+        default=CANDIDATE,
+        editable=True,
+        help_text='User role selected during registration'
+    )
 
     objects = UserManager()
 
@@ -123,26 +153,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         super(User, self).save(*args, **kwargs)
 
 
-import datetime
-
-from django.core.files.storage import default_storage
-from django.db import models
-from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
-
-from phonenumber_field.modelfields import PhoneNumberField
-
-from core.models import AbstractTimeStampedModel
-from libs.tools import resize_image
-from libs.general import COUNTRIES
-
-
-optional = {
-    'blank': True,
-    'null': True,
-}
-
-
 class ProfileBase(AbstractTimeStampedModel):
     """
     Abstract model for Profile.
@@ -158,7 +168,7 @@ class ProfileBase(AbstractTimeStampedModel):
         (STATUS_MODERATION, _('Moderation'))
     )
 
-    phone = PhoneNumberField(_('Photo'), blank=True, null=True)
+    phone = PhoneNumberField(_('Photo'), **optional)
     photo = models.ImageField(_('Photo'), upload_to='images/photo/%Y/', help_text="200x200px", **optional)
     status = models.IntegerField(_('Status'), choices=STATUS_CHOICES, default=STATUS_ACTIVE)
 
@@ -219,7 +229,7 @@ class ProfileBase(AbstractTimeStampedModel):
             # content type name will be used as a reference for alias,
             # please make sure you don't have duplicates or overlaps.
             # format for config "{app_label}_{model}"
-            content_name = "{}_{}".format('profileme', self.__class__.__name__.lower())
+            content_name = "{}_{}".format('users', self.__class__.__name__.lower())
             # TODO: make alias the same as content_type.model
             filename, file = resize_image(self.photo, settings.THUMBNAIL_ALIASES[content_name]['photo'])
             self.photo.save(filename, file, save=False)
@@ -348,7 +358,13 @@ class Agent(ProfileBase):
     Model for Agent.
     """
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='agent')
-    company = models.ForeignKey('companies.Company', on_delete=models.SET_NULL, verbose_name=_('Company'), related_name='agents', **optional)
+    company = models.ForeignKey(
+        'companies.Company',
+        on_delete=models.SET_NULL,
+        verbose_name=_('Company'),
+        related_name='agents',
+        **optional
+    )
 
     class Meta:
         verbose_name = _('Agent')

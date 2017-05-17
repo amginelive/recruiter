@@ -9,8 +9,10 @@ from libs.general import COUNTRIES
 
 
 class JobPost(AbstractTimeStampedModel):
-
-    company = models.ForeignKey('companies.Company', related_name='job_posts')
+    """
+    Model for Job Post.
+    """
+    company = models.ForeignKey('companies.Company', related_name='job_posts', verbose_name=('Company'))
     title = models.CharField(_('Title'), max_length=255)
     description = models.TextField(_('Description'))
     contract = models.TextField(_('Contract'))
@@ -28,7 +30,9 @@ class JobPost(AbstractTimeStampedModel):
 
 
 class Skill(AbstractTimeStampedModel):
-
+    """
+    Model for Skill.
+    """
     name = models.CharField(_('Name'), max_length=100)
 
     class Meta:
