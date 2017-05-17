@@ -19,6 +19,7 @@
                             <form action="" method="POST">
                                 {% csrf_token %}
                                 {{ form|bootstrap }}
+
                                 <div class="form-group text-center">
                                     <button type="submit" class="btn btn-primary btn-lg">{% trans 'Save' %}</button>
                                 </div>
@@ -34,6 +35,10 @@
 <!-- end new admin content -->
 {% endblock %}
 
-{% block footer %}
-{{ block.super }}
-{% endblock %}
+{% block footer_js %}
+<script type="text/javascript">
+    $("#id_skills").select2({
+        tags: true,
+    })
+</script>
+{% endblock footer_js %}

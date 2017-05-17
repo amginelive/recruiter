@@ -80,7 +80,7 @@ class JobPostUpdateView(UpdateView, LoginRequiredMixin):
     View for updating a job post.
     """
     model = JobPost
-    context_object_name = 'job_posts'
+    context_object_name = 'job_post'
     form_class = JobPostForm
     template_name = 'recruit/job_posts/create_update.html'
     success_url = reverse_lazy('job_post_list')
