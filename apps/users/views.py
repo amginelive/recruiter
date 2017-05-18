@@ -1,8 +1,6 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.utils.decorators import method_decorator
 from django.views.generic import (
     View,
 )
@@ -16,32 +14,10 @@ from .forms import (
     CandidatePhotoUploadForm,
     CandidateUpdateForm,
 )
+from .utils import get_profile_completeness
 
 
 User = get_user_model()
-
-
-def get_profile_completeness(profile):
-    ''' Calculates candidate profile completeness and
-        returns data to display progress bar, etc.
-    '''
-
-    is_complete = False # profile completeness flag for candidate
-    progress = 0.3  # profile progress, 0.3 is default after registration
-    if (profile.title and profile.location and profile.skills and
-        profile.phone and profile.experience and profile.residence_country):
-        is_complete = True
-
-    # calculate profile progress in %
-    progress += 0.2 if is_complete else 0
-    progress += 0.3 if profile.cv else 0
-    progress += 0.2 if profile.photo else 0
-    progress *= 100
-
-    return {'is_complete': is_complete,
-            'progress': progress,
-            'photo': True if profile.photo else False,
-            'cv': True if profile.cv else False}
 
 
 class ProfileUpdateView(View, LoginRequiredMixin):

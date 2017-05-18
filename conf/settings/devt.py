@@ -31,23 +31,7 @@ RECAPTCHA_PRIVATE_KEY = ''
 # NOCAPTCHA = False   nouse
 # RECAPTCHA_USE_SSL = True  nouse
 # CAPTCHA_AJAX = False  nouse
-#RECAPTCHA_PROXY = 'http://192.168.0.102:9000'
-
-# Emailing
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.mailgun.org'
-EMAIL_HOST_USER = 'postmaster@mail.squareballoon.com'
-EMAIL_HOST_PASSWORD = '7c4effb8443db2a9f70cf4e9ea3e243f'
-EMAIL_PORT = 587
-
-
-# can be used in email body and titles
-EMAIL_PROJECT_NAME = 'squareballoon'
-
-# Email addresses, default phone, etc.
-SERVER_EMAIL = "noreply@squareballoon.com"
-DEFAULT_FROM_EMAIL = SERVER_EMAIL
+# RECAPTCHA_PROXY = 'http://192.168.0.102:9000'
 
 
 # Debug Toolbar
