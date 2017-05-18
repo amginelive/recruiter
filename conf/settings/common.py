@@ -263,9 +263,18 @@ ACCOUNT_USERNAME_VALIDATORS = None
 # Email Configurations
 ####################################################################################################
 
+EMAIL_PROJECT_NAME = 'squareballoon'
 NOREPLY_EMAIL = 'noreply@squareballoon.com'
 DEFAULT_SUPPORT_EMAIL = 'support@squareballoon.com'
-EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.mailgun.org'
+EMAIL_HOST_USER = 'postmaster@mail.squareballoon.com'
+EMAIL_HOST_PASSWORD = '7c4effb8443db2a9f70cf4e9ea3e243f'
+SERVER_EMAIL = "noreply@squareballoon.com"
+EMAIL_PORT = 587
+DEFAULT_FROM_EMAIL = SERVER_EMAIL
 
 
 ####################################################################################################

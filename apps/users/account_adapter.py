@@ -77,7 +77,9 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
 
 
 class CustomAccountAdapter(DefaultAccountAdapter):
-    """Let's restrict generating username from email"""
+    """
+    Restrict generating username from email.
+    """
     def populate_username(self, request, user):
         pass
 

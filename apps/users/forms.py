@@ -14,10 +14,8 @@ User = get_user_model()
 
 class UserCreationForm(UserCreationForm):
     """
-    A form that creates a user, with no privileges, from the given email and
-    password.
+    A form that creates a user, with no privileges, from the given email and password.
     """
-
     def __init__(self, *args, **kargs):
         super(UserCreationForm, self).__init__(*args, **kargs)
 
@@ -27,7 +25,8 @@ class UserCreationForm(UserCreationForm):
 
 
 class UserChangeForm(UserChangeForm):
-    """A form for updating users. Includes all the fields on
+    """
+    A form for updating users. Includes all the fields on
     the user, but replaces the password field with admin's
     password hash display field.
     """
@@ -40,6 +39,9 @@ class UserChangeForm(UserChangeForm):
 
 
 class CustomSignupForm(forms.Form):
+    """
+    Custom signup form to replace allauth.
+    """
     CANDIDATE = 'c'
     AGENT = 'a'
 
@@ -48,11 +50,10 @@ class CustomSignupForm(forms.Form):
         (AGENT, _('Agent')),
     )
 
-    firstname = forms.CharField(max_length=30, required=True, label=_('First name'))
-    lastname = forms.CharField(max_length=30, required=True, label=_('Last name'))
+    firstname = forms.CharField(max_length=30, label=_('First name'))
+    lastname = forms.CharField(max_length=30, label=_('Last name'))
     phone = PhoneNumberField(required=False, label=_('Phone'))
-    registered_as = forms.ChoiceField(choices=ACC_CHOICES,
-                                      required=True)
+    registered_as = forms.ChoiceField(choices=ACC_CHOICES)
 
     def signup(self, request, user):
         if type(user).__name__ == 'SocialLogin':
