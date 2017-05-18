@@ -11,7 +11,10 @@ from django.views.generic import (
     View,
 )
 
-from braces.views import JSONResponseMixin
+from braces.views import (
+    JSONResponseMixin,
+    LoginRequiredMixin,
+)
 
 from .forms import (
     CompanyForm,
@@ -25,7 +28,7 @@ from .models import (
 )
 
 
-class CompanyUpdateView(View):
+class CompanyUpdateView(View, LoginRequiredMixin):
     """
     View for updating the company.
     """
@@ -66,15 +69,10 @@ class CompanyUpdateView(View):
             'company': company
         })
 
-
-    @method_decorator(login_required(login_url='/accounts/login/'))
-    def dispatch(self, *args, **kwargs):
-        return super(CompanyUpdateView, self).dispatch(*args, **kwargs)
-
 company_update = CompanyUpdateView.as_view()
 
 
-class CompanyInviteView(View):
+class CompanyInviteView(View, LoginRequiredMixin):
     """
     View for inviting user to the company.
     """
@@ -112,14 +110,10 @@ class CompanyInviteView(View):
             'success': success
         })
 
-    @method_decorator(login_required(login_url='/accounts/login/'))
-    def dispatch(self, *args, **kwargs):
-        return super(CompanyInviteView, self).dispatch(*args, **kwargs)
-
 company_invite = CompanyInviteView.as_view()
 
 
-class CompanyCreateView(CreateView):
+class CompanyCreateView(CreateView, LoginRequiredMixin):
     """
     View for creating a company for a new user.
     """
@@ -141,7 +135,7 @@ class CompanyCreateView(CreateView):
 company_create = CompanyCreateView.as_view()
 
 
-class CompanyPendingView(TemplateView):
+class CompanyPendingView(TemplateView, LoginRequiredMixin):
     """
     View for requesting an invitation to a company.
     """
@@ -155,7 +149,7 @@ class CompanyPendingView(TemplateView):
 company_pending = CompanyPendingView.as_view()
 
 
-class CompanyInvitationRequestAPIView(DeleteView, JSONResponseMixin):
+class CompanyInvitationRequestAPIView(DeleteView, LoginRequiredMixin, JSONResponseMixin):
     """
     View for accepting or rejecting a company invitation request.
     """
@@ -177,7 +171,7 @@ class CompanyInvitationRequestAPIView(DeleteView, JSONResponseMixin):
 api_company_invitation_request = CompanyInvitationRequestAPIView.as_view()
 
 
-class CompanyInviteSuccessView(DetailView):
+class CompanyInviteSuccessView(DetailView, LoginRequiredMixin):
     """
     View for the success page when successfully invited to a company.
     """

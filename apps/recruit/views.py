@@ -35,7 +35,7 @@ class HomeView(TemplateView):
     template_name = 'recruit/landing.html'
 
 
-class DashboardView(View):
+class DashboardView(View, LoginRequiredMixin):
     def get(self, request, **kwargs):
         if request.user.registered_as == 'a' and not request.user.agent.company:
             company = Company.objects.filter(domain=request.user.domain)
@@ -95,14 +95,10 @@ class DashboardView(View):
             'invitation_requests': CompanyRequestInvitation.objects.filter(company=company) if request.user.registered_as == 'a' else None,
         })
 
-    @method_decorator(login_required(login_url='/accounts/login/'))
-    def dispatch(self, *args, **kwargs):
-        return super(DashboardView, self).dispatch(*args, **kwargs)
-
 dashboard = DashboardView.as_view()
 
 
-class SearchView(View):
+class SearchView(View, LoginRequiredMixin):
     template_name = 'recruit/search.html'
 
     def get(self, request, **kwargs):
@@ -117,9 +113,7 @@ class SearchView(View):
             'candidates': candidates
         })
 
-    @method_decorator(login_required(login_url='/accounts/login/'))
-    def dispatch(self, *args, **kwargs):
-        return super(SearchView, self).dispatch(*args, **kwargs)
+search = SearchView.as_view()
 
 
 class JobPostListView(ListView, LoginRequiredMixin):

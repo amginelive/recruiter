@@ -7,6 +7,8 @@ from django.views.generic import (
     View,
 )
 
+from braces.views import LoginRequiredMixin
+
 from .forms import (
     AgentPhotoUploadForm,
     AgentUpdateForm,
@@ -42,7 +44,7 @@ def get_profile_completeness(profile):
             'cv': True if profile.cv else False}
 
 
-class ProfileUpdateView(View):
+class ProfileUpdateView(View, LoginRequiredMixin):
     """
     View for updating the profile of the user.
     """
@@ -97,15 +99,10 @@ class ProfileUpdateView(View):
             'completeness': completeness
         })
 
-
-    @method_decorator(login_required(login_url='/accounts/login/'))
-    def dispatch(self, *args, **kwargs):
-        return super(ProfileUpdateView, self).dispatch(*args, **kwargs)
-
 profile_update = ProfileUpdateView.as_view()
 
 
-class ProfilePhotoUploadView(View):
+class ProfilePhotoUploadView(View, LoginRequiredMixin):
     """
     View for uploading a user's profile picture.
     """
@@ -137,7 +134,7 @@ class ProfilePhotoUploadView(View):
 profile_photo_upload = ProfilePhotoUploadView.as_view()
 
 
-class ProfileCVUploadView(View):
+class ProfileCVUploadView(View, LoginRequiredMixin):
     """
     View for uploading a candidate's CV.
     """
