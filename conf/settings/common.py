@@ -273,7 +273,7 @@ NOREPLY_EMAIL = 'noreply@squareballoon.com'
 DEFAULT_SUPPORT_EMAIL = 'support@squareballoon.com'
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = '/var/www/vhosts/upwork/recruiter/tmp_mail'  # for testing
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'tmp_mail')
 
 # imagine: use temporary images or upload directly
 IMAGINE_USE_TEMP = False

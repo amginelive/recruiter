@@ -54,3 +54,4 @@ http/
 env/
 envi/
 static.prod/
+email_tmp/
