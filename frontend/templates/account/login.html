@@ -1,44 +1,41 @@
 {% extends "account/base.html" %}
 
-{% load i18n %}
-{% load bootstrap %}
-{% load account socialaccount %}
+{% load i18n bootstrap account socialaccount %}
 
 {% block head_title %}{% trans "Log In" %}{% endblock %}
 
-
 {% block inner_content %}
-        <div class="container login">
-            <div class="row">
-                <div class="col-sm-offset-3 col-md-offset-3 col-sm-6 col-md-6">
-                    <div class="form">
-                        <form id="login-form" action="{% url 'account_login' %}" method="post" role="form">
-							{% csrf_token %}
-							{% if redirect_field_value %}
-							<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-							{% endif %}
-                            <h1>{% trans "Login" %}</h1>
-                            <div class="msg"></div>
-                            <input type="login" id="login" name="login" class="form-control" placeholder="{% trans 'Email' %}"/>
-                            <input type="password" id="password" name="password" class="form-control" placeholder="{% trans 'Password' %}">
-                            <button type="submit" id="login-submit" class="btn">{% trans "Log in" %}</button>
-	                        {% if messages %}
-	                        <div class="row text-left" style="padding-top:15px;">
-	                          	<div class="col-lg-12 text-center">
-							    {% for message in messages %}
-							    	<p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
-							    {% endfor %}
-							    </div>
-							</div>
-							{% endif %}
-                            <div class="text-center">
-                                <p>{% trans "Don't have an account?" %} <a href="{% url 'account_signup' %}">{% trans "Signup" %}</a><p>
-                                <p><a href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a><p>
-                            </div>
-                        </form>
+<div class="container login">
+    <div class="row">
+        <div class="col-sm-offset-3 col-md-offset-3 col-sm-6 col-md-6">
+            <div class="form">
+                <form id="login-form" action="{% url 'account_login' %}" method="post" role="form">
+                    {% csrf_token %}
+                    {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                    {% endif %}
+                    <h1>{% trans "Login" %}</h1>
+                    <div class="msg"></div>
+                    <input type="login" id="login" name="login" class="form-control" placeholder="{% trans 'Email' %}"/>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="{% trans 'Password' %}">
+                    <button type="submit" id="login-submit" class="btn">{% trans "Log in" %}</button>
+                    {% if messages %}
+                    <div class="row text-left" style="padding-top:15px;">
+                        <div class="col-lg-12 text-center">
+                        {% for message in messages %}
+                            <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                        {% endfor %}
+                        </div>
                     </div>
-                </div>
+                    {% endif %}
+                    <div class="text-center">
+                        <p>{% trans "Don't have an account?" %} <a href="{% url 'account_signup' %}">{% trans "Signup" %}</a><p>
+                        <p><a href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a><p>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
+</div>
 {% endblock %}
 

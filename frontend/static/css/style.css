@@ -18,9 +18,9 @@ ul {
   font-style: normal; }
 
 nav.navbar {
-	height: 80px;
-	background-color: #ffffff;
-	box-shadow: 0 1px 1px 0 rgba(216, 216, 216, 0.5);
+    height: 80px;
+    background-color: #ffffff;
+    box-shadow: 0 1px 1px 0 rgba(216, 216, 216, 0.5);
 }
 
 .navbar-nav .dropdown-menu>li>a {
@@ -59,9 +59,9 @@ nav.navbar {
 .navbar-nav li a {
     margin-top: 10px;
     padding-top: 20px;
-	line-height: 20px;
-	font-size: 16px;
-	color: #4b4b4b;
+    line-height: 20px;
+    font-size: 16px;
+    color: #4b4b4b;
 }
 
 .navbar-nav .cart a {
@@ -91,14 +91,14 @@ nav.navbar {
     top: 0px;
     left: 14px;
     font-family: PangramLight;
-	font-size: 12px;
-	font-weight: 500;
-	color: #ffffff;
+    font-size: 12px;
+    font-weight: 500;
+    color: #ffffff;
     min-height: 20px;
     min-width: 20px;
     text-align: center;
-	background-color: #5c546a;
-	border: solid 1px #ffffff;
+    background-color: #5c546a;
+    border: solid 1px #ffffff;
     border-radius: 50%;
 }
 
@@ -112,23 +112,23 @@ section#account  {
     padding-top: 50px;
 }
 section#account h2 {
-	font-size: 32px;
-	color: #5c546a;
+    font-size: 32px;
+    color: #5c546a;
     padding-bottom: 20px;
 }
 section#account h4 {
-	font-size: 20px;
-	color: #5c546a;
+    font-size: 20px;
+    color: #5c546a;
     padding-bottom: 10px;
 }
 section#account  a {
-	color: #f9690e;
+    color: #f9690e;
 }
 section#account h4 a {
-	font-family: PangramLight;
-	font-size: 14px;
-	font-weight: 400;
-	color: #f9690e;
+    font-family: PangramLight;
+    font-size: 14px;
+    font-weight: 400;
+    color: #f9690e;
 }
 section#account .addresses {
     padding-bottom: 60px;
@@ -137,23 +137,23 @@ section#account .addresses ul, section#account .payments ul {
     padding:0;
 }
 section#account .addresses li, section#account .payments li {
-	font-size: 19px;
-	color: #4b4b4b;
+    font-size: 19px;
+    color: #4b4b4b;
     padding-top: 20px;
 }
 section#account .addresses li a, section#account .payments li a{
-	font-family: Pangram;
-	font-size: 14px;
-	font-weight: 500;
+    font-family: Pangram;
+    font-size: 14px;
+    font-weight: 500;
 }
 section#account #account-form label {
-	color: #574e66;
+    color: #574e66;
 }
 section#account #account-form input {
-	font-size: 17px;
+    font-size: 17px;
     height: 45px;
-	font-weight: 500;
-	color: #574e66;
+    font-weight: 500;
+    color: #574e66;
     margin-bottom: 20px;
 }
 section#account #account-photo-form label {
@@ -180,17 +180,17 @@ section#account #account-photo-form input {
     top: 8px;
 }
 .radio input[type="radio"]:checked + label::after {
-	background-color: #f9690e;
+    background-color: #f9690e;
 }
 .radio input[type="radio"]:checked + label::before {
-	color: #c8c8c8;
+    color: #c8c8c8;
 }
 
 section#account .container form button, .btn.action-btn {
-	min-width: 150px;
-	height: 39px;
-	border-radius: 5px;
-	background-color: #f9690e;
+    min-width: 150px;
+    height: 39px;
+    border-radius: 5px;
+    background-color: #f9690e;
     color: #fff !important;
     margin: 15px 0;
     padding:5px 10px;
@@ -217,7 +217,7 @@ section#account .profile-right form button {width:100%;}
 .my-applications h4, .suggested-jobs h4, .job-alerts h4 {width:100%; margin:0; display:block; background-color:#f8f8f8; line-height:25px; padding:5px 15px; font-family:PangramRegular; font-size:18px !important; border-bottom:1px solid #ccc;}
 .my-applications, .suggested-jobs, .job-alerts {padding:15px; padding-top:0px;}
 .my-applications .inner, .suggested-jobs .inner, .job-alerts .inner {
-	border:1px solid #f8f8f8; border-top:none; padding:10px 15px;
+    border:1px solid #f8f8f8; border-top:none; padding:10px 15px;
 }
 
 section#account .bottom-blocks-left {margin-top:25px; margin-right:15px; padding:0px}
@@ -283,23 +283,23 @@ section#landing .titles{
 
 section#landing  h2{
     position: relative;
-	font-size: 48px;
-	font-weight: 300;
-	color: #ffffff;
+    font-size: 48px;
+    font-weight: 300;
+    color: #ffffff;
 }
 
 section#landing  h4{
     position: relative;
-	font-size: 20px;
-	font-weight: 500;
+    font-size: 20px;
+    font-weight: 500;
     padding-top: 40px;
-	color: #ffffff;
+    color: #ffffff;
 }
 
 section#landing  .search{
     height: 50vh;
-	border-radius: 8px;
-	background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.2);
     width: 80%;
     left: 50%;
     -webkit-transform: translateX(-50%);
@@ -311,8 +311,8 @@ section#landing  .search{
 }
 
 section#landing  .search p{
-	font-size: 24px;
-	color: #ffffff;
+    font-size: 24px;
+    color: #ffffff;
     text-align: center;
     padding-top: 60px;
     padding-bottom: 20px;
@@ -322,7 +322,7 @@ section#landing  .search p{
     border: 0;
     background-image: none;
     border-radius: 8px;
-	background-color: #f9690e;
+    background-color: #f9690e;
 }
 
 section#landing  .search .select2, section#landing .search input{
@@ -348,10 +348,10 @@ section#landing  .search .select2-selection, section#landing .search input {
     z-index: 1;
     font-size: 20px;
     padding: 10px;
-	color: #6e6e6e;
+    color: #6e6e6e;
     height: 52px;
-	border-radius: 8px;
-	background-color: #ffffff;
+    border-radius: 8px;
+    background-color: #ffffff;
 }
 
 section#landing  .search .select2-container--default .select2-selection--single .select2-selection__arrow {
@@ -364,19 +364,19 @@ section#landing  .search .select2-container--default .select2-selection--single 
 }
 
 section#about, section#how-works, section#why-rent, section#get-started, section#testimonial {
-	color: #5c546a;
+    color: #5c546a;
     padding-top: 100px;
 }
 
 section#about h2, section#why-rent h2, section#how-works h2{
     font-size: 48px;
-	font-weight: 300;
+    font-weight: 300;
     margin-bottom: 100px;
 }
 
 
 section#get-started h2 strong{
-	font-family: PangramRegular;
+    font-family: PangramRegular;
 }
 
 section#how-works {
@@ -396,10 +396,10 @@ section#how-works .row div {
 section#how-works p {
     margin: auto;
     width: 270px;
-	font-family: PangramRegular;
+    font-family: PangramRegular;
     font-size: 20px;
-	font-weight: 500;
-	color: #616161;
+    font-weight: 500;
+    color: #616161;
 
 }
 section#how-works .icons div {
@@ -407,22 +407,22 @@ section#how-works .icons div {
 }
 section#how-works span {
     display: block;
-	width: 37px;
-	height: 37px;
-	background-color: #5c546a;
-	font-family: PangramLight;
-	font-size: 22px;
-	font-weight: bold;
+    width: 37px;
+    height: 37px;
+    background-color: #5c546a;
+    font-family: PangramLight;
+    font-size: 22px;
+    font-weight: bold;
     border-radius: 50%;
-	line-height: 35px;
+    line-height: 35px;
     z-index: 10;
-	color: #ffffff;
+    color: #ffffff;
     text-align: center;
     margin: 20px auto;
 }
 
 section#testimonial{
-	background-color: #f9f9f9;
+    background-color: #f9f9f9;
     padding-top: 40px;
 }
 
@@ -431,8 +431,8 @@ section#testimonial .text{
     border-top-width: 4px;
     border-radius: 0 0 8px 8px;
     padding: 20px;
-	background-color: #ffffff;
-	box-shadow: 0 0 2px 1px rgba(228, 228, 228, 0.5);
+    background-color: #ffffff;
+    box-shadow: 0 0 2px 1px rgba(228, 228, 228, 0.5);
 }
 section#testimonial img{
     padding: 20px 40px;
@@ -454,7 +454,7 @@ section#testimonial .text:before{
     position: absolute;
     border-style: solid;
     border-width: 17px 17px 0;
-	border-color: rgba(228, 228, 228, 0.5) transparent;
+    border-color: rgba(228, 228, 228, 0.5) transparent;
     display: block;
     width: 0;
     z-index: 0;
@@ -462,35 +462,35 @@ section#testimonial .text:before{
     left: 39px;
 }
 section#testimonial .text h3{
-	font-size: 26px;
-	color: #5c546a;
+    font-size: 26px;
+    color: #5c546a;
     margin-top: 0px;
 }
 section#testimonial .text p{
-	font-size: 16px;
-	color: #5c546a;
+    font-size: 16px;
+    color: #5c546a;
 }
 section#testimonial .text .name{
     font-size: 18px;
     font-family: PangramRegular;
-	color: #f9690e;
+    color: #f9690e;
 }
 section#testimonial .text .city{
-	font-size: 13px;
-	color: #5c546a;
+    font-size: 13px;
+    color: #5c546a;
 }
 
 section#testimonial h2, section#get-started h2{
-	font-size: 42px;
+    font-size: 42px;
     padding-bottom: 40px;
 }
 section#get-started .btn{
-	font-family: PangramRegular;
+    font-family: PangramRegular;
     position: relative;
     padding: 16px 55px;
-	height: 63px;
-	border-radius: 31px;
-	font-size: 22px;
+    height: 63px;
+    border-radius: 31px;
+    font-size: 22px;
     left: 50%;
     -webkit-transform: translateX(-50%);
     -ms-transform: translateX(-50%);
@@ -509,30 +509,30 @@ section#why-rent .row div{
 
 section#why-rent p{
     position: absolute;
-	font-family: PangramRegular;
+    font-family: PangramRegular;
     top: 100px;
     left: 50%;
     -webkit-transform: translateX(-50%);
     -ms-transform: translateX(-50%);
             transform: translateX(-50%);
-	font-size: 36px;
+    font-size: 36px;
     text-align: center;
     width: 100%;
-	color: #ffffff;
+    color: #ffffff;
 }
 
 section#about p{
     padding-top: 20px;
-	font-size: 28px;
-	font-weight: 300;
-	text-align: center;
-	color: #5c546a;
+    font-size: 28px;
+    font-weight: 300;
+    text-align: center;
+    color: #5c546a;
 }
 
 section#footer{
     z-index: 1000;
     /*margin-top: 70px;*/
-	background-color: #45404e;
+    background-color: #45404e;
     padding: 30px;
     height: 188px;
     width:100%;
@@ -566,7 +566,7 @@ section#footer .social a{
 
 .nav>li>a:focus, .nav>li>a:hover {
     background-color: #fff;
-	color: #f9690e;
+    color: #f9690e;
 }
 .btn-primary:focus, .btn-primary:hover {
     background-color: #45404e;
@@ -608,13 +608,13 @@ section#footer small{
     margin-bottom:20px;
 }
 #landing.auth .container .form .msg, #landing.auth .container .form .parsley-error-list {
-	color: #f9690e;
+    color: #f9690e;
 }
 #landing.auth .container .form h1 {
     font-family: PangramLight;
-	font-size: 34px;
-	font-weight: 300;
-	color: #4b4b4b;
+    font-size: 34px;
+    font-weight: 300;
+    color: #4b4b4b;
 }
 #landing.auth .container .form input {
     font-size: 20px;
@@ -630,37 +630,37 @@ section#footer small{
 }
 #landing.auth .container .form p {
     font-size: 16px;
-	color: #5f5f5f;
+    color: #5f5f5f;
 }
 #landing.auth .container .form a {
-	color: #f9690e;
+    color: #f9690e;
 }
 #landing.auth .container .form button {
     width: 294px;
-	height: 57px;
-	border-radius: 9px;
-	background-color: #f9690e;
-	font-size: 16px;
-	font-weight: bold;
-	text-align: center;
-	color: #ffffff;
+    height: 57px;
+    border-radius: 9px;
+    background-color: #f9690e;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    color: #ffffff;
     padding-bottom: 10px;
     margin: 20px;
 }
 section#heading {
-	background-color: #fffaef;
+    background-color: #fffaef;
     min-height: 50px;
 }
 section#heading a.refine-search {
     margin-left: 10px;
-	font-size: 14px;
+    font-size: 14px;
     display: inline-block;
     padding: 10px 20px;
 }
 section#heading p, section#heading a.back_link {
-	font-family: PangramRegular;
-	font-size: 16px;
-	color: #45404e;
+    font-family: PangramRegular;
+    font-size: 16px;
+    color: #45404e;
     padding: 15px 0;
     display: block;
 }
@@ -715,8 +715,8 @@ section#details ul.stats {
     padding: 0;
 }
 section#details ul.stats li {
-	font-size: 12px;
-	color: #888888;
+    font-size: 12px;
+    color: #888888;
     padding: 0 5px;
     display: inline-block;
     border-right: solid 0.5px #bfbfbf;
@@ -725,33 +725,33 @@ section#details ul.stats li:last-child {
     border: none;
 }
 section#details h3 {
-	font-family: PangramRegular;
+    font-family: PangramRegular;
     font-size: 18px;
-	font-weight: 500;
-	color: #4b4b4b;
+    font-weight: 500;
+    color: #4b4b4b;
 }
 section#details h1 {
     height: 29px;
-	font-family: PangramRegular;
-	font-size: 24px;
-	font-weight: 500;
-	color: #4b4b4b;
+    font-family: PangramRegular;
+    font-size: 24px;
+    font-weight: 500;
+    color: #4b4b4b;
 }
 section#details ul.features {
     list-style-type: disc;
 }
 
 section#details .price{
-	font-size: 24px;
-	font-weight: 500;
-	color: #f9690e;
+    font-size: 24px;
+    font-weight: 500;
+    color: #f9690e;
     font-family: PangramRegular;
 }
 section#details .save_text{
     font-family: PangramRegular;
     font-size: 12px;
-	font-weight: 500;
-	color: #2b2b2b;
+    font-weight: 500;
+    color: #2b2b2b;
 }
 
 section#details .order{
@@ -759,15 +759,15 @@ section#details .order{
 }
 section#details .order label{
     font-size: 11px;
-	font-weight: 500;
-	color: #888888;
+    font-weight: 500;
+    color: #888888;
 }
 section#details .order input{
     text-align: center;
     font-family: PangramRegular;
     font-size: 17px;
-	font-weight: 500;
-	color: #574e66;
+    font-weight: 500;
+    color: #574e66;
 }
 
 section#details button img{
@@ -776,27 +776,27 @@ section#details button img{
 section#details button {
     width: auto;
     font-size: 12px;
-	font-weight: 500;
-	color: #ffffff;
+    font-weight: 500;
+    color: #ffffff;
     padding: 10px 20px;
 }
 
 button.add_to_cart {
-	border-radius: 9px;
-	background-color: #5c546a;
+    border-radius: 9px;
+    background-color: #5c546a;
 }
 
 button.rent_now {
-	border-radius: 9px;
-	background-color: #f9690e;
+    border-radius: 9px;
+    background-color: #f9690e;
 }
 
 section#search-results ul.stats {
     padding: 0;
 }
 section#search-results ul.stats li {
-	font-size: 12px;
-	color: #888888;
+    font-size: 12px;
+    color: #888888;
     padding: 0 5px;
     display: inline-block;
     border-right: solid 0.5px #bfbfbf;
@@ -805,16 +805,16 @@ section#search-results ul.stats li:last-child {
     border: none;
 }
 section#search-results h3 {
-	font-family: PangramRegular;
+    font-family: PangramRegular;
     font-size: 18px;
-	font-weight: 500;
-	color: #4b4b4b;
+    font-weight: 500;
+    color: #4b4b4b;
 }
 section#search-results h1 {
-	font-family: PangramRegular;
-	font-size: 18px;
-	font-weight: 500;
-	color: #4b4b4b;
+    font-family: PangramRegular;
+    font-size: 18px;
+    font-weight: 500;
+    color: #4b4b4b;
     margin: 0 0 10px;
 }
 section#search-results .thumb{
@@ -822,8 +822,8 @@ section#search-results .thumb{
     width: 100%;
 }
 section#search-results .price{
-	font-size: 20px;
-	color: #4b4b4b;
+    font-size: 20px;
+    color: #4b4b4b;
     font-family: PangramRegular;
 }
 section#search-results .row.results{
@@ -843,15 +843,15 @@ section#search-results .go_details {
 .page-numbers li {
     padding: 0 5px;
     display: inline-block;
-	font-size: 16px;
+    font-size: 16px;
     font-family: PangramRegular;
 }
 .page-numbers li a {
-	color: #45404e;
+    color: #45404e;
     text-decoration: none;
 }
 .page-numbers li span {
-	color: #f9690e;
+    color: #f9690e;
 }
 section#cart {
     padding: 100px 0;
@@ -860,8 +860,8 @@ section#cart ul.stats {
     padding: 0;
 }
 section#cart ul.stats li {
-	font-size: 12px;
-	color: #888888;
+    font-size: 12px;
+    color: #888888;
     padding: 0 5px;
     display: inline-block;
     border-right: solid 0.5px #bfbfbf;
@@ -870,16 +870,16 @@ section#cart ul.stats li:last-child {
     border: none;
 }
 section#cart h3 {
-	font-family: PangramRegular;
+    font-family: PangramRegular;
     font-size: 18px;
-	font-weight: 500;
-	color: #4b4b4b;
+    font-weight: 500;
+    color: #4b4b4b;
 }
 section#cart h1 {
-	font-family: PangramRegular;
-	font-size: 22px;
-	font-weight: 500;
-	color: #4b4b4b;
+    font-family: PangramRegular;
+    font-size: 22px;
+    font-weight: 500;
+    color: #4b4b4b;
     margin: 0 0 10px;
 }
 section#cart .thumb{
@@ -887,13 +887,13 @@ section#cart .thumb{
     width: 100%;
 }
 section#cart .price.small{
-	font-size: 18px;
-	color: #4b4b4b;
+    font-size: 18px;
+    color: #4b4b4b;
     font-family: PangramLight;
 }
 section#cart .price{
-	font-size: 24px;
-	color: #4b4b4b;
+    font-size: 24px;
+    color: #4b4b4b;
     font-family: PangramRegular;
 }
 section#cart .row.results{
@@ -909,19 +909,19 @@ section#cart .order{
 }
 section#cart .order label{
     font-size: 11px;
-	font-weight: 500;
-	color: #888888;
+    font-weight: 500;
+    color: #888888;
 }
 section#cart .order input{
     text-align: center;
     font-family: PangramRegular;
     font-size: 17px;
-	font-weight: 500;
-	color: #574e66;
+    font-weight: 500;
+    color: #574e66;
 }
 section#cart .remove{
     white-space: nowrap;
-	color: #f9690e;
+    color: #f9690e;
     text-decoration: none;
 }
 section#cart .row.subtotal{
@@ -929,38 +929,38 @@ section#cart .row.subtotal{
     padding: 40px 0;
 }
 section#cart .subtotal span{
-	font-size: 22px;
-	color: #7e7e7e;
+    font-size: 22px;
+    color: #7e7e7e;
     padding-right: 20px;
 }
 section#cart .subtotal span span{
     padding: 0;
 }
 section#cart .subtotal p{
-	font-size: 14px;
-	color: #2b2b2b;
+    font-size: 14px;
+    color: #2b2b2b;
     font-family: PangramRegular;
     padding: 10px 0;
 }
 section#cart .price.subtotal{
     display: inline-block;
-	font-size: 30px;
-	color: #4b4b4b;
+    font-size: 30px;
+    color: #4b4b4b;
 }
 section#orders {
     padding: 100px 0;
 }
 section#orders .row.results .btn{
-	font-size: 12px;
-	font-family: PangramRegular;
+    font-size: 12px;
+    font-family: PangramRegular;
     padding: 12px 40px;
 }
 section#orders ul.stats {
     padding: 0;
 }
 section#orders ul.stats li {
-	font-size: 12px;
-	color: #888888;
+    font-size: 12px;
+    color: #888888;
     padding: 0 5px;
     display: inline-block;
     border-right: solid 0.5px #bfbfbf;
@@ -969,16 +969,16 @@ section#orders ul.stats li:last-child {
     border: none;
 }
 section#orders h3 {
-	font-family: PangramRegular;
+    font-family: PangramRegular;
     font-size: 18px;
-	font-weight: 500;
-	color: #4b4b4b;
+    font-weight: 500;
+    color: #4b4b4b;
 }
 section#orders h1 {
-	font-family: PangramRegular;
-	font-size: 22px;
-	font-weight: 500;
-	color: #4b4b4b;
+    font-family: PangramRegular;
+    font-size: 22px;
+    font-weight: 500;
+    color: #4b4b4b;
     margin: 0 0 10px;
 }
 section#orders .thumb{
@@ -990,20 +990,20 @@ section#orders .price_small{
     min-width: 120px;
 }
 section#orders .subline{
-	font-size: 18px;
-	color: #4b4b4b;
+    font-size: 18px;
+    color: #4b4b4b;
     font-family: PangramLight;
 }
 section#orders .row.results .due_date{
     display: inline-block;
 }
 section#orders .row.results .due_date.error{
-	color: #ff2222;
+    color: #ff2222;
     font-family: PangramRegular;
 }
 section#orders .price{
-	font-size: 24px;
-	color: #4b4b4b;
+    font-size: 24px;
+    color: #4b4b4b;
     font-family: PangramRegular;
 }
 section#orders .row.results{
@@ -1014,8 +1014,8 @@ section#orders .row.subtotal{
     padding: 40px 0;
 }
 section#orders .row.subtotal .btn{
-	font-size: 12px;
-	font-family: PangramRegular;
+    font-size: 12px;
+    font-family: PangramRegular;
     padding: 15px 50px;
 }
 @media(min-width:767px) {
@@ -1080,16 +1080,16 @@ section#orders .row.subtotal .btn{
     padding:0;
 }
 .modal-header h4{
-	font-size: 16px;
-	color: #303030;
+    font-size: 16px;
+    color: #303030;
 }
 #refine_search #refine-search-form {
     min-width: 700px;
     padding: 20px 0;
 }
 #refine_search #refine-search-form h3{
-	font-size: 16px;
-	color: #303030;
+    font-size: 16px;
+    color: #303030;
     font-family: PangramRegular;
 }
 #refine_search #refine-search-form ul{
@@ -1104,8 +1104,8 @@ section#orders .row.subtotal .btn{
     padding-left: 2px;
     padding-top: 5px;
     font-family: PangramRegular;
-	font-size: 12px;
-	color: #666666;
+    font-size: 12px;
+    color: #666666;
 }
 #refine_search #refine-search-form .btn{
     padding: 10px 30px;
@@ -1125,13 +1125,13 @@ section#orders .row.subtotal .btn{
     padding: 60px;
 }
 .modal_form form .msg, .modal_form form .parsley-error-list {
-	color: #f9690e;
+    color: #f9690e;
 }
 .modal_form form h2 {
     font-family: PangramLight;
-	font-size: 34px;
-	font-weight: 300;
-	color: #4b4b4b;
+    font-size: 34px;
+    font-weight: 300;
+    color: #4b4b4b;
 }
 .modal_form form .row {
     padding: 20px 0;
@@ -1150,39 +1150,39 @@ section#orders .row.subtotal .btn{
 }
 .modal_form form p {
     font-size: 16px;
-	color: #5f5f5f;
+    color: #5f5f5f;
 }
 .modal_form form a {
-	color: #f9690e;
+    color: #f9690e;
 }
 .modal_form form button {
     width: 294px;
-	height: 57px;
-	border-radius: 9px;
-	background-color: #f9690e;
-	font-size: 16px;
-	font-weight: bold;
-	text-align: center;
-	color: #ffffff;
+    height: 57px;
+    border-radius: 9px;
+    background-color: #f9690e;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    color: #ffffff;
     padding-bottom: 10px;
     margin: 20px;
 }
 .modal_form .btn-default:hover {
-	background-color: #f9690e;
+    background-color: #f9690e;
 }
 .modal_form .btn-default {
     background-image: none;
-	background-color: #5c546a;
+    background-color: #5c546a;
     text-shadow: none;
 }
 .modal_form .btn {
     color: #fff;
-	border-radius: 9px;
+    border-radius: 9px;
     padding: 15px 30px;
     font-family: PangramRegular;
 }
 .modal_form .btn-primary:hover {
-	background-color: #5c546a;
+    background-color: #5c546a;
 }
 .modal_form .addresses {
     padding-bottom: 60px;
@@ -1191,15 +1191,15 @@ section#orders .row.subtotal .btn{
     padding:0;
 }
 .modal_form .addresses li, section#account .payments li {
-	font-size: 19px;
-	color: #4b4b4b;
+    font-size: 19px;
+    color: #4b4b4b;
     font-family: PangramRegular;
     padding-top: 30px;
 }
 .modal_form .addresses li a, section#account .payments li a{
-	font-family: Pangram;
-	font-size: 14px;
-	font-weight: 500;
+    font-family: Pangram;
+    font-size: 14px;
+    font-weight: 500;
 }
 .modal_form  .select2{
     width: 100%!important;
@@ -1210,12 +1210,12 @@ section#orders .row.subtotal .btn{
     z-index: 1;
     font-size: 20px;
     padding: 10px;
-	color: #6e6e6e;
+    color: #6e6e6e;
     height: 52px;
-	border-radius: 0px;
+    border-radius: 0px;
     border-width: 0;
     border-bottom-width: 1px;
-	background-color: #ffffff;
+    background-color: #ffffff;
 }
 .modal_form .select2-container--default .select2-selection--single .select2-selection__arrow {
     top: 10px;
@@ -1313,4 +1313,15 @@ section#cart .code_error span {
 }
 #subtotal-coupon-price.hide {
     display: none;
+}
+
+section#job-posts .skill {
+    background-color: #f9690e;
+    padding: 3px 5px;
+    border-radius: 7px;
+    margin-right: 5px;
+}
+
+section#job-posts .job-post-detail {
+    margin-top: 50px;
 }

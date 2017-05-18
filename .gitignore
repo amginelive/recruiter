@@ -19,7 +19,6 @@ lib/
 lib64/
 parts/
 sdist/
-var/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -45,13 +44,14 @@ node_modules/
 .DS_Store
 
 # log files
-/logs
+logs/
 *.log
 
 local.py
 production.py
-/media
-/http
-/env
-/envi
+media/
+http/
+env/
+envi/
 static.prod/
+email_tmp/

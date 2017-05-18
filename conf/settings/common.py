@@ -59,9 +59,9 @@ INSTALLED_APPS = (
     'easy_thumbnails',
     'phonenumber_field',
 
-    'authme',
+    'companies',
     'recruit',
-    'profileme',
+    'users',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -94,13 +94,6 @@ DATABASES = {
     }
 }
 
-# google reCAPTCHA 2 settings
-RECAPTCHA_PUBLIC_KEY = 'pub_key'
-RECAPTCHA_PRIVATE_KEY = 'priv_key'
-# NOCAPTCHA = False   nouse
-# RECAPTCHA_USE_SSL = True  nouse
-# CAPTCHA_AJAX = False  nouse
-#RECAPTCHA_PROXY = 'http://192.168.0.102:9000'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -182,20 +175,19 @@ THUMBNAIL_ALIASES = {
     },
 }
 
+# imagine: use temporary images or upload directly
+IMAGINE_USE_TEMP = False
 TEMP_UPLOAD_DIR = MEDIA_ROOT + 'upload/'
-
-# Django JS Reverse Configurations
-JS_REVERSE_JS_MINIFY = False
 
 
 ####################################################################################################
 # Authentication
 ####################################################################################################
 
-AUTH_USER_MODEL = 'authme.User'
+AUTH_USER_MODEL = 'users.User'
 
 AUTHENTICATION_BACKENDS = (
-        'authme.auth.CustomAuth',
+        'users.auth.CustomAuth',
         # Needed to login by username in Django admin, regardless of `allauth`
         "django.contrib.auth.backends.ModelBackend",
         # `allauth` specific authentication methods, such as login by e-mail
@@ -227,18 +219,18 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 LOGIN_REDIRECT_URL = '/dashboard/'
-#ACCOUNT_ADAPTER = 'authme.account_adapter.NoNewUsersAccountAdapter'
+#ACCOUNT_ADAPTER = 'users.account_adapter.NoNewUsersAccountAdapter'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
 SIGNUP_PASSWORD_ENTER_TWICE = True
 ACCOUNT_SIGNUP_PASSWORD_VERIFICATION = True
-ACCOUNT_SIGNUP_FORM_CLASS = 'authme.forms.CustomSignupForm'
+ACCOUNT_SIGNUP_FORM_CLASS = 'users.forms.CustomSignupForm'
 ACCOUNT_LOGOUT_ON_GET = True  # don't ask on sign out
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'optional'
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 SOCIALACCOUNT_EMAIL_REQUIRED = False
-#SOCIALACCOUNT_ADAPTER = 'authme.account_adapter.CustomSocialAccountAdapter'
-ACCOUNT_ADAPTER = 'authme.account_adapter.CustomAccountAdapter'
+#SOCIALACCOUNT_ADAPTER = 'users.account_adapter.CustomSocialAccountAdapter'
+ACCOUNT_ADAPTER = 'users.account_adapter.CustomAccountAdapter'
 ACCOUNT_USERNAME_BLACKLIST = ['admin', 'squareballoon', 'root']
 ACCOUNT_USERNAME_VALIDATORS = None
 #ACCOUNT_USER_MODEL_EMAIL_FIELD= 'email'
@@ -266,31 +258,42 @@ ACCOUNT_USERNAME_VALIDATORS = None
 #          'VERIFIED_EMAIL': True,
 #          'VERSION': 'v2.4'}}
 
-# end allauth settings
 
-# Email addresses, default phone, etc.
+####################################################################################################
+# Email Configurations
+####################################################################################################
+
 NOREPLY_EMAIL = 'noreply@squareballoon.com'
 DEFAULT_SUPPORT_EMAIL = 'support@squareballoon.com'
-
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = '/var/www/vhosts/upwork/recruiter/tmp_mail'  # for testing
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'tmp_mail')
 
-# imagine: use temporary images or upload directly
-IMAGINE_USE_TEMP = False
 
-# phone_number_field settings
+####################################################################################################
+# Integrations Behaviour Configurations
+####################################################################################################
+
+# google reCAPTCHA 2 settings
+RECAPTCHA_PUBLIC_KEY = 'pub_key'
+RECAPTCHA_PRIVATE_KEY = 'priv_key'
+# NOCAPTCHA = False   nouse
+# RECAPTCHA_USE_SSL = True  nouse
+# CAPTCHA_AJAX = False  nouse
+#RECAPTCHA_PROXY = 'http://192.168.0.102:9000'
+
 PHONENUMBER_DB_FORMAT = 'E164'
-
 SEO_MODELS = True
 
+# Django JS Reverse Configurations
+JS_REVERSE_JS_MINIFY = False
+
 
 ####################################################################################################
-# Logging
+# Logging Configurations
 ####################################################################################################
-
 
 # ADMINS = (
-#     ('Illya Konovalov', 'horbor@gmail.com'),
+#     ('Lorence', 'jlorencelim@gmail.com'),
 # )
 
 # MANAGERS = ADMINS
