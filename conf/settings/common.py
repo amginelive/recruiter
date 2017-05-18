@@ -94,13 +94,6 @@ DATABASES = {
     }
 }
 
-# google reCAPTCHA 2 settings
-RECAPTCHA_PUBLIC_KEY = 'pub_key'
-RECAPTCHA_PRIVATE_KEY = 'priv_key'
-# NOCAPTCHA = False   nouse
-# RECAPTCHA_USE_SSL = True  nouse
-# CAPTCHA_AJAX = False  nouse
-#RECAPTCHA_PROXY = 'http://192.168.0.102:9000'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -182,10 +175,9 @@ THUMBNAIL_ALIASES = {
     },
 }
 
+# imagine: use temporary images or upload directly
+IMAGINE_USE_TEMP = False
 TEMP_UPLOAD_DIR = MEDIA_ROOT + 'upload/'
-
-# Django JS Reverse Configurations
-JS_REVERSE_JS_MINIFY = False
 
 
 ####################################################################################################
@@ -266,31 +258,42 @@ ACCOUNT_USERNAME_VALIDATORS = None
 #          'VERIFIED_EMAIL': True,
 #          'VERSION': 'v2.4'}}
 
-# end allauth settings
 
-# Email addresses, default phone, etc.
+####################################################################################################
+# Email Configurations
+####################################################################################################
+
 NOREPLY_EMAIL = 'noreply@squareballoon.com'
 DEFAULT_SUPPORT_EMAIL = 'support@squareballoon.com'
-
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'tmp_mail')
 
-# imagine: use temporary images or upload directly
-IMAGINE_USE_TEMP = False
 
-# phone_number_field settings
+####################################################################################################
+# Integrations Behaviour Configurations
+####################################################################################################
+
+# google reCAPTCHA 2 settings
+RECAPTCHA_PUBLIC_KEY = 'pub_key'
+RECAPTCHA_PRIVATE_KEY = 'priv_key'
+# NOCAPTCHA = False   nouse
+# RECAPTCHA_USE_SSL = True  nouse
+# CAPTCHA_AJAX = False  nouse
+#RECAPTCHA_PROXY = 'http://192.168.0.102:9000'
+
 PHONENUMBER_DB_FORMAT = 'E164'
-
 SEO_MODELS = True
 
+# Django JS Reverse Configurations
+JS_REVERSE_JS_MINIFY = False
+
 
 ####################################################################################################
-# Logging
+# Logging Configurations
 ####################################################################################################
-
 
 # ADMINS = (
-#     ('Illya Konovalov', 'horbor@gmail.com'),
+#     ('Lorence', 'jlorencelim@gmail.com'),
 # )
 
 # MANAGERS = ADMINS
