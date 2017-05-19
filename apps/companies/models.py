@@ -110,7 +110,7 @@ class Company(AbstractTimeStampedModel):
             # content type name will be used as a reference for alias,
             # please make sure you don't have duplicates or overlaps.
             # format for config "{app_label}_{model}"
-            content_name = "{}_{}".format('recruit', self.__class__.__name__.lower())
+            content_name = "{}_{}".format('companies', self.__class__.__name__.lower())
             # TODO: make alias the same as content_type.model
             filename, file = resize_image(self.logo, settings.THUMBNAIL_ALIASES[content_name]['logo'])
             self.logo.save(filename, file, save=False)
