@@ -164,13 +164,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'frontend', 'media')
 
 THUMBNAIL_ALIASES = {
     # based on models
-    'profileme_candidate': {
+    'users_candidate': {
         'photo': {'size': (200, 200), 'crop': 'smart'},
     },
-    'profileme_agent': {
+    'users_agent': {
         'photo': {'size': (200, 200), 'crop': 'smart'},
     },
-    'recruit_company': {
+    'companies_company': {
         'logo': {'size': (600, 200), 'crop': 'smart'},
     },
 }
