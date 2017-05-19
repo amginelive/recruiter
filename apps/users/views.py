@@ -20,7 +20,7 @@ from .utils import get_profile_completeness
 User = get_user_model()
 
 
-class ProfileUpdateView(View, LoginRequiredMixin):
+class ProfileUpdateView(LoginRequiredMixin, View):
     """
     View for updating the profile of the user.
     """
@@ -78,7 +78,7 @@ class ProfileUpdateView(View, LoginRequiredMixin):
 profile_update = ProfileUpdateView.as_view()
 
 
-class ProfilePhotoUploadView(View, LoginRequiredMixin):
+class ProfilePhotoUploadView(LoginRequiredMixin, View):
     """
     View for uploading a user's profile picture.
     """
@@ -110,7 +110,7 @@ class ProfilePhotoUploadView(View, LoginRequiredMixin):
 profile_photo_upload = ProfilePhotoUploadView.as_view()
 
 
-class ProfileCVUploadView(View, LoginRequiredMixin):
+class ProfileCVUploadView(LoginRequiredMixin, View):
     """
     View for uploading a candidate's CV.
     """

@@ -33,7 +33,7 @@ class HomeView(TemplateView):
     template_name = 'recruit/landing.html'
 
 
-class DashboardView(View, LoginRequiredMixin):
+class DashboardView(LoginRequiredMixin, View):
     def get(self, request, **kwargs):
         if request.user.registered_as == 'a' and not request.user.agent.company:
             company = Company.objects.filter(domain=request.user.domain)
@@ -96,7 +96,7 @@ class DashboardView(View, LoginRequiredMixin):
 dashboard = DashboardView.as_view()
 
 
-class SearchView(View, LoginRequiredMixin):
+class SearchView(LoginRequiredMixin, View):
     template_name = 'recruit/search.html'
 
     def get(self, request, **kwargs):
@@ -114,7 +114,7 @@ class SearchView(View, LoginRequiredMixin):
 search = SearchView.as_view()
 
 
-class JobPostListView(ListView, LoginRequiredMixin):
+class JobPostListView(LoginRequiredMixin, ListView):
     """
     View for displaying the list of all the company's job posts.
     """
@@ -128,7 +128,7 @@ class JobPostListView(ListView, LoginRequiredMixin):
 job_post_list = JobPostListView.as_view()
 
 
-class JobPostCreateView(CreateView, LoginRequiredMixin):
+class JobPostCreateView(LoginRequiredMixin, CreateView):
     """
     View for creating a new job post.
     """
@@ -143,7 +143,7 @@ class JobPostCreateView(CreateView, LoginRequiredMixin):
 job_post_create = JobPostCreateView.as_view()
 
 
-class JobPostUpdateView(UpdateView, LoginRequiredMixin):
+class JobPostUpdateView(LoginRequiredMixin, UpdateView):
     """
     View for updating a job post.
     """
@@ -159,7 +159,7 @@ class JobPostUpdateView(UpdateView, LoginRequiredMixin):
 job_post_update = JobPostUpdateView.as_view()
 
 
-class JobPostDeleteView(DeleteView, LoginRequiredMixin):
+class JobPostDeleteView(LoginRequiredMixin, DeleteView):
     """
     View for deleting a job post.
     """

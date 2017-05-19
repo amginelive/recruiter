@@ -1,8 +1,6 @@
-from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
-from django.utils.decorators import method_decorator
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -28,7 +26,7 @@ from .models import (
 )
 
 
-class CompanyUpdateView(View, LoginRequiredMixin):
+class CompanyUpdateView(LoginRequiredMixin, View):
     """
     View for updating the company.
     """
@@ -72,7 +70,7 @@ class CompanyUpdateView(View, LoginRequiredMixin):
 company_update = CompanyUpdateView.as_view()
 
 
-class CompanyInviteView(View, LoginRequiredMixin):
+class CompanyInviteView(LoginRequiredMixin, View):
     """
     View for inviting user to the company.
     """
@@ -113,7 +111,7 @@ class CompanyInviteView(View, LoginRequiredMixin):
 company_invite = CompanyInviteView.as_view()
 
 
-class CompanyCreateView(CreateView, LoginRequiredMixin):
+class CompanyCreateView(LoginRequiredMixin, CreateView):
     """
     View for creating a company for a new user.
     """
@@ -135,7 +133,7 @@ class CompanyCreateView(CreateView, LoginRequiredMixin):
 company_create = CompanyCreateView.as_view()
 
 
-class CompanyPendingView(TemplateView, LoginRequiredMixin):
+class CompanyPendingView(LoginRequiredMixin, TemplateView):
     """
     View for requesting an invitation to a company.
     """
@@ -149,7 +147,7 @@ class CompanyPendingView(TemplateView, LoginRequiredMixin):
 company_pending = CompanyPendingView.as_view()
 
 
-class CompanyInvitationRequestAPIView(DeleteView, LoginRequiredMixin, JSONResponseMixin):
+class CompanyInvitationRequestAPIView(LoginRequiredMixin, DeleteView, JSONResponseMixin):
     """
     View for accepting or rejecting a company invitation request.
     """
@@ -171,7 +169,7 @@ class CompanyInvitationRequestAPIView(DeleteView, LoginRequiredMixin, JSONRespon
 api_company_invitation_request = CompanyInvitationRequestAPIView.as_view()
 
 
-class CompanyInviteSuccessView(DetailView, LoginRequiredMixin):
+class CompanyInviteSuccessView(LoginRequiredMixin, DetailView):
     """
     View for the success page when successfully invited to a company.
     """
