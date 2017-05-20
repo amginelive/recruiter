@@ -109,22 +109,31 @@ class SearchView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, *args, **kwargs):
         context = super(SearchView, self).get_context_data(*args, **kwargs)
         search = self.request.GET.get('search', None)
+        filters = self.request.GET.get('filters', None)
         results = []
 
-        if search:
-            # generate query search item
-            for index, item in enumerate(search.split()):
+        if search or filters:
+            search_query = None
+
+            # generate SearchQuery item from search
+            for index, item in enumerate(filters.split(',')):
                 if index == 0:
                     search_query = SearchQuery(item)
                 search_query |= SearchQuery(item)
 
-            # search for jpb posts
+            # generate additioanl SearchQuery item from filters
+            for index, item in enumerate(search.split()):
+                if not search_query:
+                    search_query = SearchQuery(item)
+                search_query |= SearchQuery(item)
+
+            # job posts seatch
             if self.request.user.registered_as == User.ACCOUNT_CANDIDATE:
                 results = JobPost.objects\
                     .annotate(search=SearchVector('title', 'skills__name', 'city', 'country'))\
                     .filter(search=search_query)\
                     .distinct('id')
-            # search for candidates
+            # candidate search
             else:
                 results = Candidate.objects.filter(
                     Q(skills__iexact=search) | Q(title__iexact=search)
@@ -132,6 +141,7 @@ class SearchView(LoginRequiredMixin, TemplateView):
 
         context['skills'] = Skill.objects.all()
         context['results'] = results
+        context['filters'] = filters.split(',') if filters else []
         context['search'] = search
         return context
 
@@ -147,7 +157,7 @@ class JobPostListView(LoginRequiredMixin, ListView):
     template_name = 'recruit/job_posts/list.html'
 
     def get_queryset(self):
-        return JobPost.objects.filter(company=self.request.user.agent.company).order_by('-updated_at')
+        return JobPost.objects.filter(posted_by=self.request.user.agent).order_by('-updated_at')
 
 job_post_list = JobPostListView.as_view()
 
@@ -162,7 +172,7 @@ class JobPostCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('recruit:job_post_list')
 
     def get_initial(self):
-        return {'company': self.request.user.agent.company}
+        return {'posted_by': self.request.user.agent}
 
 job_post_create = JobPostCreateView.as_view()
 

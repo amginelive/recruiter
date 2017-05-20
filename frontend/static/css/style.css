@@ -1337,3 +1337,22 @@ section#job-posts .job-post-detail {
     border-radius: 7px;
     margin-right: 10px;
 }
+
+.add-filter {
+    display: block;
+}
+
+.remove-filter {
+    cursor:pointer;
+}
+
+.search-company-image {
+    width: 120px;
+    height: 120px;
+}
+
+.search_results .search_job_post {
+    border:1px
+    solid #dfdfdf;
+    padding:15px;
+}

@@ -7,30 +7,34 @@
     <!-- internal block -->
         <div class="container">
             <div class="row" style="padding-top:40px;">
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <h3>Filters</h3>
                     <div class="row">
                         <div class="col-md-12">
                             <h4>Skills</h4>
                             {% for skill in skills %}
-                                <a href="#" class="add-filter">{{ skill.name }}</a><br>
+                                {% if skill.name in filters %}
+                                    <div>{{ skill.name }}</div>
+                                {% else %}
+                                    <a href="#" class="add-filter multiple">{{ skill.name }}</a>
+                                {% endif %}
                             {% endfor %}
                         </div>
                     </div>
                 </div>
-                <div class="col-md-9 text-center">
+                <div class="col-md-10 text-center">
                     <div class="row">
                         <div class="col-md-12">
-                            <form action="{% url 'recruit:search' %}" method="GET">
+                            <form class="search-form" action="{% url 'recruit:search' %}" method="GET">
                                 <div class="search_block">
                                     <input type="text" placeholder="Search..." name="search" value="{{ search|default_if_none:'' }}"/>
-                                    <input type="hidden" name="filter" value="{{ filter|default_if_none:'' }}"/>
+                                    <input type="hidden" name="filters" value="{% if filters %}{{ filters|join:',' }}{% endif %}"/>
                                     <button class="btn search-btn" type="submit" value="Search"><i class="glyphicon glyphicon-search"></i> Search</button>
                                 </div>
                                 <div>
                                     <div class="search-filters">
                                         {% for item in filters %}
-                                            <span class="filter-item">{{ item }}</span>
+                                            <span class="filter-item"><span class="filter-text">{{ item }}</span> <i class="glyphicon glyphicon-remove remove-filter"></i></span>
                                         {% endfor %}
                                     </div>
                                 </div>
@@ -39,18 +43,27 @@
                         <div class="col-md-12 search_results">
                             {% for result in results %}
                                 {% if request.user.registered_as == request.user.ACCOUNT_CANDIDATE %}
-                                    <div class="search__candidate" style="width:100%; border:1px solid #dfdfdf; padding:15px;">
-                                        <h2>{{ result.title }}</h2>
-                                        <h5>{{ result.city }}, {{ result.get_country_display }}</h5>
-                                        <p>{{ result.description }}</p>
-                                        <div class="job-post-skills">
-                                            {% for skill in result.skills.all %}
-                                                <span class="skill">{{ skill.name }}</span>
-                                            {% endfor %}
+                                    <div class="search_job_post col-md-6">
+                                        <div class="col-md-4">
+                                            <img class="search-company-image" src="{% if result.posted_by.company.logo %}{{ result.posted_by.company.logo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}">
+                                        </div>
+                                        <div class="col-md-8 text-left">
+                                            <h2>{{ result.title }}</h2>
+                                            <h4>{{ result.posted_by.company.name }}</h4>
+                                            <h5>{{ result.city }}, {{ result.get_country_display }}</h5>
+                                            <div class="job-post-skills">
+                                                {% for skill in result.skills.all %}
+                                                    <span class="skill">{{ skill.name }}</span>
+                                                {% endfor %}
+                                            </div>
+                                            <div class="job-posted-by pull-right">
+                                                <span>{{ result.posted_by.user.get_full_name }}</span>
+                                                <img src="{% if result.posted_by.photo %}{{ result.posted_by.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:30px; border-radius:50%">
+                                            </div>
                                         </div>
                                     </div>
                                 {% else %}
-                                    <div class="search__candidate" style="width:100%; border:1px solid #dfdfdf; padding:15px;">
+                                    <div class="search__candidate col-md-6" style="width:100%; border:1px solid #dfdfdf; padding:15px;">
                                         <a href="#">
                                             <img src="{% if result.photo %}{{ result.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:100px; border-radius:50%">
                                             <span class="candidate_info">{{ result.user.get_full_name }}</span>
@@ -81,10 +94,30 @@
 
 {% block footer_js %}
 <script type="text/javascript">
-    $('.add-filter').on("click", function(event) {
+    $('.add-filter.multiple').on("click", function(event) {
         event.preventDefault();
-        var filter = $(this).html();
-        $('input[name=filter]').val()
+        var add_filter = $(this).html();
+        var filter = $('input[name=filters]');
+
+        if (filter.val() == '')
+            filter.val(add_filter);
+        else
+            filter.val(filter.val() + ',' + add_filter);
+
+        $('.search-form').submit();
+    });
+
+    $('.remove-filter').on("click", function(event) {
+        event.preventDefault();
+        $(this).parent().remove();
+
+        var filters = [];
+        $('.filter-item').each(function(key, value){
+            filters.push($(this).find('.filter-text').html());
+        })
+        $('input[name=filters]').val(filters.join(','));
+
+        $('.search-form').submit();
     });
 </script>
 {% endblock footer_js %}
