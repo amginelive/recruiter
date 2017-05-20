@@ -2,6 +2,10 @@ from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse_lazy
 from django.db.models import Q
 from django.http import HttpResponseRedirect
+from django.contrib.postgres.search import (
+    SearchQuery,
+    SearchVector,
+)
 from django.shortcuts import render
 from django.views.generic import (
     CreateView,
@@ -14,7 +18,10 @@ from django.views.generic import (
 
 from braces.views import LoginRequiredMixin
 
-from .models import JobPost
+from .models import (
+    JobPost,
+    Skill,
+)
 from .forms import JobPostForm
 from companies.models import (
     Company,
@@ -96,20 +103,37 @@ class DashboardView(LoginRequiredMixin, View):
 dashboard = DashboardView.as_view()
 
 
-class SearchView(LoginRequiredMixin, View):
+class SearchView(LoginRequiredMixin, TemplateView):
     template_name = 'recruit/search.html'
 
-    def get(self, request, **kwargs):
-        search_string = request.GET.get('search', None)
-        candidates = []
+    def get_context_data(self, *args, **kwargs):
+        context = super(SearchView, self).get_context_data(*args, **kwargs)
+        search = self.request.GET.get('search', None)
+        results = []
 
-        if search_string is not None:
-            candidates = Candidate.objects.filter(Q(skills__iexact=search_string) |
-                                              Q(title__iexact=search_string))
+        if search:
+            # generate query search item
+            for index, item in enumerate(search.split()):
+                if index == 0:
+                    search_query = SearchQuery(item)
+                search_query |= SearchQuery(item)
 
-        return render(request, self.template_name, {
-            'candidates': candidates
-        })
+            # search for jpb posts
+            if self.request.user.registered_as == User.ACCOUNT_CANDIDATE:
+                results = JobPost.objects\
+                    .annotate(search=SearchVector('title', 'skills__name', 'city', 'country'))\
+                    .filter(search=search_query)\
+                    .distinct('id')
+            # search for candidates
+            else:
+                results = Candidate.objects.filter(
+                    Q(skills__iexact=search) | Q(title__iexact=search)
+                )
+
+        context['skills'] = Skill.objects.all()
+        context['results'] = results
+        context['search'] = search
+        return context
 
 search = SearchView.as_view()
 

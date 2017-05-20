@@ -18,7 +18,7 @@
                         </div>
                         <div class="col-md-12">
                             {% for job_post in job_posts %}
-                                <div class="row job-post-detail">
+                                <div class="row job-post-detail" style="width:100%; border:1px solid #dfdfdf; padding:15px;">
                                     <div class="pull-right">
                                         <a href="{% url 'recruit:job_post_update' job_post.uuid %}" class="btn btn-default">Edit</a>
                                         <a href="{% url 'recruit:job_post_delete' job_post.uuid %}" class="btn btn-danger">Delete</a>
