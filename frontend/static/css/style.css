@@ -1315,7 +1315,7 @@ section#cart .code_error span {
     display: none;
 }
 
-section#job-posts .skill {
+.job-post-skills .skill {
     background-color: #f9690e;
     padding: 3px 5px;
     border-radius: 7px;
@@ -1324,4 +1324,16 @@ section#job-posts .skill {
 
 section#job-posts .job-post-detail {
     margin-top: 50px;
+}
+
+.search-filters {
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+
+.search-filters .filter-item {
+    background-color: #F5F5F3;
+    padding: 10px 10px;
+    border-radius: 7px;
+    margin-right: 10px;
 }

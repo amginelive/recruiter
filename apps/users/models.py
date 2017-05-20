@@ -70,12 +70,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     Email and password are required. Other fields are optional.
     """
-    CANDIDATE = 'c'
-    AGENT = 'a'
+    ACCOUNT_CANDIDATE = 'c'
+    ACCOUNT_AGENT = 'a'
 
-    ACC_CHOICES = (
-        (CANDIDATE, _('Candidate')),
-        (AGENT, _('Agent')),
+    ACCOUNT_CHOICES = (
+        (ACCOUNT_CANDIDATE, _('Candidate')),
+        (ACCOUNT_AGENT, _('Agent')),
     )
 
     email = models.EmailField(_('email address'), max_length=254, unique=True)
@@ -98,8 +98,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     registered_as = models.CharField(
         _('Registered As'),
         max_length=1,
-        choices=ACC_CHOICES,
-        default=CANDIDATE,
+        choices=ACCOUNT_CHOICES,
+        default=ACCOUNT_CANDIDATE,
         editable=True,
         help_text='User role selected during registration'
     )
@@ -110,7 +110,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['firstname', 'lastname']
 
     index_together = [
-        ["slug", "is_active"],
+        ['slug', 'is_active'],
     ]
 
     class Meta:
