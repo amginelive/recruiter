@@ -52,7 +52,7 @@
                             {% if company.address_1 %}<span>{{ company.address_1 }}</span>{% endif %}
                             {% if company.address_2 %}<span>{{ company.address_2 }}</span>{% endif %}
                             {% if company.zip and company.city %}<span>{{ company.zip }} {{ company.city }}</span>{% endif %}
-                            {% if company.country %}<span>{{ company.get_country_display }}</span>{% endif %}
+                            {% if company.country %}<span>{{ company.country.name }}</span>{% endif %}
                             {% if company.website %}<span><a href="{{ company.website }}">{{ company.website }}</a></span>{% endif %}
                             {% if company.overview %}<hr>
                             <span>{{ company.overview }}</span>

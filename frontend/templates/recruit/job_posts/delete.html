@@ -17,7 +17,7 @@
                                 <div class="col-md-12">
                                     <div class="row job-post-detail">
                                         <h3>{{ job_post.title }}</h3>
-                                        <h5>{{ job_post.city }}, {{ job_post.get_country_display }}</h5>
+                                        <h5>{{ job_post.city }}, {{ job_post.country.name }}</h5>
                                         <p>{{ job_post.description }}</p>
                                         <div class="job-post-skills">
                                             {% for skill in job_post.skills.all %}

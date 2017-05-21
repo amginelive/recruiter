@@ -17,6 +17,7 @@ from django.views.generic import (
 )
 
 from braces.views import LoginRequiredMixin
+from django_countries import countries
 
 from .models import (
     JobPost,
@@ -113,16 +114,34 @@ class SearchView(LoginRequiredMixin, TemplateView):
         results = []
 
         if search or filters:
-            search_query = None
+            # reverse the key and value of the country dictionary
+            reversed_countries = {
+                value.lower(): key.lower()
+                for key, value in countries
+            }
+
+            # search
+            search_list = search.split()
+            for item in search_list:
+                country_search = reversed_countries.get(item.lower(), None)
+                if country_search:
+                    search_list.append(country_search)
+
+            # filter
+            filter_list = filters.split(',')
+            for item in filter_list:
+                country_filter = reversed_countries.get(item.lower(), None)
+                if country_filter:
+                    filter_list.append(country_filter)
 
             # generate SearchQuery item from search
-            for index, item in enumerate(filters.split(',')):
+            for index, item in enumerate(filter_list):
                 if index == 0:
                     search_query = SearchQuery(item)
                 search_query |= SearchQuery(item)
 
             # generate additioanl SearchQuery item from filters
-            for index, item in enumerate(search.split()):
+            for index, item in enumerate(search_list):
                 if not search_query:
                     search_query = SearchQuery(item)
                 search_query |= SearchQuery(item)
@@ -139,6 +158,9 @@ class SearchView(LoginRequiredMixin, TemplateView):
                     Q(skills__iexact=search) | Q(title__iexact=search)
                 )
 
+        job_post_countries = JobPost.objects.all().distinct('country').values_list('country', flat=True)
+        context['countries'] = [dict(countries).get(country) for country in job_post_countries if dict(countries).get(country)]
+        context['cities'] = JobPost.objects.all().distinct('city').values_list('city', flat=True)
         context['skills'] = Skill.objects.all()
         context['results'] = results
         context['filters'] = filters.split(',') if filters else []

@@ -16,7 +16,31 @@
                                 {% if skill.name in filters %}
                                     <div>{{ skill.name }}</div>
                                 {% else %}
-                                    <a href="#" class="add-filter multiple">{{ skill.name }}</a>
+                                    <a href="#" class="add-filter">{{ skill.name }}</a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Country</h4>
+                            {% for country in countries %}
+                                {% if country in filters %}
+                                    <div>{{ country }}</div>
+                                {% else %}
+                                    <a href="#" class="add-filter">{{ country }}</a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>City</h4>
+                            {% for city in cities %}
+                                {% if city in filters %}
+                                    <div>{{ city }}</div>
+                                {% else %}
+                                    <a href="#" class="add-filter">{{ city }}</a>
                                 {% endif %}
                             {% endfor %}
                         </div>
@@ -50,7 +74,7 @@
                                         <div class="col-md-8 text-left">
                                             <h2>{{ result.title }}</h2>
                                             <h4>{{ result.posted_by.company.name }}</h4>
-                                            <h5>{{ result.city }}, {{ result.get_country_display }}</h5>
+                                            <h5>{{ result.city }}, {{ result.country.name }}</h5>
                                             <div class="job-post-skills">
                                                 {% for skill in result.skills.all %}
                                                     <span class="skill">{{ skill.name }}</span>
@@ -94,7 +118,7 @@
 
 {% block footer_js %}
 <script type="text/javascript">
-    $('.add-filter.multiple').on("click", function(event) {
+    $('.add-filter').on("click", function(event) {
         event.preventDefault();
         var add_filter = $(this).html();
         var filter = $('input[name=filters]');

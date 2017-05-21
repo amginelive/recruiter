@@ -5,13 +5,14 @@ from django.utils.translation import ugettext_lazy as _
 
 
 from core.models import AbstractTimeStampedModel
-from libs.general import COUNTRIES
+from django_countries.fields import CountryField
 
 
 optional = {
     'blank': True,
     'null': True,
 }
+
 
 class JobPost(AbstractTimeStampedModel):
     """
@@ -28,11 +29,11 @@ class JobPost(AbstractTimeStampedModel):
     description = models.TextField(_('Description'))
     contract = models.TextField(_('Contract'))
     city = models.CharField(_('City'), max_length=80)
-    country = models.CharField(_('Country'), max_length=2, choices=COUNTRIES)
+    country = CountryField(_('Country'))
     skills = models.ManyToManyField(
         'recruit.Skill',
         related_name='job_posts',
-        verbose_name=_('Skills'),
+        verbose_name=_('Skills')
     )
     uuid = models.SlugField(_('UUID'), default=uuid.uuid4, editable=False)
 
