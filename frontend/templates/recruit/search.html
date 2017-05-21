@@ -69,7 +69,7 @@
                                 {% if request.user.registered_as == request.user.ACCOUNT_CANDIDATE %}
                                     <div class="search_job_post col-md-6">
                                         <div class="col-md-4">
-                                            <img class="search-company-image" src="{% if result.posted_by.company.logo %}{{ result.posted_by.company.logo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}">
+                                            <img class="search-company-image" src="{% if result.posted_by.company.logo %}{{ result.posted_by.company.logo.url }}{% else %}{% static 'img/default_logo.png' %}{% endif %}">
                                         </div>
                                         <div class="col-md-8 text-left">
                                             <h2>{{ result.title }}</h2>
