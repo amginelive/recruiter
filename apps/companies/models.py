@@ -9,10 +9,10 @@ from django.db.models.signals import post_save
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
+from django_countries.fields import CountryField
 from slugify import slugify_url
 
 from core.models import AbstractTimeStampedModel
-from libs.general import COUNTRIES
 from libs.tools import resize_image, random_string_gen
 
 
@@ -55,7 +55,7 @@ class Company(AbstractTimeStampedModel):
     address_2 = models.CharField(_('Address line 2'), max_length=80, **optional)
     zip = models.CharField(_('Postal code / ZIP'), max_length=10, **optional)
     city = models.CharField(_('City'), max_length=80)
-    country = models.CharField(_('Country'), max_length=2, choices=COUNTRIES)
+    country = CountryField(_('Country'))
     website = models.URLField(_('Website'), **optional)
     is_charity = models.BooleanField(_('Is it a charity organization?'), default=False)
     allow_auto_invite = models.BooleanField(_('Allow auto invite?'), default=False)

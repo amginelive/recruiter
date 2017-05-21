@@ -13,6 +13,7 @@ from django.core.mail import send_mail
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from django_countries.fields import CountryField
 from phonenumber_field.modelfields import PhoneNumberField
 
 from core.models import AbstractTimeStampedModel
@@ -324,7 +325,7 @@ class Candidate(ProfileBase):
     location = models.CharField(_('Current location'),  max_length=200, **optional)
     job_location = models.CharField(_('Desired job location'),  max_length=200, **optional)
     job_type = models.IntegerField(_('Job type'), choices=JOB_TYPE_CHOICES, **optional)
-    residence_country = models.CharField(_('Country of residence'), max_length=2, choices=COUNTRIES)
+    country = CountryField(_('Country'))
     experience = models.SmallIntegerField(_("Experience (full years)"), **optional)
     cv = models.FileField(_("CV"), upload_to=get_cv_path, max_length=150, editable=True, **optional)
 

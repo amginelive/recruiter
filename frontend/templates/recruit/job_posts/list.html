@@ -24,7 +24,7 @@
                                         <a href="{% url 'recruit:job_post_delete' job_post.uuid %}" class="btn btn-danger">Delete</a>
                                     </div>
                                     <h3>{{ job_post.title }}</h3>
-                                    <h5>{{ job_post.city }}, {{ job_post.get_country_display }}</h5>
+                                    <h5>{{ job_post.city }}, {{ job_post.country.name }}</h5>
                                     <p>{{ job_post.description }}</p>
                                     <div class="job-post-skills">
                                         {% for skill in job_post.skills.all %}

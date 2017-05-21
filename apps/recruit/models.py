@@ -5,20 +5,36 @@ from django.utils.translation import ugettext_lazy as _
 
 
 from core.models import AbstractTimeStampedModel
-from libs.general import COUNTRIES
+from django_countries.fields import CountryField
+
+
+optional = {
+    'blank': True,
+    'null': True,
+}
 
 
 class JobPost(AbstractTimeStampedModel):
     """
     Model for Job Post.
     """
-    company = models.ForeignKey('companies.Company', related_name='job_posts', verbose_name=('Company'))
+    posted_by = models.ForeignKey(
+        'users.Agent',
+        on_delete=models.SET_NULL,
+        related_name='job_posts',
+        verbose_name=('Posted By'),
+        **optional
+    )
     title = models.CharField(_('Title'), max_length=255)
     description = models.TextField(_('Description'))
     contract = models.TextField(_('Contract'))
     city = models.CharField(_('City'), max_length=80)
-    country = models.CharField(_('Country'), max_length=2, choices=COUNTRIES)
-    skills = models.ManyToManyField('recruit.Skill', related_name='job_posts', verbose_name=_('Skills'))
+    country = CountryField(_('Country'))
+    skills = models.ManyToManyField(
+        'recruit.Skill',
+        related_name='job_posts',
+        verbose_name=_('Skills')
+    )
     uuid = models.SlugField(_('UUID'), default=uuid.uuid4, editable=False)
 
     class Meta:

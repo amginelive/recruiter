@@ -17,6 +17,7 @@ from django.views.generic import (
 )
 
 from braces.views import LoginRequiredMixin
+from django_countries import countries
 
 from .models import (
     JobPost,
@@ -109,29 +110,60 @@ class SearchView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, *args, **kwargs):
         context = super(SearchView, self).get_context_data(*args, **kwargs)
         search = self.request.GET.get('search', None)
+        filters = self.request.GET.get('filters', None)
         results = []
 
-        if search:
-            # generate query search item
-            for index, item in enumerate(search.split()):
+        if search or filters:
+            # reverse the key and value of the country dictionary
+            reversed_countries = {
+                value.lower(): key.lower()
+                for key, value in countries
+            }
+
+            # search
+            search_list = search.split()
+            for item in search_list:
+                country_search = reversed_countries.get(item.lower(), None)
+                if country_search:
+                    search_list.append(country_search)
+
+            # filter
+            filter_list = filters.split(',')
+            for item in filter_list:
+                country_filter = reversed_countries.get(item.lower(), None)
+                if country_filter:
+                    filter_list.append(country_filter)
+
+            # generate SearchQuery item from search
+            for index, item in enumerate(filter_list):
                 if index == 0:
                     search_query = SearchQuery(item)
                 search_query |= SearchQuery(item)
 
-            # search for jpb posts
+            # generate additioanl SearchQuery item from filters
+            for index, item in enumerate(search_list):
+                if not search_query:
+                    search_query = SearchQuery(item)
+                search_query |= SearchQuery(item)
+
+            # job posts seatch
             if self.request.user.registered_as == User.ACCOUNT_CANDIDATE:
                 results = JobPost.objects\
                     .annotate(search=SearchVector('title', 'skills__name', 'city', 'country'))\
                     .filter(search=search_query)\
                     .distinct('id')
-            # search for candidates
+            # candidate search
             else:
                 results = Candidate.objects.filter(
                     Q(skills__iexact=search) | Q(title__iexact=search)
                 )
 
+        job_post_countries = JobPost.objects.all().distinct('country').values_list('country', flat=True)
+        context['countries'] = [dict(countries).get(country) for country in job_post_countries if dict(countries).get(country)]
+        context['cities'] = JobPost.objects.all().distinct('city').values_list('city', flat=True)
         context['skills'] = Skill.objects.all()
         context['results'] = results
+        context['filters'] = filters.split(',') if filters else []
         context['search'] = search
         return context
 
@@ -147,7 +179,7 @@ class JobPostListView(LoginRequiredMixin, ListView):
     template_name = 'recruit/job_posts/list.html'
 
     def get_queryset(self):
-        return JobPost.objects.filter(company=self.request.user.agent.company).order_by('-updated_at')
+        return JobPost.objects.filter(posted_by=self.request.user.agent).order_by('-updated_at')
 
 job_post_list = JobPostListView.as_view()
 
@@ -162,7 +194,7 @@ class JobPostCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('recruit:job_post_list')
 
     def get_initial(self):
-        return {'company': self.request.user.agent.company}
+        return {'posted_by': self.request.user.agent}
 
 job_post_create = JobPostCreateView.as_view()
 

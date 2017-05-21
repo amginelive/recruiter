@@ -31,7 +31,7 @@
                         <div class="col-md-8">
                             <h5>My profile</h5>
                             <ul class="candidate_profile_data">
-                            {{ f.country.get_value_display }}
+                            {{ f.country.name }}
                             {% for field in f %}
                                 {% if field.value %}
                                 <li>
@@ -39,7 +39,7 @@
                                   {% if field.name == 'job_type' %}
                                     {{ profile.get_job_type_display }}
                                   {% elif field.name == 'residence_country' %}
-                                    {{ profile.get_residence_country_display }}
+                                    {{ profile.country.name }}
                                   {% else %}
                                     {{ field.value }}
                                   {% endif %}

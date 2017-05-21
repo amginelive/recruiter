@@ -172,7 +172,7 @@ THUMBNAIL_ALIASES = {
         'photo': {'size': (200, 200), 'crop': 'smart'},
     },
     'companies_company': {
-        'logo': {'size': (600, 200), 'crop': 'smart'},
+        'logo': {'size': (200, 200), 'crop': 'smart'},
     },
 }
 
