@@ -161,7 +161,7 @@ class SearchView(LoginRequiredMixin, TemplateView):
         job_post_countries = JobPost.objects.all().distinct('country').values_list('country', flat=True)
         context['countries'] = [dict(countries).get(country) for country in job_post_countries if dict(countries).get(country)]
         job_post_cities = JobPost.objects.all().distinct('city').values_list('city', flat=True)
-        context['cities'] = set([city.lower() for city in job_post_cities])
+        context['cities'] = set([city.title() for city in job_post_cities])
         context['skills'] = Skill.objects.all()
         context['results'] = results
         context['filters'] = filters.split(',') if filters else []
