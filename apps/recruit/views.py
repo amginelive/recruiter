@@ -29,10 +29,11 @@ from companies.models import (
     Company,
     CompanyRequestInvitation,
 )
-from users.models import Candidate
 from users.forms import (
     CandidateUpdateForm,
 )
+from users.models import Candidate
+from users.mixins import AgentRequiredMixin
 
 
 User = get_user_model()
@@ -172,7 +173,7 @@ class SearchView(LoginRequiredMixin, TemplateView):
 search = SearchView.as_view()
 
 
-class JobPostListView(LoginRequiredMixin, ListView):
+class JobPostListView(AgentRequiredMixin, ListView):
     """
     View for displaying the list of all the company's job posts.
     """
@@ -200,7 +201,7 @@ class JobPostDetailView(LoginRequiredMixin, DetailView):
 job_post_detail = JobPostDetailView.as_view()
 
 
-class JobPostCreateView(LoginRequiredMixin, CreateView):
+class JobPostCreateView(AgentRequiredMixin, CreateView):
     """
     View for creating a new job post.
     """
@@ -215,7 +216,7 @@ class JobPostCreateView(LoginRequiredMixin, CreateView):
 job_post_create = JobPostCreateView.as_view()
 
 
-class JobPostUpdateView(LoginRequiredMixin, UpdateView):
+class JobPostUpdateView(AgentRequiredMixin, UpdateView):
     """
     View for updating a job post.
     """
@@ -231,7 +232,7 @@ class JobPostUpdateView(LoginRequiredMixin, UpdateView):
 job_post_update = JobPostUpdateView.as_view()
 
 
-class JobPostDeleteView(LoginRequiredMixin, DeleteView):
+class JobPostDeleteView(AgentRequiredMixin, DeleteView):
     """
     View for deleting a job post.
     """
