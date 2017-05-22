@@ -166,7 +166,7 @@ class ProfileBase(AbstractTimeStampedModel):
         (STATUS_MODERATION, _('Moderation'))
     )
 
-    phone = PhoneNumberField(_('Photo'), **optional)
+    phone = PhoneNumberField(_('Phone'), **optional)
     photo = models.ImageField(_('Photo'), upload_to='images/photo/%Y/', help_text="200x200px", **optional)
     status = models.IntegerField(_('Status'), choices=STATUS_CHOICES, default=STATUS_ACTIVE)
 
