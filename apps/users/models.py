@@ -18,7 +18,6 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from core.models import AbstractTimeStampedModel
 from libs.tools import random_string_gen, resize_image
-from libs.general import COUNTRIES
 
 
 logger = logging.getLogger('console_log')

@@ -72,7 +72,7 @@
                                             <img class="search-company-image" src="{% if result.posted_by.company.logo %}{{ result.posted_by.company.logo.url }}{% else %}{% static 'img/default_logo.png' %}{% endif %}">
                                         </div>
                                         <div class="col-md-8 text-left">
-                                            <h2>{{ result.title }}</h2>
+                                            <h2><a href="{% url 'recruit:job_post_detail' result.uuid %}">{{ result.title }}</a></h2>
                                             <h4>{{ result.posted_by.company.name }}</h4>
                                             <h5>{{ result.city }}, {{ result.country.name }}</h5>
                                             <div class="job-post-skills">

@@ -1356,7 +1356,11 @@ section#cart .code_error span {
     padding:15px;
 }
 
-.job-post-list .job-post-detail {
+.job-post-detail-section {
+    margin-top: 50px;
+}
+
+.job-post-detail {
     border:1px
     solid #dfdfdf;
     padding:15px;

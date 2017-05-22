@@ -10,6 +10,7 @@ from django.shortcuts import render
 from django.views.generic import (
     CreateView,
     DeleteView,
+    DetailView,
     ListView,
     TemplateView,
     UpdateView,
@@ -183,6 +184,20 @@ class JobPostListView(LoginRequiredMixin, ListView):
         return JobPost.objects.filter(posted_by=self.request.user.agent).order_by('-updated_at')
 
 job_post_list = JobPostListView.as_view()
+
+
+class JobPostDetailView(LoginRequiredMixin, DetailView):
+    """
+    View for displaying the details of the company's job posts.
+    """
+    model = JobPost
+    context_object_name = 'job_post'
+    template_name = 'recruit/job_posts/detail.html'
+
+    def get_object(self):
+        return JobPost.objects.get(uuid=self.kwargs.get('uuid'))
+
+job_post_detail = JobPostDetailView.as_view()
 
 
 class JobPostCreateView(LoginRequiredMixin, CreateView):

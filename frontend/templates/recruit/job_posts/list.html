@@ -23,7 +23,11 @@
                                         <img class="search-company-image" src="{% if job_post.posted_by.company.logo %}{{ job_post.posted_by.company.logo.url }}{% else %}{% static 'img/default_logo.png' %}{% endif %}">
                                     </div>
                                     <div class="col-md-8 text-left">
-                                        <h2>{{ job_post.title }}</h2>
+                                        <div class="pull-right">
+                                            <a href="{% url 'recruit:job_post_update' job_post.uuid %}" class="btn btn-default">Edit</a>
+                                            <a href="{% url 'recruit:job_post_delete' job_post.uuid %}" class="btn btn-danger">Delete</a>
+                                        </div>
+                                        <h2><a href="{% url 'recruit:job_post_detail' job_post.uuid %}">{{ job_post.title }}</a></h2>
                                         <h4>{{ job_post.posted_by.company.name }}</h4>
                                         <h5>{{ job_post.city }}, {{ job_post.country.name }}</h5>
                                         <div class="job-post-skills">
