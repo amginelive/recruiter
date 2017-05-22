@@ -14,6 +14,7 @@ from .forms import (
     CandidatePhotoUploadForm,
     CandidateUpdateForm,
 )
+from .mixins import CandidateRequiredMixin
 from .utils import get_profile_completeness
 
 
@@ -60,7 +61,7 @@ class ProfileUpdateView(LoginRequiredMixin, View):
             completeness = get_profile_completeness(request.user.candidate)
 
             if form.is_valid():
-                candidate = form.save(commit=True)
+                form.save(commit=True)
 
         # show agent dashboard
         elif request.user.account_type == User.ACCOUNT_AGENT:
@@ -68,7 +69,7 @@ class ProfileUpdateView(LoginRequiredMixin, View):
             form = AgentUpdateForm(form_values, request.FILES, instance=request.user.agent)
 
             if form.is_valid():
-                agent = form.save(commit=True)
+                form.save(commit=True)
 
         return render(request, self.template_name, {
             'form': form,
@@ -83,55 +84,44 @@ class ProfilePhotoUploadView(LoginRequiredMixin, View):
     View for uploading a user's profile picture.
     """
     def post(self, request, **kwargs):
-        if request.user.is_authenticated:
-            # show profile dashboard according to user role
-            # start with candidate profile
-            form_values = request.POST.copy()
-            form_values['user'] = request.user.id
-            if request.user.account_type == User.ACCOUNT_CANDIDATE:
-                candidate = request.user.candidate
-                form = CandidatePhotoUploadForm(form_values, request.FILES, instance=candidate)
+        # show profile dashboard according to user role
+        # start with candidate profile
+        form_values = request.POST.copy()
+        form_values['user'] = request.user.id
+        if request.user.account_type == User.ACCOUNT_CANDIDATE:
+            candidate = request.user.candidate
+            form = CandidatePhotoUploadForm(form_values, request.FILES, instance=candidate)
 
-                if form.is_valid():
-                    candidate = form.save(commit=True)
-                    return JsonResponse({'success': True, 'image': candidate.photo.url})
+            if form.is_valid():
+                candidate = form.save(commit=True)
+                return JsonResponse({'success': True, 'image': candidate.photo.url})
 
-            # show agent dashboard
-            elif request.user.account_type == User.ACCOUNT_AGENT:
-                agent = request.user.agent
-                form = AgentPhotoUploadForm(form_values, request.FILES, instance=agent)
+        # show agent dashboard
+        elif request.user.account_type == User.ACCOUNT_AGENT:
+            agent = request.user.agent
+            form = AgentPhotoUploadForm(form_values, request.FILES, instance=agent)
 
-                if form.is_valid():
-                    agent = form.save(commit=True)
-                    return JsonResponse({'success': True, 'image': agent.photo.url})
-        else:
-            return JsonResponse({'success': False, 'message': 'Not authorized'})
+            if form.is_valid():
+                agent = form.save(commit=True)
+                return JsonResponse({'success': True, 'image': agent.photo.url})
 
 profile_photo_upload = ProfilePhotoUploadView.as_view()
 
 
-class ProfileCVUploadView(LoginRequiredMixin, View):
+class ProfileCVUploadView(CandidateRequiredMixin, View):
     """
     View for uploading a candidate's CV.
     """
     def post(self, request, **kwargs):
-        if request.user.is_authenticated:
-            # show profile dashboard according to user role
-            # start with candidate profile
-            form_values = request.POST.copy()
-            if request.user.account_type == User.ACCOUNT_CANDIDATE:
-                form_values['user'] = request.user.id
-                candidate = request.user.candidate
-                form = CandidateCVUploadForm(form_values, request.FILES, instance=candidate)
+        # show profile dashboard according to user role
+        # start with candidate profile
+        form_values = request.POST.copy()
+        form_values['user'] = request.user.id
+        candidate = request.user.candidate
+        form = CandidateCVUploadForm(form_values, request.FILES, instance=candidate)
 
-                if form.is_valid():
-                    candidate = form.save(commit=True)
-                    return JsonResponse({'success': True, 'cv': candidate.cv.url})
-
-            # restricted for agents
-            else:
-                return JsonResponse({'success': False, 'message': 'Not authorized'})
-        else:
-            return JsonResponse({'success': False, 'message': 'Not authorized'})
+        if form.is_valid():
+            candidate = form.save(commit=True)
+            return JsonResponse({'success': True, 'cv': candidate.cv.url})
 
 profile_cv_upload = ProfileCVUploadView.as_view()
