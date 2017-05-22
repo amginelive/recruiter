@@ -8,7 +8,7 @@
     <section id="job-posts">
         <div class="container">
             <div class="row">
-                <div class="col-md-8 col-md-offset-2">
+                <div class="col-md-10 col-md-offset-1">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="text-center">
@@ -16,20 +16,30 @@
                                 <a href="{% url 'recruit:job_post_create' %}" class="btn btn-success">Create</a>
                             </div>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-12 job-post-list">
                             {% for job_post in job_posts %}
-                                <div class="row job-post-detail" style="width:100%; border:1px solid #dfdfdf; padding:15px;">
-                                    <div class="pull-right">
-                                        <a href="{% url 'recruit:job_post_update' job_post.uuid %}" class="btn btn-default">Edit</a>
-                                        <a href="{% url 'recruit:job_post_delete' job_post.uuid %}" class="btn btn-danger">Delete</a>
+                                <div class="job-post-detail col-md-6">
+                                    <div class="col-md-4">
+                                        <img class="search-company-image" src="{% if job_post.posted_by.company.logo %}{{ job_post.posted_by.company.logo.url }}{% else %}{% static 'img/default_logo.png' %}{% endif %}">
                                     </div>
-                                    <h3>{{ job_post.title }}</h3>
-                                    <h5>{{ job_post.city }}, {{ job_post.country.name }}</h5>
-                                    <p>{{ job_post.description }}</p>
-                                    <div class="job-post-skills">
-                                        {% for skill in job_post.skills.all %}
-                                            <span class="skill">{{ skill.name }}</span>
-                                        {% endfor %}
+                                    <div class="col-md-8 text-left">
+                                        <div class="pull-right">
+                                            <a href="{% url 'recruit:job_post_update' job_post.uuid %}" class="btn btn-default">Edit</a>
+                                            <a href="{% url 'recruit:job_post_delete' job_post.uuid %}" class="btn btn-danger">Delete</a>
+                                        </div>
+                                        <h2><a href="{% url 'recruit:job_post_detail' job_post.uuid %}">{{ job_post.title }}</a></h2>
+                                        <h4>{{ job_post.posted_by.company.name }}</h4>
+                                        <h5>{{ job_post.city }}, {{ job_post.country.name }}</h5>
+                                        <div class="job-post-skills">
+                                            {% for skill in job_post.skills.all %}
+                                                <span class="skill">{{ skill.name }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        <h6>{{ job_post.created_at|date }}</h6>
+                                        <div class="job-posted-by pull-right">
+                                            <span>{{ job_post.posted_by.user.get_full_name }}</span>
+                                            <img src="{% if job_post.posted_by.photo %}{{ job_post.posted_by.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:30px; border-radius:50%">
+                                        </div>
                                     </div>
                                 </div>
                             {% endfor %}

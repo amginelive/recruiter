@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
@@ -24,6 +25,9 @@ from .models import (
     CompanyInvitation,
     CompanyRequestInvitation
 )
+
+
+User = get_user_model()
 
 
 class CompanyUpdateView(LoginRequiredMixin, View):
@@ -80,7 +84,7 @@ class CompanyInviteView(LoginRequiredMixin, View):
         completeness = []
 
         form = []
-        if (request.user.registered_as == 'a' and
+        if (request.user.account_type == User.ACCOUNT_AGENT and
             request.user.agent.company.owner == request.user):
 
             return render(request, self.template_name, {})
@@ -91,7 +95,7 @@ class CompanyInviteView(LoginRequiredMixin, View):
         form = []
         success = False
 
-        if request.user.registered_as == 'a':
+        if request.user.account_type == User.ACCOUNT_AGENT:
             form = CompanyInvitationForm(request.POST)
             # create invitation
             if form.is_valid():

@@ -1322,7 +1322,7 @@ section#cart .code_error span {
     margin-right: 5px;
 }
 
-section#job-posts .job-post-detail {
+.job-post-list {
     margin-top: 50px;
 }
 
@@ -1351,6 +1351,16 @@ section#job-posts .job-post-detail {
 }
 
 .search_results .search_job_post {
+    border:1px
+    solid #dfdfdf;
+    padding:15px;
+}
+
+.job-post-detail-section {
+    margin-top: 50px;
+}
+
+.job-post-detail {
     border:1px
     solid #dfdfdf;
     padding:15px;

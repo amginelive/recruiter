@@ -30,8 +30,8 @@ class Company(AbstractTimeStampedModel):
     STATUS_INACTIVE = 1
 
     STATUS_CHOICES = (
-        (STATUS_ACTIVE, 'active'),
-        (STATUS_INACTIVE, 'inactive'),
+        (STATUS_ACTIVE, 'Active'),
+        (STATUS_INACTIVE, 'Inactive'),
     )
 
     owner = models.ForeignKey('users.User', on_delete=models.SET_NULL, verbose_name=_('Major company representative'), **optional)
