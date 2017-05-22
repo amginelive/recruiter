@@ -57,8 +57,8 @@
                             </ul>
                         </li>
                         {% else %}
-                        <li><a href="{% url 'account_signup' %}?registered_as=c"><i class="glyphicon glyphicon-user"></i> Register CV</a></li>
-                        <li><a href="{% url 'account_signup' %}?registered_as=a"><i class="glyphicon glyphicon-briefcase"></i> Recruiter registration</a></li>
+                        <li><a href="{% url 'account_signup' %}?account_type={{ request.user.ACCOUNT_CANDIDATE }}"><i class="glyphicon glyphicon-user"></i> Register CV</a></li>
+                        <li><a href="{% url 'account_signup' %}?account_type={{ request.user.ACCOUNT_AGENT}}"><i class="glyphicon glyphicon-briefcase"></i> Recruiter registration</a></li>
                         <li>
                             <a href="{% url 'account_login' %}"><i class="glyphicon glyphicon-log-in"></i> {% trans "Login" %}</a>
                         </li>

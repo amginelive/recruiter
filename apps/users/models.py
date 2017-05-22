@@ -70,10 +70,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     Email and password are required. Other fields are optional.
     """
-    ACCOUNT_CANDIDATE = 'c'
-    ACCOUNT_AGENT = 'a'
+    ACCOUNT_CANDIDATE = 1
+    ACCOUNT_AGENT = 2
 
-    ACCOUNT_CHOICES = (
+    ACCOUNT_TYPE_CHOICES = (
         (ACCOUNT_CANDIDATE, _('Candidate')),
         (ACCOUNT_AGENT, _('Agent')),
     )
@@ -95,12 +95,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     get_ads = models.BooleanField(_('Receive ads by email?'), default=True)
     date_joined = models.DateTimeField(_('Date Joined'), default=timezone.now)
-    registered_as = models.CharField(
-        _('Registered As'),
-        max_length=1,
-        choices=ACCOUNT_CHOICES,
+    account_type = models.IntegerField(
+        _('Account Type'),
+        choices=ACCOUNT_TYPE_CHOICES,
         default=ACCOUNT_CANDIDATE,
-        editable=True,
         help_text='User role selected during registration'
     )
 

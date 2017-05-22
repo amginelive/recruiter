@@ -21,7 +21,7 @@ class UserCreationForm(UserCreationForm):
 
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ("email", "firstname", "lastname", "registered_as")
+        fields = ('email', 'firstname', 'lastname', 'account_type')
 
 
 class UserChangeForm(UserChangeForm):
@@ -53,7 +53,7 @@ class CustomSignupForm(forms.Form):
     firstname = forms.CharField(max_length=30, label=_('First name'))
     lastname = forms.CharField(max_length=30, label=_('Last name'))
     phone = PhoneNumberField(required=False, label=_('Phone'))
-    registered_as = forms.ChoiceField(choices=ACC_CHOICES)
+    account_type = forms.ChoiceField(choices=ACC_CHOICES)
 
     def signup(self, request, user):
         if type(user).__name__ == 'SocialLogin':
@@ -63,7 +63,7 @@ class CustomSignupForm(forms.Form):
         user.firstname = self.cleaned_data['firstname'].strip()
         user.lastname = self.cleaned_data['lastname'].strip()
         user.email = self.cleaned_data['email'].strip()
-        user.registered_as = self.cleaned_data['registered_as']
+        user.account_type = self.cleaned_data['account_type']
 
         if user.firstname and user.lastname:
             user.slug = slugify_url("{} {}".format(user.firstname, user.lastname))
@@ -76,9 +76,9 @@ class CustomSignupForm(forms.Form):
         }
 
         # create profile for new user
-        if user.registered_as == 'c':
+        if user.account_type == User.ACCOUNT_CANDIDATE:
             Candidate.objects.create(**data)
-        elif user.registered_as == 'a':
+        elif user.account_type == User.ACCOUNT_AGENT:
             Agent.objects.create(**data)
 
 

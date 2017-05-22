@@ -44,7 +44,7 @@ class HomeView(TemplateView):
 
 class DashboardView(LoginRequiredMixin, View):
     def get(self, request, **kwargs):
-        if request.user.registered_as == 'a' and not request.user.agent.company:
+        if request.user.account_type == User.ACCOUNT_AGENT and not request.user.agent.company:
             company = Company.objects.filter(domain=request.user.domain)
 
             if company.exists():
@@ -72,7 +72,7 @@ class DashboardView(LoginRequiredMixin, View):
         # start with candidate profile
         is_complete = False  # profile completeness flag for candidate
         completeness = 0.3  # profile completeness, 0.3 is default after registration
-        if request.user.registered_as == 'c':
+        if request.user.account_type == User.ACCOUNT_CANDIDATE:
             self.template_name = 'recruit/candidate_dashboard.html'
             profile = request.user.candidate
             if (profile.title and profile.location and profile.skills and
@@ -88,7 +88,7 @@ class DashboardView(LoginRequiredMixin, View):
             f = CandidateUpdateForm(instance=profile)
 
         # show agent dashboard
-        elif request.user.registered_as == 'a':
+        elif request.user.account_type == User.ACCOUNT_AGENT:
             self.template_name = 'recruit/agent_dashboard.html'
             profile = request.user.agent
             company = profile.company
@@ -99,7 +99,7 @@ class DashboardView(LoginRequiredMixin, View):
             'profile_completeness': completeness,
             'company': company,
             'f': f, # form, for candidate
-            'invitation_requests': CompanyRequestInvitation.objects.filter(company=company) if request.user.registered_as == 'a' else None,
+            'invitation_requests': CompanyRequestInvitation.objects.filter(company=company) if request.user.account_type == User.ACCOUNT_AGENT else None,
         })
 
 dashboard = DashboardView.as_view()
@@ -148,7 +148,7 @@ class SearchView(LoginRequiredMixin, TemplateView):
                 search_query |= SearchQuery(item)
 
             # job posts seatch
-            if self.request.user.registered_as == User.ACCOUNT_CANDIDATE:
+            if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
                 results = JobPost.objects\
                     .annotate(search=SearchVector('title', 'skills__name', 'city', 'country'))\
                     .filter(search=search_query)\

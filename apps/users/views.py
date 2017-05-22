@@ -32,12 +32,12 @@ class ProfileUpdateView(LoginRequiredMixin, View):
         # show profile form according to user role
         # start with candidate profile
         form = []
-        if request.user.registered_as == 'c':
+        if request.user.account_type == User.ACCOUNT_CANDIDATE:
             self.template_name = 'users/candidate_update.html'
             form = CandidateUpdateForm(instance=request.user.candidate)
             completeness = get_profile_completeness(request.user.candidate)
         # show agent dashboard
-        elif request.user.registered_as == 'a':
+        elif request.user.account_type == User.ACCOUNT_AGENT:
             self.template_name = 'users/agent_update.html'
             profile = request.user.agent
             form = AgentUpdateForm(instance=profile)
@@ -54,7 +54,7 @@ class ProfileUpdateView(LoginRequiredMixin, View):
         form_values = request.POST.copy()
         form_values['user'] = request.user.id
 
-        if request.user.registered_as == 'c':
+        if request.user.account_type == User.ACCOUNT_CANDIDATE:
             self.template_name = 'users/candidate_update.html'
             form = CandidateUpdateForm(form_values, request.FILES, instance=request.user.candidate)
             completeness = get_profile_completeness(request.user.candidate)
@@ -63,7 +63,7 @@ class ProfileUpdateView(LoginRequiredMixin, View):
                 candidate = form.save(commit=True)
 
         # show agent dashboard
-        elif request.user.registered_as == 'a':
+        elif request.user.account_type == User.ACCOUNT_AGENT:
             self.template_name = 'users/agent_update.html'
             form = AgentUpdateForm(form_values, request.FILES, instance=request.user.agent)
 
@@ -88,7 +88,7 @@ class ProfilePhotoUploadView(LoginRequiredMixin, View):
             # start with candidate profile
             form_values = request.POST.copy()
             form_values['user'] = request.user.id
-            if request.user.registered_as == 'c':
+            if request.user.account_type == User.ACCOUNT_CANDIDATE:
                 candidate = request.user.candidate
                 form = CandidatePhotoUploadForm(form_values, request.FILES, instance=candidate)
 
@@ -97,7 +97,7 @@ class ProfilePhotoUploadView(LoginRequiredMixin, View):
                     return JsonResponse({'success': True, 'image': candidate.photo.url})
 
             # show agent dashboard
-            elif request.user.registered_as == 'a':
+            elif request.user.account_type == User.ACCOUNT_AGENT:
                 agent = request.user.agent
                 form = AgentPhotoUploadForm(form_values, request.FILES, instance=agent)
 
@@ -119,7 +119,7 @@ class ProfileCVUploadView(LoginRequiredMixin, View):
             # show profile dashboard according to user role
             # start with candidate profile
             form_values = request.POST.copy()
-            if request.user.registered_as == 'c':
+            if request.user.account_type == User.ACCOUNT_CANDIDATE:
                 form_values['user'] = request.user.id
                 candidate = request.user.candidate
                 form = CandidateCVUploadForm(form_values, request.FILES, instance=candidate)

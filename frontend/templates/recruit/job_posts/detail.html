@@ -13,7 +13,7 @@
                         <div class="col-md-12">
                             <div class="text-center">
                                 <h1>{{ job_post.title }}</h1>
-                                {% if request.user.registered_as == request.user.ACCOUNT_AGENT %}
+                                {% if request.user.account_type == request.user.ACCOUNT_AGENT %}
                                     <a href="{% url 'recruit:job_post_update' job_post.uuid %}" class="btn btn-default">Edit</a>
                                     <a href="{% url 'recruit:job_post_delete' job_post.uuid %}" class="btn btn-danger">Delete</a>
                                 {% endif %}
