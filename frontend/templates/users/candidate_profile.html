@@ -1,0 +1,45 @@
+{% extends 'users/index.html' %}
+
+{% load staticfiles i18n bootstrap %}
+
+{% block content %}
+<section id="internal-wrap">
+    <!-- internal block -->
+    <section id="job-posts">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-2">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="text-center">
+                                <h1>{{ userprofileget_full_name }}</h1>
+                                <a href="{% url 'users:profile_update' %}" class="btn btn-default">Edit</a>
+                            </div>
+                        </div>
+                        <div class="col-md-12 job-post-detail-section">
+                            <div class="row job-post-detail text-center">
+                                <img class="profile_photo" src="{% if profile.logo %}{{ profile.logo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}">
+                                <h4>{{ profile }}</h4>
+                                <h5>{{ profile }}</h5>
+                                <div><strong>Phone:</strong> {{ profile.phone }}</div>
+                                <div><strong>Location:</strong> {{ profile.city }}, {{ profile.country.name }}</div>
+                                <div><strong>Desired Job Location:</strong> {{ profile.job_location }}</div>
+                                <div><strong>Job Type:</strong> {{ profile.get_job_type_display }}</div>
+                                <div><strong>Experience:</strong> {{ profile.experience }} years</div>
+                                <a href="{% if profile.cv %}{{ profile.cv.url }}{% endif %}" id="current_cv" {% if not profile.cv %}class="hidden"{% endif %}><i class="glyphicon glyphicon-download"></i> Download current CV</a>
+                                <div class="job-post-skills">
+                                    {% for skill in profile.skills.all %}
+                                        <span class="skill">{{ skill.name }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- end internal block -->
+</section>
+<!-- end new admin content -->
+{% endblock %}

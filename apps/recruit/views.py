@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse_lazy
-from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.contrib.postgres.search import (
     SearchQuery,
@@ -76,8 +75,8 @@ class DashboardView(LoginRequiredMixin, View):
         if request.user.account_type == User.ACCOUNT_CANDIDATE:
             self.template_name = 'recruit/candidate_dashboard.html'
             profile = request.user.candidate
-            if (profile.title and profile.location and profile.skills and
-                profile.phone and profile.experience and profile.residence_country):
+            if (profile.title and profile.city and profile.skills.all() and
+                profile.phone and profile.experience and profile.country):
                 is_complete = True
             # calculate profile completeness in %
             completeness += 0.2 if is_complete else 0
@@ -155,10 +154,11 @@ class SearchView(LoginRequiredMixin, TemplateView):
                     .filter(search=search_query)\
                     .distinct('id')
             # candidate search
-            else:
-                results = Candidate.objects.filter(
-                    Q(skills__iexact=search) | Q(title__iexact=search)
-                )
+            elif self.request.user.account_type == User.ACCOUNT_AGENT:
+                results = Candidate.objects\
+                    .annotate(search=SearchVector('user__first_name', 'user__last_name', 'user__email', 'skills__name', 'city', 'country'))\
+                    .filter(search=search_query)\
+                    .distinct('id')
 
         job_post_countries = JobPost.objects.all().distinct('country').values_list('country', flat=True)
         context['countries'] = [dict(countries).get(country) for country in job_post_countries if dict(countries).get(country)]

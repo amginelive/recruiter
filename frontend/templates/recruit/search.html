@@ -82,8 +82,10 @@
                                             </div>
                                             <h6>{{ result.created_at|date }}</h6>
                                             <div class="job-posted-by pull-right">
-                                                <span>{{ result.posted_by.user.get_full_name }}</span>
-                                                <img src="{% if result.posted_by.photo %}{{ result.posted_by.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:30px; border-radius:50%">
+                                                <a href="{% url 'users:profile_detail' result.posted_by.user.slug %}">
+                                                    <span>{{ result.posted_by.user.get_full_name }}</span>
+                                                    <img src="{% if result.posted_by.photo %}{{ result.posted_by.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:30px; border-radius:50%">
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

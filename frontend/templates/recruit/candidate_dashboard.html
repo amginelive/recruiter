@@ -38,8 +38,10 @@
                                   <b>{{ field.label_tag }}</b>
                                   {% if field.name == 'job_type' %}
                                     {{ profile.get_job_type_display }}
-                                  {% elif field.name == 'residence_country' %}
+                                  {% elif field.name == 'country' %}
                                     {{ profile.country.name }}
+                                  {% elif field.name == 'skills' %}
+                                    {{ profile.skills.all|join:", " }}
                                   {% else %}
                                     {{ field.value }}
                                   {% endif %}
