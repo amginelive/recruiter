@@ -23,7 +23,7 @@ class UserAdmin(UserAdmin):
     # that reference the removed 'username' field
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (_('Personal info'), {'fields': ('firstname', 'lastname', 'slug', 'account_type')}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'slug', 'account_type')}),
         (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
                                        'groups', 'user_permissions')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
@@ -35,8 +35,8 @@ class UserAdmin(UserAdmin):
     )
     form = UserChangeForm
     add_form = UserCreationForm
-    list_display = ('email', 'firstname', 'lastname', 'is_staff', 'account_type')
-    search_fields = ('email', 'firstname', 'lastname')
+    list_display = ('email', 'first_name', 'last_name', 'is_staff', 'account_type')
+    search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email', 'last_login', 'date_joined')
 
 

@@ -20,16 +20,16 @@
                      {% csrf_token %}
                     <div class="form-group">
                         <div>
-                            <input type="text" name="firstname" class="form-control" maxlength="30" required id="id_firstname" placeholder="First name" value="{{ form.firstname.value|default_if_none:'' }}"/>
+                            <input type="text" name="first_name" class="form-control" maxlength="30" required id="id_first_name" placeholder="First name" value="{{ form.first_name.value|default_if_none:'' }}"/>
                         </div>
                     </div>
-                    {{ form.firstname.errors }}
+                    {{ form.first_name.errors }}
                     <div class="form-group">
                         <div>
-                            <input type="text" name="lastname" class="form-control" maxlength="30" required id="id_lastname" placeholder="Last name" value="{{ form.lastname.value|default_if_none:'' }}"/>
+                            <input type="text" name="last_name" class="form-control" maxlength="30" required id="id_last_name" placeholder="Last name" value="{{ form.last_name.value|default_if_none:'' }}"/>
                         </div>
                     </div>
-                    {{ form.lastname.errors }}
+                    {{ form.last_name.errors }}
                     <div class="form-group">
                         <div>
                             <input type="tel" name="phone" class=" form-control" id="id_phone" placeholder="Phone number" value="{{ form.phone.value|default_if_none:'' }}"/>

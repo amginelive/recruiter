@@ -32,7 +32,7 @@ class UserManager(BaseUserManager):
     Model for a Custom user Manager
     """
 
-    def _create_user(self, email, firstname, lastname, password, is_staff, is_superuser, **extra_fields):
+    def _create_user(self, email, first_name, last_name, password, is_staff, is_superuser, **extra_fields):
         """
         Creates and saves a User with the given email and password.
         """
@@ -43,8 +43,8 @@ class UserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(
             email=email,
-            firstname=firstname,
-            lastname=lastname,
+            first_name=first_name,
+            last_name=last_name,
             is_staff=is_staff,
             is_active=True,
             is_superuser=is_superuser,
@@ -56,11 +56,11 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, firstname, lastname, password=None, **extra_fields):
+    def create_user(self, email, first_name, last_name, password=None, **extra_fields):
         return self._create_user(email, password, False, False, **extra_fields)
 
-    def create_superuser(self, email, firstname, lastname, password, **extra_fields):
-        return self._create_user(email, firstname, lastname, password, True, True, **extra_fields)
+    def create_superuser(self, email, first_name, last_name, password, **extra_fields):
+        return self._create_user(email, first_name, last_name, password, True, True, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -78,9 +78,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         (ACCOUNT_AGENT, _('Agent')),
     )
 
-    email = models.EmailField(_('email address'), max_length=254, unique=True)
-    firstname = models.CharField(_('First name'), max_length=30)
-    lastname = models.CharField(_('Last name'), max_length=30)
+    email = models.EmailField(_('Email Address'), max_length=254, unique=True)
+    first_name = models.CharField(_('First Name'), max_length=30)
+    last_name = models.CharField(_('Last Name'), max_length=30)
     slug = models.SlugField(_('Alias/Slug'), **optional)
     is_staff = models.BooleanField(
         _('staff status'),
@@ -105,7 +105,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['firstname', 'lastname']
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     index_together = [
         ['slug', 'is_active'],
@@ -122,12 +122,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         Returns the first_name plus the last_name, with a space in between.
         """
-        full_name = '%s %s' % (self.firstname, self.lastname)
+        full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
 
     def get_short_name(self):
         "Returns the short name for the user."
-        return "{} {}".format(self.firstname, self.lastname[0].upper())
+        return "{} {}".format(self.first_name, self.last_name[0].upper())
 
     def email_user(self, subject, message, from_email=None):
         """

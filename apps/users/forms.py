@@ -21,7 +21,7 @@ class UserCreationForm(UserCreationForm):
 
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ('email', 'firstname', 'lastname', 'account_type')
+        fields = ('email', 'first_name', 'last_name', 'account_type')
 
 
 class UserChangeForm(UserChangeForm):
@@ -42,31 +42,31 @@ class CustomSignupForm(forms.Form):
     """
     Custom signup form to replace allauth.
     """
-    CANDIDATE = 'c'
-    AGENT = 'a'
+    ACCOUNT_CANDIDATE = 1
+    ACCOUNT_AGENT = 2
 
-    ACC_CHOICES = (
-        (CANDIDATE, _('Candidate')),
-        (AGENT, _('Agent')),
+    ACCOUNT_TYPE_CHOICES = (
+        (ACCOUNT_CANDIDATE, _('Candidate')),
+        (ACCOUNT_AGENT, _('Agent')),
     )
 
-    firstname = forms.CharField(max_length=30, label=_('First name'))
-    lastname = forms.CharField(max_length=30, label=_('Last name'))
+    first_name = forms.CharField(max_length=30, label=_('First name'))
+    last_name = forms.CharField(max_length=30, label=_('Last name'))
     phone = PhoneNumberField(required=False, label=_('Phone'))
-    account_type = forms.ChoiceField(choices=ACC_CHOICES)
+    account_type = forms.ChoiceField(choices=ACCOUNT_TYPE_CHOICES)
 
     def signup(self, request, user):
         if type(user).__name__ == 'SocialLogin':
             user = user.user
         user = User.objects.get(pk=user.id)
 
-        user.firstname = self.cleaned_data['firstname'].strip()
-        user.lastname = self.cleaned_data['lastname'].strip()
+        user.first_name = self.cleaned_data['first_name'].strip()
+        user.last_name = self.cleaned_data['last_name'].strip()
         user.email = self.cleaned_data['email'].strip()
         user.account_type = self.cleaned_data['account_type']
 
-        if user.firstname and user.lastname:
-            user.slug = slugify_url("{} {}".format(user.firstname, user.lastname))
+        if user.first_name and user.last_name:
+            user.slug = slugify_url('{} {}'.format(user.first_name, user.last_name))
 
         user.save()
 
