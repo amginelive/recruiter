@@ -1,7 +1,15 @@
 {% extends 'users/index.html' %}
 
 {% load staticfiles i18n %}
+{% block extra_css %}
 
+<link href="{% static 'css/cropper.min.css' %}" rel="stylesheet">
+<style>
+    .photo-upload-inputs {
+        display: none;
+    }
+</style>
+{% endblock %}
 {% block content %}
 <section id="internal-wrap">
     <!-- internal block -->
@@ -24,7 +32,10 @@
                             <img id="profile_photo" src="{% if profile.photo %}{{ profile.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}">
                             <form action="{% url 'users:profile_photo_upload' %}" id="photo_upload_form" method="post" role="form" enctype="multipart/form-data">
                                 {% csrf_token %}
-                                <input type="file" name="photo" id="photo_upload" style="display:none"/>
+                                <div class="photo-upload-inputs">
+                                {{ photo_form }}
+                                </div>
+                                <!-- <input type="file" name="photo" id="photo_upload"/> -->
                                 <button type="button" class="btn" id="photo_upload_btn" OnClick="javascript:void(0)">{% trans "Update Photo" %}</button>
                             </form>
                         </div>
@@ -104,10 +115,40 @@
     <!-- end internal block -->
 </section>
 <!-- end new admin content -->
+
+  <!-- MODAL TO CROP THE IMAGE -->
+  <div class="modal fade" id="modalCrop">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title">Crop the photo</h4>
+        </div>
+        <div class="modal-body">
+          <img src="" id="image" style="max-width: 100%;">
+        </div>
+        <div class="modal-footer">
+          <div class="btn-group pull-left" role="group">
+            <button type="button" class="btn btn-default js-zoom-in">
+              <span class="glyphicon glyphicon-zoom-in"></span>
+            </button>
+            <button type="button" class="btn btn-default js-zoom-out">
+              <span class="glyphicon glyphicon-zoom-out"></span>
+            </button>
+          </div>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary js-crop-and-upload">Upload</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block footer_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
+<script src="{% static 'js/cropper.min.js' %}" type="text/javascript"></script>
 <script>
     function updateProfilePhoto(responseText, statusText, xhr, $form){
         if(responseText['success'] == true){
@@ -129,10 +170,62 @@
         $("#photo_upload").trigger("click");
     });
     $("#photo_upload").change(function(){
-        $("#photo_upload_form").ajaxSubmit({success:updateProfilePhoto});
+        // $("#photo_upload_form").ajaxSubmit({success:updateProfilePhoto});
     });
     $("#cv_upload").change(function(){
         $("#cv_upload_form").ajaxSubmit({success:updateCandidateCV});
     });
+
+    /* SCRIPTS TO HANDLE THE CROPPER BOX */
+      var $image = $("#image");
+      var cropBoxData;
+      var canvasData;
+      $("#modalCrop").on("shown.bs.modal", function () {
+        $image.cropper({
+          viewMode: 1,
+          aspectRatio: 1/1,
+          minCropBoxWidth: 200,
+          minCropBoxHeight: 200,
+          ready: function () {
+            $image.cropper("setCanvasData", canvasData);
+            $image.cropper("setCropBoxData", cropBoxData);
+          }
+        });
+      }).on("hidden.bs.modal", function () {
+        cropBoxData = $image.cropper("getCropBoxData");
+        canvasData = $image.cropper("getCanvasData");
+        $image.cropper("destroy");
+      });
+
+      $(".js-zoom-in").click(function () {
+        $image.cropper("zoom", 0.1);
+      });
+
+      $(".js-zoom-out").click(function () {
+        $image.cropper("zoom", -0.1);
+      });
+
+    /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER */
+    $(".js-crop-and-upload").click(function () {
+        var cropData = $image.cropper("getData");
+        $("#id_x").val(cropData["x"]);
+        $("#id_y").val(cropData["y"]);
+        $("#id_height").val(cropData["height"]);
+        $("#id_width").val(cropData["width"]);
+        $("#photo_upload_form").submit();
+      });
+
+    /* SCRIPT TO OPEN THE MODAL WITH THE PREVIEW */
+      $("#photo_upload").change(function () {
+        if (this.files && this.files[0]) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            $("#image").attr("src", e.target.result);
+            $("#modalCrop").modal("show");
+          }
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
 </script>
+
 {% endblock %}

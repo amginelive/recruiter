@@ -374,3 +374,16 @@ class Agent(ProfileBase):
 
     def __str__(self):
         return self.user.get_full_name()
+
+
+class ProfilePhoto(models.Model):
+    file = models.ImageField(_('Photo'), upload_to='images/photo/%Y/', help_text="200x200px")
+    description = models.CharField(max_length=255, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'photo'
+        verbose_name_plural = 'photos'
+
+    def __str__(self):
+        return self.description

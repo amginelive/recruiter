@@ -47,7 +47,6 @@ class ProfileUpdateView(LoginRequiredMixin, View):
             self.template_name = 'users/agent_update.html'
             profile = request.user.agent
             form = AgentUpdateForm(instance=profile)
-
         return render(request, self.template_name, {
             'form': form,
             'completeness': completeness,

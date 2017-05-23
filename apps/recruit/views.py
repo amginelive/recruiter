@@ -30,6 +30,7 @@ from companies.models import (
 )
 from users.forms import (
     CandidateUpdateForm,
+    CandidatePhotoUploadForm
 )
 from users.models import Candidate
 from users.mixins import AgentRequiredMixin
@@ -94,6 +95,7 @@ class DashboardView(LoginRequiredMixin, View):
             company = profile.company
 
         return render(request, self.template_name, {
+            'photo_form': CandidatePhotoUploadForm,
             'profile': profile,
             'is_complete': is_complete,
             'profile_completeness': completeness,

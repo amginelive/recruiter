@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from phonenumber_field.formfields import PhoneNumberField
 from slugify import slugify_url
+from PIL import Image
 
 from .models import Candidate, Agent
 
@@ -102,10 +103,35 @@ class AgentUpdateForm(forms.ModelForm):
 
 
 class CandidatePhotoUploadForm(forms.ModelForm):
+    x = forms.FloatField(widget=forms.HiddenInput())
+    y = forms.FloatField(widget=forms.HiddenInput())
+    width = forms.FloatField(widget=forms.HiddenInput())
+    height = forms.FloatField(widget=forms.HiddenInput())
 
     class Meta:
         model = Candidate
-        fields = ['photo',]
+        fields = ['photo', 'x', 'y', 'width', 'height', ]
+        widgets={
+            "photo": forms.FileInput(attrs={'id':'photo_upload'})
+        }
+
+    def save(self):
+        candidate = super(CandidatePhotoUploadForm, self).save()
+
+        x = self.cleaned_data.get('x')
+        y = self.cleaned_data.get('y')
+        w = self.cleaned_data.get('width')
+        h = self.cleaned_data.get('height')
+        photo = self.cleaned_data.get('photo')
+
+
+        #TO-DO: write proper way of saving the image, the coordinates are already given on top.
+        image = Image.open(photo.file)
+        cropped_image = image.crop((x, y, w+x, h+y))
+        # resized_image = cropped_image.resize((200, 200), Image.ANTIALIAS)
+        # resized_image.save(candidate.photo.file.path)
+        candidate.photo = cropped_image
+        return candidate
 
 
 class CandidateCVUploadForm(forms.ModelForm):
@@ -120,3 +146,4 @@ class AgentPhotoUploadForm(forms.ModelForm):
     class Meta:
         model = Agent
         fields = ['photo',]
+
