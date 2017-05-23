@@ -43,25 +43,31 @@
 
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav navbar-right">
-                        {% if user and not user.is_anonymous %}
-                        <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="account" aria-expanded="true">
-                                {% trans "Your account" %} <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="account">
-                                <li><a href="{% url 'recruit:dashboard' %}">{% trans "Settings" %}</a></li>
-                                <li class="divider"></li>
-                                <li>
-                                    <a href="{% url 'account_logout' %}">{% trans "Logout" %}</a>
-                                </li>
-                            </ul>
-                        </li>
+                        {% if user.is_anonymous %}
+                            <li><a href="{% url 'account_signup' %}?account_type=1"><i class="glyphicon glyphicon-user"></i> Register CV</a></li>
+                            <li><a href="{% url 'account_signup' %}?account_type=2"><i class="glyphicon glyphicon-briefcase"></i> Recruiter registration</a></li>
+                            <li>
+                                <a href="{% url 'account_login' %}"><i class="glyphicon glyphicon-log-in"></i> {% trans "Login" %}</a>
+                            </li>
                         {% else %}
-                        <li><a href="{% url 'account_signup' %}?account_type=1"><i class="glyphicon glyphicon-user"></i> Register CV</a></li>
-                        <li><a href="{% url 'account_signup' %}?account_type=2"><i class="glyphicon glyphicon-briefcase"></i> Recruiter registration</a></li>
-                        <li>
-                            <a href="{% url 'account_login' %}"><i class="glyphicon glyphicon-log-in"></i> {% trans "Login" %}</a>
-                        </li>
+                            <li>
+                                <a href="{% url 'recruit:dashboard' %}">{% trans "My Dashboard" %}</a>
+                            </li>
+                            <li>
+                                <a href="">{% trans "Messages" %}</a>
+                            </li>
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="account" aria-expanded="true">
+                                    {% trans "My Account" %} <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="account">
+                                    <li><a href="{% url 'recruit:dashboard' %}">{% trans "Settings" %}</a></li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a href="{% url 'account_logout' %}">{% trans "Logout" %}</a>
+                                    </li>
+                                </ul>
+                            </li>
                        {% endif %}
                     </ul>
                 </div>
