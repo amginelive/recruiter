@@ -95,9 +95,8 @@ class ProfilePhotoUploadView(LoginRequiredMixin, View):
         if request.user.account_type == User.ACCOUNT_CANDIDATE:
             candidate = request.user.candidate
             form = CandidatePhotoUploadForm(form_values, request.FILES, instance=candidate)
-
             if form.is_valid():
-                candidate = form.save(commit=True)
+                candidate = form.save()
                 return JsonResponse({'success': True, 'image': candidate.photo.url})
 
         # show agent dashboard
@@ -106,7 +105,7 @@ class ProfilePhotoUploadView(LoginRequiredMixin, View):
             form = AgentPhotoUploadForm(form_values, request.FILES, instance=agent)
 
             if form.is_valid():
-                agent = form.save(commit=True)
+                agent = form.save()
                 return JsonResponse({'success': True, 'image': agent.photo.url})
 
 profile_photo_upload = ProfilePhotoUploadView.as_view()
