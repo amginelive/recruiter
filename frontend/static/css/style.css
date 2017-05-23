@@ -1365,3 +1365,12 @@ section#cart .code_error span {
     solid #dfdfdf;
     padding:15px;
 }
+
+.profile_photo {
+    width:180px;
+    border-radius:50%;
+}
+
+.profile-company-image {
+    width: 25px;
+}

@@ -76,8 +76,8 @@ class DashboardView(LoginRequiredMixin, View):
         if request.user.account_type == User.ACCOUNT_CANDIDATE:
             self.template_name = 'recruit/candidate_dashboard.html'
             profile = request.user.candidate
-            if (profile.title and profile.location and profile.skills and
-                profile.phone and profile.experience and profile.residence_country):
+            if (profile.title and profile.city and profile.skills.all() and
+                profile.phone and profile.experience and profile.country):
                 is_complete = True
             # calculate profile completeness in %
             completeness += 0.2 if is_complete else 0

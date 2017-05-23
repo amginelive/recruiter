@@ -102,6 +102,10 @@
 {% block footer_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script>
+    $("#id_skills").select2({
+        tags: true,
+    })
+
     function updateProfilePhoto(responseText, statusText, xhr, $form){
         if(responseText['success'] == true){
             document.getElementById("profile_photo").src = responseText['image'];

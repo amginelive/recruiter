@@ -1,0 +1,42 @@
+{% extends 'users/index.html' %}
+
+{% load staticfiles i18n bootstrap %}
+
+{% block content %}
+<section id="internal-wrap">
+    <!-- internal block -->
+    <section id="job-posts">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-2">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="text-center">
+                                <h1>{{ profile }}</h1>
+                                <a href="{% url 'users:profile_update' %}" class="btn btn-default">Edit</a>
+                            </div>
+                        </div>
+                        <div class="col-md-12 job-post-detail-section">
+                            <div class="row job-post-detail text-center">
+                                <img class="profile_photo" src="{% if profile.logo %}{{ profile.logo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}">
+                                <h4>{{ profile }}</h4>
+                                <h5>{{ profile }}</h5>
+                                <div><strong>Phone:</strong> {{ profile.phone }}</div>
+                                <div><strong>Company:</strong> <img class="profile-company-image" src="{% if profile.company.logo %}{{ profile.company.logo.url }}{% else %}{% static 'img/default_logo.png' %}{% endif %}"> {{ profile.company.name }}</div>
+                                <div class="job-post-skills">
+                                    {% for skill in job_post.skills.all %}
+                                        <span class="skill">{{ skill.name }}</span>
+                                    {% endfor %}
+                                </div>
+                                <h6>{{ job_post.created_at|date }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- end internal block -->
+</section>
+<!-- end new admin content -->
+{% endblock %}

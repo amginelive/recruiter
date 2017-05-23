@@ -5,8 +5,8 @@ def get_profile_completeness(profile):
     """
     is_complete = False # profile completeness flag for candidate
     progress = 0.3  # profile progress, 0.3 is default after registration
-    if (profile.title and profile.location and profile.skills and
-        profile.phone and profile.experience and profile.residence_country):
+    if (profile.title and profile.city and profile.skills.all() and
+        profile.phone and profile.experience and profile.country):
         is_complete = True
 
     # calculate profile progress in %

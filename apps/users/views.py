@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.generic import (
+    DetailView,
     View,
 )
 
@@ -15,6 +16,10 @@ from .forms import (
     CandidateUpdateForm,
 )
 from .mixins import CandidateRequiredMixin
+from .models import (
+    Agent,
+    Candidate,
+)
 from .utils import get_profile_completeness
 
 
@@ -125,3 +130,25 @@ class ProfileCVUploadView(CandidateRequiredMixin, View):
             return JsonResponse({'success': True, 'cv': candidate.cv.url})
 
 profile_cv_upload = ProfileCVUploadView.as_view()
+
+
+class ProfileDetailView(LoginRequiredMixin, DetailView):
+    """
+    View for viewing a user's profile.
+    """
+    context_object_name = 'profile'
+
+    def get_template_names(self):
+        if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
+            return ['users/candidate_profile.html']
+        elif self.request.user.account_type == User.ACCOUNT_AGENT:
+            return ['users/agent_profile.html']
+
+    def get_object(self):
+        slug = self.kwargs.get('slug')
+        if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
+            return Candidate.objects.get(user__slug=slug)
+        elif self.request.user.account_type == User.ACCOUNT_AGENT:
+            return Agent.objects.get(user__slug=slug)
+
+profile_detail = ProfileDetailView.as_view()

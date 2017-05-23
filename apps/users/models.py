@@ -318,12 +318,16 @@ class Candidate(ProfileBase):
     )
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='candidate')
     title = models.CharField(_('Job title'), max_length=200, **optional)
-    skills = models.TextField(_('Skills'),  max_length=250, help_text="Comma separated skills", **optional)
-    location = models.CharField(_('Current location'),  max_length=200, **optional)
+    skills = models.ManyToManyField(
+        'recruit.Skill',
+        related_name='candidates',
+        verbose_name=_('Skills')
+    )
     job_location = models.CharField(_('Desired job location'),  max_length=200, **optional)
     job_type = models.IntegerField(_('Job type'), choices=JOB_TYPE_CHOICES, **optional)
+    city = models.CharField(_('City'),  max_length=200)
     country = CountryField(_('Country'))
-    experience = models.SmallIntegerField(_("Experience (full years)"), **optional)
+    experience = models.SmallIntegerField(_('Experience (full years)'), **optional)
     cv = models.FileField(_("CV"), upload_to=get_cv_path, max_length=150, editable=True, **optional)
 
     # delete old cv file if new is there
