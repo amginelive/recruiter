@@ -60,10 +60,15 @@ class CustomSignupForm(forms.Form):
             user = user.user
         user = User.objects.get(pk=user.id)
 
-        user.first_name = self.cleaned_data['first_name'].strip()
-        user.last_name = self.cleaned_data['last_name'].strip()
-        user.email = self.cleaned_data['email'].strip()
-        user.account_type = self.cleaned_data['account_type']
+        first_name = self.cleaned_data.get('first_name').strip()
+        last_name = self.cleaned_data.get('last_name').strip()
+        email = self.cleaned_data.get('email').strip()
+        account_type = int(self.cleaned_data.get('account_type'))
+
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        user.account_type = account_type
 
         if user.first_name and user.last_name:
             user.slug = slugify_url('{} {}'.format(user.first_name, user.last_name))
