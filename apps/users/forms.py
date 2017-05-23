@@ -111,8 +111,8 @@ class CandidatePhotoUploadForm(forms.ModelForm):
     class Meta:
         model = Candidate
         fields = ['photo', 'x', 'y', 'width', 'height', ]
-        widgets={
-            "photo": forms.FileInput(attrs={'id':'photo_upload'})
+        widgets = {
+            'photo': forms.FileInput(attrs={'id': 'photo_upload'})
         }
 
     def save(self):
@@ -127,7 +127,7 @@ class CandidatePhotoUploadForm(forms.ModelForm):
 
         #TO-DO: write proper way of saving the image, the coordinates are already given on top.
         image = Image.open(photo.file)
-        cropped_image = image.crop((x, y, w+x, h+y))
+        cropped_image = image.crop((x, y, w + x, h + y))
         # resized_image = cropped_image.resize((200, 200), Image.ANTIALIAS)
         # resized_image.save(candidate.photo.file.path)
         candidate.photo = cropped_image

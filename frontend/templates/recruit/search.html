@@ -66,44 +66,47 @@
                         </div>
                         <div class="col-md-12 search_results">
                             {% for result in results %}
-                                {% if request.user.account_type == request.user.ACCOUNT_CANDIDATE %}
+                                {% if user.account_type == user.ACCOUNT_CANDIDATE %}
                                     <div class="search_job_post col-md-6">
                                         <div class="col-md-4">
                                             <img class="search-company-image" src="{% if result.posted_by.company.logo %}{{ result.posted_by.company.logo.url }}{% else %}{% static 'img/default_logo.png' %}{% endif %}">
+                                            <div class="job-posted-by pull-right">
+                                                <span class="search-info">{{ result.created_at|date }}</span>
+                                                <span class="search-info"><strong>Posted By:</strong></span>
+                                                <a href="{% url 'users:profile_detail' result.posted_by.user.slug %}">
+                                                    <img src="{% if result.posted_by.photo %}{{ result.posted_by.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:20px; border-radius:50%">
+                                                    <span>{{ result.posted_by.user.get_full_name }}</span>
+                                                </a>
+                                            </div>
                                         </div>
                                         <div class="col-md-8 text-left">
-                                            <h2><a href="{% url 'recruit:job_post_detail' result.uuid %}">{{ result.title }}</a></h2>
-                                            <h4>{{ result.posted_by.company.name }}</h4>
-                                            <h5>{{ result.city }}, {{ result.country.name }}</h5>
-                                            <div class="job-post-skills">
+                                            <span class="search-info"><a href="{% url 'recruit:job_post_detail' result.uuid %}">{{ result.title }}</a></span>
+                                            <span class="search-info">{{ result.posted_by.company.name }}</span>
+                                            <span class="search-info">{{ result.city }}, {{ result.country.name }}</span>
+                                            <div class="job-post-skills search-info">
                                                 {% for skill in result.skills.all %}
                                                     <span class="skill">{{ skill.name }}</span>
                                                 {% endfor %}
                                             </div>
-                                            <h6>{{ result.created_at|date }}</h6>
-                                            <div class="job-posted-by pull-right">
-                                                <a href="{% url 'users:profile_detail' result.posted_by.user.slug %}">
-                                                    <span>{{ result.posted_by.user.get_full_name }}</span>
-                                                    <img src="{% if result.posted_by.photo %}{{ result.posted_by.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:30px; border-radius:50%">
-                                                </a>
-                                            </div>
                                         </div>
                                     </div>
-                                {% else %}
-                                    <div class="search__candidate col-md-6" style="width:100%; border:1px solid #dfdfdf; padding:15px;">
-                                        <a href="#">
+                                {% elif user.account_type == user.ACCOUNT_AGENT %}
+                                    <div class="search_job_post col-md-6">
+                                        <div class="col-md-4">
                                             <img src="{% if result.photo %}{{ result.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:100px; border-radius:50%">
-                                            <span class="candidate_info">{{ result.user.get_full_name }}</span>
-                                            {% if result.title %}
-                                                <span class="candidate_info">Title: {{ result.title }}</span>
-                                            {% endif %}
-                                            {% if result.skills %}
-                                                <span class="candidate_info">Skills: {{ result.skills }}</span>
-                                            {% endif %}
-                                            {% if result.phone %}
-                                                <span class="candidate_info">Phone: {{ result.phone }}</span>
-                                            {% endif %}
-                                        </a>
+                                        </div>
+                                        <div class="col-md-8 text-left">
+                                            <span class="search-info"><a href="{% url 'users:profile_detail' result.user.slug %}">{{ result.user.get_full_name }}</a></span>
+                                            <span class="search-info">{{ result.user.email }}</span>
+                                            <span class="search-info">{{ result.phone }}</span>
+                                            <span class="search-info">{{ result.city }}, {{ result.country.name }}</span>
+                                            <span class="search-info">{{ result.title }}</span>
+                                            <div class="job-post-skills search-info">
+                                                {% for skill in result.skills.all %}
+                                                    <span class="skill">{{ skill.name }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
                                     </div>
                                 {% endif %}
                             {% empty %}

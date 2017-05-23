@@ -30,7 +30,7 @@ from companies.models import (
 )
 from users.forms import (
     CandidateUpdateForm,
-    CandidatePhotoUploadForm
+    CandidatePhotoUploadForm,
 )
 from users.models import Candidate
 from users.mixins import AgentRequiredMixin
@@ -162,10 +162,16 @@ class SearchView(LoginRequiredMixin, TemplateView):
                     .filter(search=search_query)\
                     .distinct('id')
 
-        job_post_countries = JobPost.objects.all().distinct('country').values_list('country', flat=True)
-        context['countries'] = [dict(countries).get(country) for country in job_post_countries if dict(countries).get(country)]
-        job_post_cities = JobPost.objects.all().distinct('city').values_list('city', flat=True)
-        context['cities'] = set([city.title() for city in job_post_cities])
+        # list the cities and countries that can be filtered
+        if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
+            model = JobPost
+        elif self.request.user.account_type == User.ACCOUNT_AGENT:
+            model = Candidate
+        countries_search = model.objects.all().distinct('country').values_list('country', flat=True)
+        cities_search = model.objects.all().distinct('city').values_list('city', flat=True)
+
+        context['countries'] = [dict(countries).get(country) for country in countries_search if dict(countries).get(country)]
+        context['cities'] = set([city.title() for city in cities_search])
         context['skills'] = Skill.objects.all()
         context['results'] = results
         context['filters'] = filters.split(',') if filters else []
