@@ -262,7 +262,6 @@ section#account .request-users {
 .search_block .btn.search-btn {height:40px; width:19%; background-color:#f9690e; color:#fff; margin-bottom:3px}
 .search_block .btn.search-btn i {margin-right:5px;}
 .search_results .search__candidate img {margin-bottom:5px;}
-.search_results .search__candidate .candidate_info {display:block;}
 .search_results .search__candidate a:hover {text-decoration:none;}
 /* end Illya K. */
 
@@ -1373,4 +1372,9 @@ section#cart .code_error span {
 
 .profile-company-image {
     width: 25px;
+}
+
+.search-info {
+    display: block;
+    margin-top: 5px;
 }
