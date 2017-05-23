@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from phonenumber_field.formfields import PhoneNumberField
 from slugify import slugify_url
-from PIL import Image, ImageOps
+from PIL import Image
 
 from .models import Candidate, Agent
 
