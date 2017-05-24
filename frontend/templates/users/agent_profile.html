@@ -15,10 +15,12 @@
                 <div class="col-md-7 col-md-offset-1 profile-left">
                     <div class="row">
                         <div class="col-md-4 text-center">
-                            <h4>{{ request.user.get_full_name }}</h4>
+                            <h4>{{ profile.user.get_full_name }}</h4>
                         </div>
                         <div class="col-md-8 account-actions">
-                            <a class="btn" href="{% url 'users:profile_update' %}"><i class="glyphicon glyphicon-edit"></i> Edit profile</a>
+                            {% if user == profile.user %}
+                               <a class="btn" href="{% url 'users:profile_update' %}"><i class="glyphicon glyphicon-edit"></i> Edit profile</a>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="row">
@@ -30,7 +32,9 @@
                                 <div class="photo-upload-inputs">
                                     {{ photo_form }}
                                 </div>
-                                <button type="button" class="btn" id="photo_upload_btn" OnClick="javascript:void(0)">{% trans "Update Photo" %}</button>
+                                {% if user == profile.user %}
+                                    <button type="button" class="btn" id="photo_upload_btn" OnClick="javascript:void(0)">{% trans "Update Photo" %}</button>
+                                {% endif %}
                             </form>
 
                         </div>
@@ -41,8 +45,10 @@
                                 <li><i class="glyphicon glyphicon-paperclip"></i><b>15</b> Posted</li>
                                 <li><i class="glyphicon glyphicon-tasks"></i><b>12</b> Remaining</li>
                             </ul>
-                            <a href="{% url 'recruit:search' %}" class="btn action-btn" style="width:80%; margin-top:20px;"><i class="glyphicon glyphicon-search"></i>Find candidates</a>
-                            <a href="{% url 'recruit:job_post_list' %}" class="btn action-btn" style="width:80%; margin-top:20px;">Job Posts</a>
+                            {% if user == profile.user %}
+                                <a href="{% url 'recruit:search' %}" class="btn action-btn" style="width:80%; margin-top:20px;"><i class="glyphicon glyphicon-search"></i>Find candidates</a>
+                                <a href="{% url 'recruit:job_post_list' %}" class="btn action-btn" style="width:80%; margin-top:20px;">Job Posts</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -67,7 +73,7 @@
                         </div>
                         <div class="text-center">
                             {% for agent in company.agents.all %}
-                                {% if agent != user.agent %}
+                                {% if agent != profile %}
                                     <img
                                         class="agent_photo"
                                         src="{% if agent.photo %}{{ agent.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}"
@@ -77,7 +83,7 @@
                                 {% endif %}
                             {% endfor %}
                         </div>
-                        {% if company.owner == request.user %}
+                        {% if company.owner == profile.user and user == profile.user %}
                             <a href="{% url 'companies:company_update' %}" class="btn action-btn"><i class="glyphicon glyphicon-briefcase"></i> {% trans 'Update Company Profile' %}</a>
                             <a href="{% url 'companies:company_invite' %}" class="btn action-btn"><i class="glyphicon glyphicon-user"></i> {% trans "Add User" %}</a>
                             <div>
