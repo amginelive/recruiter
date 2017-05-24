@@ -8,7 +8,7 @@ import django.db.models.deletion
 import django.utils.timezone
 import django_countries.fields
 import phonenumber_field.modelfields
-import users.models
+import core.utils
 
 
 class Migration(migrations.Migration):
@@ -78,7 +78,7 @@ class Migration(migrations.Migration):
                 ('city', models.CharField(max_length=200, verbose_name='City')),
                 ('country', django_countries.fields.CountryField(max_length=2, verbose_name='Country')),
                 ('experience', models.SmallIntegerField(blank=True, null=True, verbose_name='Experience (full years)')),
-                ('cv', models.FileField(blank=True, max_length=150, null=True, upload_to=users.models.get_cv_path, verbose_name='CV')),
+                ('cv', models.FileField(blank=True, max_length=150, null=True, upload_to=core.utils.get_upload_path, verbose_name='CV')),
                 ('skills', models.ManyToManyField(related_name='candidates', to='recruit.Skill', verbose_name='Skills')),
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='candidate', to=settings.AUTH_USER_MODEL)),
             ],
