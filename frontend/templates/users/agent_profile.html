@@ -139,12 +139,6 @@
 <script src="{% static 'js/cropper.min.js' %}" type="text/javascript"></script>
 <script>
     $('[data-toggle="tooltip"]').tooltip();
-
-    function updateProfilePhoto(responseText, statusText, xhr, $form){
-        if(responseText['success'] == true){
-            document.getElementById("profile_photo").src = responseText['image'];
-        }
-    }
     function updateCandidateCV(responseText, statusText, xhr, $form){
         if(responseText['success'] == true){
             $('#cv_updated').fadeIn().delay(500).fadeOut();
@@ -186,27 +180,27 @@
     var canvasData;
     $("#modalCrop").on("shown.bs.modal", function () {
     $image.cropper({
-      viewMode: 1,
-      aspectRatio: 1/1,
-      minCropBoxWidth: 200,
-      minCropBoxHeight: 200,
-      ready: function () {
-        $image.cropper("setCanvasData", canvasData);
-        $image.cropper("setCropBoxData", cropBoxData);
-      }
+        viewMode: 1,
+        aspectRatio: 1/1,
+        minCropBoxWidth: 200,
+        minCropBoxHeight: 200,
+        ready: function () {
+            $image.cropper("setCanvasData", canvasData);
+            $image.cropper("setCropBoxData", cropBoxData);
+        }
     });
     }).on("hidden.bs.modal", function () {
-    cropBoxData = $image.cropper("getCropBoxData");
-    canvasData = $image.cropper("getCanvasData");
-    $image.cropper("destroy");
+        cropBoxData = $image.cropper("getCropBoxData");
+        canvasData = $image.cropper("getCanvasData");
+        $image.cropper("destroy");
     });
 
     $(".js-zoom-in").click(function () {
-    $image.cropper("zoom", 0.1);
+        $image.cropper("zoom", 0.1);
     });
 
     $(".js-zoom-out").click(function () {
-    $image.cropper("zoom", -0.1);
+        $image.cropper("zoom", -0.1);
     });
 
     /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER */
@@ -217,18 +211,26 @@
         $("#id_height").val(cropData["height"]);
         $("#id_width").val(cropData["width"]);
         $("#modalCrop").modal("hide");
-        $("#photo_upload_form").ajaxSubmit({success:updateProfilePhoto});
-      });
+        $("#photo_upload_form").ajaxSubmit({
+            beforeSubmit: function (arr, $form, options) {
+                $("#profile_photo").attr('src', '/static/img/loader.gif');
+            },
+            success: function (response) {
+                if (response.success)
+                    $("#profile_photo").attr('src', response.image);
+            }
+        });
+    });
 
     /* SCRIPT TO OPEN THE MODAL WITH THE PREVIEW */
     $("#photo_upload").change(function () {
       if (this.files && this.files[0]) {
-        var reader = new FileReader();
-        reader.onload = function (e) {
-          $("#image").attr("src", e.target.result);
-          $("#modalCrop").modal("show");
-        }
-        reader.readAsDataURL(this.files[0]);
+          var reader = new FileReader();
+          reader.onload = function (e) {
+              $("#image").attr("src", e.target.result);
+              $("#modalCrop").modal("show");
+          }
+          reader.readAsDataURL(this.files[0]);
       }
     });
 </script>
