@@ -17,7 +17,8 @@ from django_countries.fields import CountryField
 from phonenumber_field.modelfields import PhoneNumberField
 
 from core.models import AbstractTimeStampedModel
-from libs.tools import random_string_gen, resize_image
+from core.utils import get_upload_path
+from libs.tools import random_string_gen
 
 
 logger = logging.getLogger('console_log')
@@ -167,7 +168,7 @@ class ProfileBase(AbstractTimeStampedModel):
     )
 
     phone = PhoneNumberField(_('Phone'), **optional)
-    photo = models.ImageField(_('Photo'), upload_to='images/photo/%Y/', help_text="200x200px", **optional)
+    photo = models.ImageField(_('Photo'), upload_to=get_upload_path, help_text="200x200px", **optional)
     status = models.IntegerField(_('Status'), choices=STATUS_CHOICES, default=STATUS_ACTIVE)
 
     class Meta:
@@ -179,9 +180,6 @@ class ProfileBase(AbstractTimeStampedModel):
 
     def __str__(self):
         return '%s' % (self.user)
-
-def get_cv_path(self, filename):
-    return "files/cv/{}/{}/{}".format(datetime.date.today().year, self.user.pk, filename)
 
 
 class Candidate(ProfileBase):
@@ -207,31 +205,7 @@ class Candidate(ProfileBase):
     city = models.CharField(_('City'),  max_length=200)
     country = CountryField(_('Country'))
     experience = models.SmallIntegerField(_('Experience (full years)'), **optional)
-    cv = models.FileField(_("CV"), upload_to=get_cv_path, max_length=150, editable=True, **optional)
-
-    # delete old cv file if new is there
-    def cv_has_changed(self):
-        if getattr(self, 'cv') and getattr(self, '_ProfileBase__initial_cv_file_path') !=  getattr(self, 'cv').path:
-            try:
-                default_storage.delete(getattr(self, '_ProfileBase__initial_cv_file_path'))
-            except:
-                pass
-            return True
-        return False
-
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self.cv_has_changed()
-        super(Candidate, self).save()
-
-    def delete(self, *args, **kwargs):
-        if self.cv:
-            try:
-                self.cv.delete()
-            except:
-                pass
-
-        super(Candidate, self).delete(*args, **kwargs)
+    cv = models.FileField(_("CV"), upload_to=get_upload_path, max_length=150, editable=True, **optional)
 
 
 class Agent(ProfileBase):

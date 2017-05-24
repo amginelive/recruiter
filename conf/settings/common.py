@@ -164,16 +164,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'frontend', 'media')
 
 THUMBNAIL_ALIASES = {
-    # based on models
-    'users_candidate': {
-        'photo': {'size': (200, 200), 'crop': 'smart'},
-    },
-    'users_agent': {
-        'photo': {'size': (200, 200), 'crop': 'smart'},
-    },
-    'companies_company': {
-        'logo': {'size': (200, 200), 'crop': 'smart'},
-    },
 }
 
 # imagine: use temporary images or upload directly

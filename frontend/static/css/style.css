@@ -1382,3 +1382,13 @@ section#cart .code_error span {
 .photo-upload-inputs {
     display: none;
 }
+
+/*override cropper shape to circle*/
+.cropper-crop-box, .cropper-view-box {
+    border-radius: 50%;
+}
+
+.cropper-view-box {
+    box-shadow: 0 0 0 1px #39f;
+    outline: 0;
+}

@@ -138,30 +138,32 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
 
     context_object_name = 'profile'
 
-    def get_template_names(self):
-        if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
-            return ['users/candidate_profile.html']
-        elif self.request.user.account_type == User.ACCOUNT_AGENT:
-            return ['users/agent_profile.html']
-
     def get_object(self):
-        slug = self.kwargs.get('slug')
-        if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
-            return Candidate.objects.get(user__slug=slug)
-        elif self.request.user.account_type == User.ACCOUNT_AGENT:
-            return Agent.objects.get(user__slug=slug)
+        user = User.objects.get(slug=self.kwargs.get('slug'))
+
+        if user.account_type == User.ACCOUNT_CANDIDATE:
+            return user.candidate
+        elif user.account_type == User.ACCOUNT_AGENT:
+            return user.agent
+
+    def get_template_names(self):
+        profile = self.get_object()
+
+        if profile.user.account_type == User.ACCOUNT_CANDIDATE:
+            return ['users/candidate_profile.html']
+        elif profile.user.account_type == User.ACCOUNT_AGENT:
+            return ['users/agent_profile.html']
 
     def get_context_data(self, *args, **kwargs):
         context = super(ProfileDetailView, self).get_context_data(*args, **kwargs)
-
         profile = self.get_object()
 
-        if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
+        if profile.user.account_type == User.ACCOUNT_CANDIDATE:
             context['photo_form'] = CandidatePhotoUploadForm
             context['completeness'] = get_profile_completeness(profile)
             context['candidate_form'] = CandidateUpdateForm(instance=profile)
 
-        elif self.request.user.account_type == User.ACCOUNT_AGENT:
+        elif profile.user.account_type == User.ACCOUNT_AGENT:
             company = profile.company
             context['company'] = company
             context['invitation_requests'] = CompanyRequestInvitation.objects.filter(company=company)
