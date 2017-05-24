@@ -116,17 +116,18 @@ class CandidatePhotoUploadForm(forms.ModelForm):
         }
 
     def save(self):
-        candidate = super(CandidatePhotoUploadForm, self).save()
+        candidate = super(CandidatePhotoUploadForm, self).save(commit=False)
         x = int(self.cleaned_data.get('x'))
         y = int(self.cleaned_data.get('y'))
         w = int(self.cleaned_data.get('width'))
         h = int(self.cleaned_data.get('height'))
-        photo = self.cleaned_data.get('photo')
 
         img = Image.open(candidate.photo)
-        cropped_image = img.crop((x, y, w+x, h+y))
+        cropped_image = img.crop((x, y, w + x, h + y))
         resized_image = cropped_image.resize((200,200), Image.ANTIALIAS)
         resized_image.save(candidate.photo.path)
+
+        candidate.save()
 
         return candidate
 
@@ -152,16 +153,17 @@ class AgentPhotoUploadForm(forms.ModelForm):
         }
 
     def save(self):
-        agent = super(AgentPhotoUploadForm, self).save()
+        agent = super(AgentPhotoUploadForm, self).save(commit=False)
         x = int(self.cleaned_data.get('x'))
         y = int(self.cleaned_data.get('y'))
         w = int(self.cleaned_data.get('width'))
         h = int(self.cleaned_data.get('height'))
-        photo = self.cleaned_data.get('photo')
 
         img = Image.open(agent.photo)
-        cropped_image = img.crop((x, y, w+x, h+y))
+        cropped_image = img.crop((x, y, w + x, h + y))
         resized_image = cropped_image.resize((200,200), Image.ANTIALIAS)
         resized_image.save(agent.photo.path)
+
+        agent.save()
 
         return agent

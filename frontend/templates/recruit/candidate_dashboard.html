@@ -1,15 +1,11 @@
 {% extends 'users/index.html' %}
 
 {% load staticfiles i18n %}
-{% block extra_css %}
 
+{% block extra_css %}
 <link href="{% static 'css/cropper.min.css' %}" rel="stylesheet">
-<style>
-    .photo-upload-inputs {
-        display: none;
-    }
-</style>
 {% endblock %}
+
 {% block content %}
 <section id="internal-wrap">
     <!-- internal block -->
@@ -33,9 +29,8 @@
                             <form action="{% url 'users:profile_photo_upload' %}" id="photo_upload_form" method="post" role="form" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <div class="photo-upload-inputs">
-                                {{ photo_form }}
+                                    {{ photo_form }}
                                 </div>
-                                <!-- <input type="file" name="photo" id="photo_upload"/> -->
                                 <button type="button" class="btn" id="photo_upload_btn" OnClick="javascript:void(0)">{% trans "Update Photo" %}</button>
                             </form>
                         </div>
@@ -116,8 +111,8 @@
 </section>
 <!-- end new admin content -->
 
-  <!-- MODAL TO CROP THE IMAGE -->
-  <div class="modal fade" id="modalCrop">
+<!-- MODAL TO CROP THE IMAGE -->
+<div class="modal fade" id="modalCrop">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -143,7 +138,7 @@
         </div>
       </div>
     </div>
-  </div>
+</div>
 {% endblock %}
 
 {% block footer_js %}
@@ -169,41 +164,38 @@
     $("#photo_upload_btn").on("click", function() {
         $("#photo_upload").trigger("click");
     });
-    $("#photo_upload").change(function(){
-        // $("#photo_upload_form").ajaxSubmit({success:updateProfilePhoto});
-    });
     $("#cv_upload").change(function(){
         $("#cv_upload_form").ajaxSubmit({success:updateCandidateCV});
     });
 
     /* SCRIPTS TO HANDLE THE CROPPER BOX */
-      var $image = $("#image");
-      var cropBoxData;
-      var canvasData;
-      $("#modalCrop").on("shown.bs.modal", function () {
-        $image.cropper({
-          viewMode: 1,
-          aspectRatio: 1/1,
-          minCropBoxWidth: 200,
-          minCropBoxHeight: 200,
-          ready: function () {
-            $image.cropper("setCanvasData", canvasData);
-            $image.cropper("setCropBoxData", cropBoxData);
-          }
-        });
-      }).on("hidden.bs.modal", function () {
-        cropBoxData = $image.cropper("getCropBoxData");
-        canvasData = $image.cropper("getCanvasData");
-        $image.cropper("destroy");
-      });
+    var $image = $("#image");
+    var cropBoxData;
+    var canvasData;
+    $("#modalCrop").on("shown.bs.modal", function () {
+    $image.cropper({
+      viewMode: 1,
+      aspectRatio: 1/1,
+      minCropBoxWidth: 200,
+      minCropBoxHeight: 200,
+      ready: function () {
+        $image.cropper("setCanvasData", canvasData);
+        $image.cropper("setCropBoxData", cropBoxData);
+      }
+    });
+    }).on("hidden.bs.modal", function () {
+    cropBoxData = $image.cropper("getCropBoxData");
+    canvasData = $image.cropper("getCanvasData");
+    $image.cropper("destroy");
+    });
 
-      $(".js-zoom-in").click(function () {
-        $image.cropper("zoom", 0.1);
-      });
+    $(".js-zoom-in").click(function () {
+    $image.cropper("zoom", 0.1);
+    });
 
-      $(".js-zoom-out").click(function () {
-        $image.cropper("zoom", -0.1);
-      });
+    $(".js-zoom-out").click(function () {
+    $image.cropper("zoom", -0.1);
+    });
 
     /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER */
     $(".js-crop-and-upload").click(function () {
@@ -212,20 +204,20 @@
         $("#id_y").val(cropData["y"]);
         $("#id_height").val(cropData["height"]);
         $("#id_width").val(cropData["width"]);
-        $("#photo_upload_form").submit();
+        $("#modalCrop").modal("hide");
+        $("#photo_upload_form").ajaxSubmit({success:updateProfilePhoto});
       });
 
     /* SCRIPT TO OPEN THE MODAL WITH THE PREVIEW */
-      $("#photo_upload").change(function () {
-        if (this.files && this.files[0]) {
-          var reader = new FileReader();
-          reader.onload = function (e) {
-            $("#image").attr("src", e.target.result);
-            $("#modalCrop").modal("show");
-          }
-          reader.readAsDataURL(this.files[0]);
+    $("#photo_upload").change(function () {
+      if (this.files && this.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          $("#image").attr("src", e.target.result);
+          $("#modalCrop").modal("show");
         }
-      });
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
 </script>
-
 {% endblock %}
