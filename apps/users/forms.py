@@ -116,7 +116,7 @@ class CandidatePhotoUploadForm(forms.ModelForm):
         }
 
     def save(self):
-        candidate = super(CandidatePhotoUploadForm, self).save(commit=False)
+        candidate = super(CandidatePhotoUploadForm, self).save()
         x = int(self.cleaned_data.get('x'))
         y = int(self.cleaned_data.get('y'))
         width = int(self.cleaned_data.get('width'))
