@@ -156,7 +156,7 @@ section#account #account-form input {
     color: #574e66;
     margin-bottom: 20px;
 }
-section#account #account-photo-form label {
+section#account #account-`form label {
     color: #574e66;
 }
 section#account #account-photo-form input {
@@ -1377,4 +1377,8 @@ section#cart .code_error span {
 .search-info {
     display: block;
     margin-top: 5px;
+}
+
+.photo-upload-inputs {
+    display: none;
 }

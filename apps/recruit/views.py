@@ -1,11 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse_lazy
-from django.http import HttpResponseRedirect
 from django.contrib.postgres.search import (
     SearchQuery,
     SearchVector,
 )
-from django.shortcuts import render
+from django.http import HttpResponseRedirect
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -13,7 +12,6 @@ from django.views.generic import (
     ListView,
     TemplateView,
     UpdateView,
-    View,
 )
 
 from braces.views import LoginRequiredMixin
@@ -28,10 +26,6 @@ from companies.models import (
     Company,
     CompanyRequestInvitation,
 )
-from users.forms import (
-    CandidateUpdateForm,
-    CandidatePhotoUploadForm,
-)
 from users.models import Candidate
 from users.mixins import AgentRequiredMixin
 
@@ -43,8 +37,10 @@ class HomeView(TemplateView):
     template_name = 'recruit/landing.html'
 
 
-class DashboardView(LoginRequiredMixin, View):
-    def get(self, request, **kwargs):
+class DashboardView(LoginRequiredMixin, TemplateView):
+    template_name = 'recruit/dashboard.html'
+
+    def dispatch(self, request, *args, **kwargs):
         if request.user.account_type == User.ACCOUNT_AGENT and not request.user.agent.company:
             company = Company.objects.filter(domain=request.user.domain)
 
@@ -66,43 +62,7 @@ class DashboardView(LoginRequiredMixin, View):
                         )
                     return HttpResponseRedirect(reverse_lazy('companies:company_pending'))
             return HttpResponseRedirect(reverse_lazy('companies:company_create'))
-
-        company = []
-        f = []
-        # show profile dashboard according to user role
-        # start with candidate profile
-        is_complete = False  # profile completeness flag for candidate
-        completeness = 0.3  # profile completeness, 0.3 is default after registration
-        if request.user.account_type == User.ACCOUNT_CANDIDATE:
-            self.template_name = 'recruit/candidate_dashboard.html'
-            profile = request.user.candidate
-            if (profile.title and profile.city and profile.skills.all() and
-                profile.phone and profile.experience and profile.country):
-                is_complete = True
-            # calculate profile completeness in %
-            completeness += 0.2 if is_complete else 0
-            completeness += 0.3 if profile.cv else 0
-            completeness += 0.2 if profile.photo else 0
-            completeness *= 100
-
-            # form will be used to generate user profile data
-            f = CandidateUpdateForm(instance=profile)
-
-        # show agent dashboard
-        elif request.user.account_type == User.ACCOUNT_AGENT:
-            self.template_name = 'recruit/agent_dashboard.html'
-            profile = request.user.agent
-            company = profile.company
-
-        return render(request, self.template_name, {
-            'photo_form': CandidatePhotoUploadForm,
-            'profile': profile,
-            'is_complete': is_complete,
-            'profile_completeness': completeness,
-            'company': company,
-            'f': f, # form, for candidate
-            'invitation_requests': CompanyRequestInvitation.objects.filter(company=company) if request.user.account_type == User.ACCOUNT_AGENT else None,
-        })
+        return super(DashboardView, self).dispatch(request, *args, **kwargs)
 
 dashboard = DashboardView.as_view()
 
