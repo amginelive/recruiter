@@ -29,7 +29,7 @@
                     <div class="row">
                         <div class="col-md-4 text-center">
                             <h5>Photo</h5>
-                            <img id="profile_photo" src="{% if profile.photo %}{{ profile.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}">
+                            <img id="profile_photo" src="{% if profile.photo %}{{ profile.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" class="thumbnail">
                             <form action="{% url 'users:profile_photo_upload' %}" id="photo_upload_form" method="post" role="form" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <div class="photo-upload-inputs">
