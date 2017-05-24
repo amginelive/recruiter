@@ -21,6 +21,7 @@ from .models import (
     Candidate,
 )
 from .utils import get_profile_completeness
+from companies.models import CompanyRequestInvitation
 
 
 User = get_user_model()
@@ -134,6 +135,7 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
     """
     View for viewing a user's profile.
     """
+
     context_object_name = 'profile'
 
     def get_template_names(self):
@@ -148,5 +150,23 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
             return Candidate.objects.get(user__slug=slug)
         elif self.request.user.account_type == User.ACCOUNT_AGENT:
             return Agent.objects.get(user__slug=slug)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(ProfileDetailView, self).get_context_data(*args, **kwargs)
+
+        profile = self.get_object()
+
+        if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
+            context['photo_form'] = CandidatePhotoUploadForm
+            context['completeness'] = get_profile_completeness(profile)
+            context['candidate_form'] = CandidateUpdateForm(instance=profile)
+
+        elif self.request.user.account_type == User.ACCOUNT_AGENT:
+            company = profile.company
+            context['company'] = company
+            context['invitation_requests'] = CompanyRequestInvitation.objects.filter(company=company)
+            context['photo_form'] = AgentPhotoUploadForm
+
+        return context
 
 profile_detail = ProfileDetailView.as_view()

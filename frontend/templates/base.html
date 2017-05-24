@@ -51,6 +51,9 @@
                             </li>
                         {% else %}
                             <li>
+                                <a href="{% url 'users:profile_detail' user.slug %}">{% trans "My Profile" %}</a>
+                            </li>
+                            <li>
                                 <a href="{% url 'recruit:dashboard' %}">{% trans "My Dashboard" %}</a>
                             </li>
                             <li>
@@ -61,7 +64,7 @@
                                     {% trans "My Account" %} <span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="account">
-                                    <li><a href="{% url 'recruit:dashboard' %}">{% trans "Settings" %}</a></li>
+                                    <li><a href="{% url 'account_change_password' %}">{% trans "Settings" %}</a></li>
                                     <li class="divider"></li>
                                     <li>
                                         <a href="{% url 'account_logout' %}">{% trans "Logout" %}</a>
