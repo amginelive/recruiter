@@ -14,7 +14,7 @@
                             <h4>{{ request.user.get_full_name }}</h4>
                         </div>
                         <div class="col-md-8 account-actions">
-                            <a class="btn" href="{% url 'recruit:dashboard' %}"><i class="glyphicon glyphicon-eye-open"></i> My profile</a>
+                            <a class="btn" href="{% url 'users:profile_detail' user.slug %}"><i class="glyphicon glyphicon-eye-open"></i> My profile</a>
                         </div>
                     </div>
 <!--                    <div class="row">

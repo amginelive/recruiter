@@ -206,6 +206,18 @@ class Candidate(ProfileBase):
     country = CountryField(_('Country'))
     experience = models.SmallIntegerField(_('Experience (full years)'), **optional)
     cv = models.FileField(_("CV"), upload_to=get_upload_path, max_length=150, editable=True, **optional)
+    networks = models.ManyToManyField(
+        'users.Candidate',
+        related_name='candidates',
+        verbose_name=_('Networks')
+    )
+
+    class Meta:
+        verbose_name = _('Candidate')
+        verbose_name_plural = _('Candidates')
+
+    def __str__(self):
+        return self.user.get_full_name()
 
 
 class Agent(ProfileBase):

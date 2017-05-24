@@ -15,11 +15,13 @@
                 <div class="col-md-7 col-md-offset-1 profile-left">
                     <div class="row">
                         <div class="col-md-4 text-center">
-                            <h4>{{ request.user.get_full_name }}</h4>
+                            <h4>{{ profile.user.get_full_name }}</h4>
                         </div>
-                        <div class="col-md-8 account-actions">
-                            <a class="btn" href="{% url 'users:profile_update' %}"><i class="glyphicon glyphicon-edit"></i> Edit profile</a>
-                        </div>
+                        {% if user == profile.user %}
+                            <div class="col-md-8 account-actions">
+                                <a class="btn" href="{% url 'users:profile_update' %}"><i class="glyphicon glyphicon-edit"></i> Edit profile</a>
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="row">
                         <div class="col-md-4 text-center">
@@ -30,7 +32,9 @@
                                 <div class="photo-upload-inputs">
                                     {{ photo_form }}
                                 </div>
-                                <button type="button" class="btn" id="photo_upload_btn" OnClick="javascript:void(0)">{% trans "Update Photo" %}</button>
+                                {% if user == profile.user %}
+                                    <button type="button" class="btn" id="photo_upload_btn" OnClick="javascript:void(0)">{% trans "Update Photo" %}</button>
+                                {% endif %}
                             </form>
                         </div>
                         <div class="col-md-8">
@@ -54,7 +58,9 @@
                                 {% endif %}
                             {% endfor %}
                             </ul>
-                            <a href="{% url 'recruit:search' %}" class="btn action-btn" style="width:80%; margin-top:20px;"><i class="glyphicon glyphicon-search"></i>Find job positions</a>
+                            {% if user == profile.user %}
+                                <a href="{% url 'recruit:search' %}" class="btn action-btn" style="width:80%; margin-top:20px;"><i class="glyphicon glyphicon-search"></i>Find job positions</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -74,7 +80,9 @@
                     <form action="{% url 'users:profile_cv_upload' %}" id="cv_upload_form" method="post" role="form" enctype="multipart/form-data">
                         {% csrf_token %}
                         <input type="file" name="cv" id="cv_upload" style="display:none"/>
-                        <button type="button" class="btn" id="cv_upload_btn" OnClick="javascript:void(0)">{% trans "Update CV" %}</button>
+                        {% if user == profile.user %}
+                            <button type="button" class="btn" id="cv_upload_btn" OnClick="javascript:void(0)">{% trans "Update CV" %}</button>
+                        {% endif %}
                         <div id="cv_updated" class="label label-success cv_updated">{% trans 'CV updated' %}</div>
                         <a href="{% if profile.cv %}{{ profile.cv.url }}{% endif %}" id="current_cv" {% if not profile.cv %}class="hidden"{% endif %}><i class="glyphicon glyphicon-download"></i> Download current CV</a>
                     </form>
