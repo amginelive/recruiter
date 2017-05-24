@@ -119,15 +119,13 @@ class CandidatePhotoUploadForm(forms.ModelForm):
         candidate = super(CandidatePhotoUploadForm, self).save(commit=False)
         x = int(self.cleaned_data.get('x'))
         y = int(self.cleaned_data.get('y'))
-        w = int(self.cleaned_data.get('width'))
-        h = int(self.cleaned_data.get('height'))
+        width = int(self.cleaned_data.get('width'))
+        height = int(self.cleaned_data.get('height'))
 
         img = Image.open(candidate.photo)
-        cropped_image = img.crop((x, y, w + x, h + y))
-        resized_image = cropped_image.resize((200,200), Image.ANTIALIAS)
+        cropped_image = img.crop((x, y, width + x, height + y))
+        resized_image = cropped_image.resize((200, 200), Image.ANTIALIAS)
         resized_image.save(candidate.photo.path)
-
-        candidate.save()
 
         return candidate
 
