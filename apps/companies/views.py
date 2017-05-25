@@ -4,13 +4,10 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.views.generic import (
     CreateView,
-    DeleteView,
     DetailView,
     TemplateView,
     View,
 )
-
-from braces.views import JSONResponseMixin
 
 from .forms import (
     CompanyForm,
@@ -20,7 +17,6 @@ from .forms import (
 from .models import (
     Company,
     CompanyInvitation,
-    CompanyRequestInvitation,
 )
 from users.mixins import AgentRequiredMixin
 
@@ -144,28 +140,6 @@ class CompanyPendingView(AgentRequiredMixin, TemplateView):
         return super(CompanyPendingView, self).dispatch(request, *args, **kwargs)
 
 company_pending = CompanyPendingView.as_view()
-
-
-class CompanyInvitationRequestAPIView(AgentRequiredMixin, DeleteView, JSONResponseMixin):
-    """
-    View for accepting or rejecting a company invitation request.
-    """
-    model = CompanyRequestInvitation
-
-    def get_object(self):
-        return CompanyRequestInvitation.objects.get(uuid=self.kwargs.get('uuid'))
-
-    def post(self, request, *args, **kwargs):
-        request_invitation = self.get_object()
-        request_invitation.delete()
-
-        if request.POST.get('action') == 'accept':
-            request_invitation.user.agent.company = request_invitation.company
-            request_invitation.user.agent.save()
-
-        return self.render_json_response({})
-
-api_company_invitation_request = CompanyInvitationRequestAPIView.as_view()
 
 
 class CompanyInviteSuccessView(AgentRequiredMixin, DetailView):
