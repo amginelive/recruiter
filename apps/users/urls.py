@@ -7,4 +7,5 @@ urlpatterns = (
     url(r'^profile/:slug/$', views.profile_detail, name='profile_detail'),
     url(r'^photo/upload/$', views.profile_photo_upload, name='profile_photo_upload'),
     url(r'^cv/upload/$', views.profile_cv_upload, name='profile_cv_upload'),
+    url(r'^candidate/search/$', views.candidate_search, name='candidate_search'),
 )

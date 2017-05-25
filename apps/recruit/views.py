@@ -97,13 +97,13 @@ class SearchView(LoginRequiredMixin, TemplateView):
                 if country_filter:
                     filter_list.append(country_filter)
 
-            # generate SearchQuery item from search
+            # generate SearchQuery item from filter
             for index, item in enumerate(filter_list):
                 if index == 0:
                     search_query = SearchQuery(item)
                 search_query |= SearchQuery(item)
 
-            # generate additioanl SearchQuery item from filters
+            # generate additioanl SearchQuery item from search
             for index, item in enumerate(search_list):
                 if not search_query:
                     search_query = SearchQuery(item)
