@@ -1,8 +1,13 @@
 from django.contrib.auth import get_user_model
+from django.contrib.postgres.search import (
+    SearchQuery,
+    SearchVector,
+)
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.generic import (
     DetailView,
+    TemplateView,
     View,
 )
 
@@ -172,3 +177,35 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         return context
 
 profile_detail = ProfileDetailView.as_view()
+
+
+class CandidateSearchView(CandidateRequiredMixin, TemplateView):
+    """
+    View for candidates to search for another candidate to add to their network.
+    """
+    template_name = 'users/candidate_search.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(CandidateSearchView, self).get_context_data(*args, **kwargs)
+        search = self.request.GET.get('search', None)
+        candidates = []
+
+        if search:
+            search_list = search.split()
+
+            for index, item in enumerate(search_list):
+                if index == 0:
+                    search_query = SearchQuery(item)
+                search_query |= SearchQuery(item)
+
+            candidates = Candidate.objects\
+                .annotate(search=SearchVector('user__first_name', 'user__last_name'))\
+                .filter(search=search_query)\
+                .exclude(user=self.request.user)\
+                .distinct('id')
+
+        context['candidates'] = candidates
+
+        return context
+
+candidate_search = CandidateSearchView.as_view()
