@@ -25,6 +25,7 @@ from .models import (
 )
 from .utils import get_profile_completeness
 from companies.models import CompanyRequestInvitation
+from recruit.models import ConnectionRequest
 
 
 User = get_user_model()
@@ -156,6 +157,15 @@ class CandidateSearchView(CandidateRequiredMixin, TemplateView):
                 .distinct('id')
 
         context['candidates'] = candidates
+        context['connection_request'] = ConnectionRequest
+
+        connection_requests = ConnectionRequest.objects.filter(request_recipient__in=candidates)
+        context['team_member_requests'] = connection_requests\
+            .filter(connection_type=ConnectionRequest.CONNECTION_TEAM_MEMBER)\
+            .values_list('request_recipient__pk', flat=True)
+        context['network_requests'] = connection_requests\
+            .filter(connection_type=ConnectionRequest.CONNECTION_NETWORK)\
+            .values_list('request_recipient__pk', flat=True)
 
         return context
 

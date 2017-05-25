@@ -179,7 +179,7 @@ class JobPostCreateView(AgentRequiredMixin, CreateView):
     success_url = reverse_lazy('recruit:job_post_list')
 
     def get_initial(self):
-        return {'posted_by': self.request.user.agent}
+        return {'agent': self.request.user.agent}
 
 job_post_create = JobPostCreateView.as_view()
 

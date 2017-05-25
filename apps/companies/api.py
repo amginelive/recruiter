@@ -27,6 +27,6 @@ class CompanyInvitationRequestAPIView(AgentRequiredMixin, DeleteView, JSONRespon
             request_invitation.user.agent.company = request_invitation.company
             request_invitation.user.agent.save()
 
-        return self.render_json_response({})
+        return self.render_json_response({'success': True})
 
 company_invitation_request = CompanyInvitationRequestAPIView.as_view()
