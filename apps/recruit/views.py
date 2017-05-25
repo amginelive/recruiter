@@ -41,7 +41,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'recruit/dashboard.html'
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.account_type == User.ACCOUNT_AGENT and not request.user.agent.company:
+        if request.user.is_authenticated and request.user.account_type == User.ACCOUNT_AGENT and not request.user.agent.company:
             company = Company.objects.filter(domain=request.user.domain)
 
             if company.exists():
