@@ -59,29 +59,15 @@ class CustomSignupForm(forms.Form):
     def signup(self, request, user):
         if type(user).__name__ == 'SocialLogin':
             user = user.user
-        user = User.objects.get(pk=user.id)
 
-        first_name = self.cleaned_data.get('first_name').strip()
-        last_name = self.cleaned_data.get('last_name').strip()
-        email = self.cleaned_data.get('email').strip()
-        account_type = int(self.cleaned_data.get('account_type'))
-
-        user.first_name = first_name
-        user.last_name = last_name
-        user.email = email
-        user.account_type = account_type
-
-        if user.first_name and user.last_name:
-            user.slug = slugify_url('{} {}'.format(user.first_name, user.last_name))
-
+        user.account_type = int(self.cleaned_data.get('account_type'))
         user.save()
 
+        # create profile for new user
         data = {
             'user': user,
             'phone': self.cleaned_data['phone']
         }
-
-        # create profile for new user
         if user.account_type == User.ACCOUNT_CANDIDATE:
             Candidate.objects.create(**data)
         elif user.account_type == User.ACCOUNT_AGENT:
