@@ -57,3 +57,26 @@ class Skill(AbstractTimeStampedModel):
 
     def __str__(self):
         return self.name
+
+
+class ConnectionRequest(AbstractTimeStampedModel):
+    """
+    Model for requesting to be added to network or team.
+    """
+    CONNECTION_NETWORK = 1
+    CONNECTION_TEAM_MEMBER = 2
+    CONNECTION_TYPE_CHOICES = (
+        (CONNECTION_NETWORK, _('Network')),
+        (CONNECTION_TEAM_MEMBER, _('Team Member')),
+    )
+    requested_by = models.ForeignKey('users.Candidate', related_name='connection_requests', verbose_name=_('Requested By'))
+    request_recipient = models.ForeignKey('users.Candidate', related_name='connection_recipients', verbose_name=_('Request Recipient'))
+    connection_type = models.IntegerField(_('Connection Type'), choices=CONNECTION_TYPE_CHOICES)
+    uuid = models.SlugField(_('UUID'), default=uuid.uuid4, editable=False)
+
+    class Meta:
+        verbose_name = _('Connection Request')
+        verbose_name_plural = _('Connection Requests')
+
+    def __str__(self):
+        return self.uuid

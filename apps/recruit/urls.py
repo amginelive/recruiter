@@ -1,6 +1,9 @@
 from macrosurl import url
 
-from . import views
+from . import (
+    api,
+    views,
+)
 
 
 urlpatterns = (
@@ -12,4 +15,6 @@ urlpatterns = (
     url(r'^job/posts/create/$', views.job_post_create, name='job_post_create'),
     url(r'^job/posts/:uuid/update/$', views.job_post_update, name='job_post_update'),
     url(r'^job/posts/:uuid/delete/$', views.job_post_delete, name='job_post_delete'),
+
+    url(r'^connection/request/$', api.connection_request_create, name='connection_request_create'),
 )

@@ -3,7 +3,7 @@ from django.contrib.postgres.search import (
     SearchQuery,
     SearchVector,
 )
-from django.http import JsonResponse
+
 from django.shortcuts import render
 from django.views.generic import (
     DetailView,
@@ -16,17 +16,16 @@ from braces.views import LoginRequiredMixin
 from .forms import (
     AgentPhotoUploadForm,
     AgentUpdateForm,
-    CandidateCVUploadForm,
     CandidatePhotoUploadForm,
     CandidateUpdateForm,
 )
 from .mixins import CandidateRequiredMixin
 from .models import (
-    Agent,
     Candidate,
 )
 from .utils import get_profile_completeness
 from companies.models import CompanyRequestInvitation
+from recruit.models import ConnectionRequest
 
 
 User = get_user_model()
@@ -87,53 +86,6 @@ class ProfileUpdateView(LoginRequiredMixin, View):
         })
 
 profile_update = ProfileUpdateView.as_view()
-
-
-class ProfilePhotoUploadView(LoginRequiredMixin, View):
-    """
-    View for uploading a user's profile picture.
-    """
-    def post(self, request, **kwargs):
-        # show profile dashboard according to user role
-        # start with candidate profile
-        form_values = request.POST.copy()
-        form_values['user'] = request.user.id
-        if request.user.account_type == User.ACCOUNT_CANDIDATE:
-            candidate = request.user.candidate
-            form = CandidatePhotoUploadForm(form_values, request.FILES, instance=candidate)
-            if form.is_valid():
-                candidate = form.save()
-                return JsonResponse({'success': True, 'image': candidate.photo.url})
-
-        # show agent dashboard
-        elif request.user.account_type == User.ACCOUNT_AGENT:
-            agent = request.user.agent
-            form = AgentPhotoUploadForm(form_values, request.FILES, instance=agent)
-
-            if form.is_valid():
-                agent = form.save()
-                return JsonResponse({'success': True, 'image': agent.photo.url})
-
-profile_photo_upload = ProfilePhotoUploadView.as_view()
-
-
-class ProfileCVUploadView(CandidateRequiredMixin, View):
-    """
-    View for uploading a candidate's CV.
-    """
-    def post(self, request, **kwargs):
-        # show profile dashboard according to user role
-        # start with candidate profile
-        form_values = request.POST.copy()
-        form_values['user'] = request.user.id
-        candidate = request.user.candidate
-        form = CandidateCVUploadForm(form_values, request.FILES, instance=candidate)
-
-        if form.is_valid():
-            candidate = form.save(commit=True)
-            return JsonResponse({'success': True, 'cv': candidate.cv.url})
-
-profile_cv_upload = ProfileCVUploadView.as_view()
 
 
 class ProfileDetailView(LoginRequiredMixin, DetailView):
@@ -205,6 +157,15 @@ class CandidateSearchView(CandidateRequiredMixin, TemplateView):
                 .distinct('id')
 
         context['candidates'] = candidates
+        context['connection_request'] = ConnectionRequest
+
+        connection_requests = ConnectionRequest.objects.filter(request_recipient__in=candidates)
+        context['team_member_requests'] = connection_requests\
+            .filter(connection_type=ConnectionRequest.CONNECTION_TEAM_MEMBER)\
+            .values_list('request_recipient__pk', flat=True)
+        context['network_requests'] = connection_requests\
+            .filter(connection_type=ConnectionRequest.CONNECTION_NETWORK)\
+            .values_list('request_recipient__pk', flat=True)
 
         return context
 

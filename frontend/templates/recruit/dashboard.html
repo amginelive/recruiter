@@ -4,15 +4,30 @@
 
 {% block content %}
 <section id="internal-wrap">
-    <!-- internal block -->
-        <div class="container">
-            <div class="row">
-                <div class="col-md-10 col-md-offset-1 text-center" style="padding-top:100px;">
-                    <h1>Dashboard</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1 text-center" style="padding-top:100px;">
+                <div>
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#activity-feed" aria-controls="activity-feed" role="tab" data-toggle="tab">Activity Feed</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#notifications" aria-controls="notifications" role="tab" data-toggle="tab">Notifications</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="activity-feed">
+                            <h1>Acitivity Feed</h1>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="notifications">
+                            <h1>Notifications</h1>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    <!-- end internal block -->
+    </div>
 </section>
-<!-- end new admin content -->
 {% endblock %}

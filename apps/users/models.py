@@ -210,8 +210,13 @@ class Candidate(ProfileBase):
     cv = models.FileField(_("CV"), upload_to=get_upload_path, max_length=150, editable=True, **optional)
     networks = models.ManyToManyField(
         'users.Candidate',
-        related_name='candidates',
+        related_name='+',
         verbose_name=_('Networks')
+    )
+    team_members = models.ManyToManyField(
+        'users.Candidate',
+        related_name='+',
+        verbose_name=_('Team Members')
     )
 
     class Meta:
