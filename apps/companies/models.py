@@ -72,7 +72,7 @@ class Company(AbstractTimeStampedModel):
         return '/company/%s' % self.id
 
     def __str__(self):
-        return '%s' % (self.name)
+        return self.name
 
     def clean(self):
         if not self.pk:
