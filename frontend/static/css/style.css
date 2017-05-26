@@ -1392,3 +1392,9 @@ section#cart .code_error span {
     box-shadow: 0 0 0 1px #39f;
     outline: 0;
 }
+
+.connection-request-card {
+    border:1px
+    solid #dfdfdf;
+    padding:15px;
+}
