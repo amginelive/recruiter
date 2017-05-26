@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
 
 from phonenumber_field.formfields import PhoneNumberField
-from slugify import slugify_url
 from PIL import Image
 
 from .models import Candidate, Agent
@@ -78,7 +77,7 @@ class CandidateUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Candidate
-        exclude = ('user', 'date_updated', 'status', 'photo', 'cv', 'networks')
+        exclude = ('user', 'date_updated', 'status', 'photo', 'cv', 'connections')
 
 
 class AgentUpdateForm(forms.ModelForm):

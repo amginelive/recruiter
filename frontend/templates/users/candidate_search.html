@@ -1,6 +1,6 @@
 {% extends 'users/index.html' %}
 
-{% load staticfiles i18n %}
+{% load staticfiles i18n recruit_tags %}
 
 {% block content %}
 <section id="internal-wrap">
@@ -25,28 +25,37 @@
                                     </div>
                                     <div class="col-md-8 text-left">
                                         <span class="search-info">{{ candidate.user.get_full_name }}</span>
-                                        <form action="{% url 'recruit:connection_request_create' %}" method="POST">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="request_recipient" value="{{ candidate.pk }}">
-                                            <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_TEAM_MEMBER }}">
-
-                                            {% if candidate.pk in team_member_requests %}
-                                                <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Pending Team Member</button>
+                                        {% with user.candidate|connections:candidate as connections %}
+                                            {% if connections %}
+                                                {% if connections.connection_type == connection_request.CONNECTION_TEAM_MEMBER %}
+                                                    <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Team Member</button>
+                                                {% elif connections.connection_type == connection_request.CONNECTION_NETWORK %}
+                                                    <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Network</button>
+                                                {% endif %}
                                             {% else %}
-                                                <button class="btn btn-primary btn-xs add-connection">Add as team member</button>
-                                            {% endif %}
-                                        </form>
+                                                {% if candidate.pk in team_member_requests %}
+                                                    <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Team Member Approval</button>
+                                                {% elif candidate.pk in network_requests %}
+                                                    <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Network Approval</button>
+                                                {% else %}
+                                                    <form action="{% url 'recruit:connection_request_create' %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="connectee" value="{{ candidate.pk }}">
+                                                        <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_TEAM_MEMBER }}">
 
-                                        <form action="{% url 'recruit:connection_request_create' %}" method="POST">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="request_recipient" value="{{ candidate.pk }}">
-                                            <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_NETWORK }}">
-                                            {% if candidate.pk in network_requests %}
-                                                <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Pending Network</button>
-                                            {% else %}
-                                                <button class="btn btn-primary btn-xs add-connection">Add to my network</button>
+                                                        <button class="btn btn-primary btn-xs add-connection">Add as team member</button>
+                                                    </form>
+
+                                                    <form action="{% url 'recruit:connection_request_create' %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="connectee" value="{{ candidate.pk }}">
+                                                        <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_NETWORK }}">
+
+                                                        <button class="btn btn-primary btn-xs add-connection">Add to my network</button>
+                                                    </form>
+                                                {% endif %}
                                             {% endif %}
-                                        </form>
+                                        {% endwith %}
                                     </div>
                                 </div>
                             {% empty %}
@@ -78,11 +87,22 @@
             data: form.serialize(),
             dataType: "json",
             success: function(response) {
-                if (connection_type == 1)
-                    $(this).html('Pending Network');
-                else if (connection_type == 2)
-                    $(this).html('Pending Team Member');
-                $(this).attr('disabled', '');
+                if (response.success) {
+                    if (connection_type == 1)
+                        var button_text = 'Awating Network Approval'
+                    else if (connection_type == 2)
+                        var button_text = 'Awating Team Member Approval'
+
+                    form.before('<button class="btn btn-primary btn-xs add-connection" disabled="disabled">' + button_text + '</button>');
+                    $.each($('.search_candidates form'), function(key, value){
+                        $(this).remove();
+                    })
+                }
+                else {
+                    $.each(response.errors, function(key, value){
+                        alert(value);
+                    })
+                }
             }
         });
     });

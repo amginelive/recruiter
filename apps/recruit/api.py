@@ -17,13 +17,18 @@ class ConnectionRequestCreateAPIView(CandidateRequiredMixin, CreateView, JSONRes
     form_class = ConnectionRequestForm
 
     def get_initial(self):
-        return {'user': self.request.user}
+        return {'candidate': self.request.user.candidate}
 
     def form_valid(self, form):
         form.save()
-        return self.render_json_response({'success': True})
+        return self.render_json_response({
+            'success': True,
+        })
 
     def form_invalid(self, form):
-        return self.render_json_response({'success': False})
+        return self.render_json_response({
+            'success': False,
+            'errors': form.errors,
+        })
 
 connection_request_create = ConnectionRequestCreateAPIView.as_view()
