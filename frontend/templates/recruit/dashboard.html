@@ -22,7 +22,45 @@
                             <h1>Acitivity Feed</h1>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="notifications">
-                            <h1>Notifications</h1>
+                            <div class="row">
+                                <h1>Network</h1>
+                                <div class="row">
+                                    {% for network_request in network_requests %}
+                                        <div class="connection-request-card col-md-4">
+                                            <div class="col-md-4">
+                                                <img src="{% if network_request.connecter.photo %}{{ network_request.connecter.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+                                            </div>
+                                            <div class="col-md-8 text-left">
+                                                <span class="search-info">{{ network_request.connecter.user.get_full_name }}</span>
+                                                <button class="btn btn-primary btn-xs btn-connection-request" data-action="accept" data-uuid="{{ network_request.uuid }}">Accept</button>
+                                                <button class="btn btn-primary btn-xs btn-connection-request" data-action="decline" data-uuid="{{ network_request.uuid }}">Decline</button>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p>No requests as of the moment.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <h1>Team Member</h1>
+                                <div class="row">
+                                    {% for team_member_request in team_member_requests %}
+                                        <div class="connection-request-card col-md-4">
+                                            <div class="col-md-4">
+                                                <img src="{% if team_member_request.connecter.photo %}{{ team_member_request.connecter.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+                                            </div>
+                                            <div class="col-md-8 text-left">
+                                                <span class="search-info">{{ team_member_request.connecter.user.get_full_name }}</span>
+                                                <button class="btn btn-primary btn-xs btn-connection-request" data-action="accept" data-uuid="{{ team_member_request.uuid }}">Accept</button>
+                                                <button class="btn btn-primary btn-xs btn-connection-request" data-action="decline" data-uuid="{{ team_member_request.uuid }}">Decline</button>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p>No requests as of the moment.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -31,3 +69,29 @@
     </div>
 </section>
 {% endblock %}
+
+{% block footer_js %}
+<script type="text/javascript">
+    $('.btn-connection-request').on("click", function() {
+        var uuid = $(this).attr('data-uuid');
+        var action = $(this).attr('data-action');
+
+        $.ajax({
+            context: this,
+            type: 'POST',
+            url: Urls['recruit:connection_request_delete'](uuid),
+            data: {
+                action: action,
+            },
+            dataType: "json",
+            success: function(response) {
+                var row = $(this).closest('.row');
+                if (row.find('.connection-request-card').length == 1)
+                    row.html('<p>No requests as of the moment.</p>')
+
+                $(this).closest('.connection-request-card').remove();
+            }
+        });
+    });
+</script>
+{% endblock footer_js %}

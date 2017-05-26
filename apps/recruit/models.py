@@ -92,8 +92,8 @@ class ConnectionRequest(AbstractTimeStampedModel):
         (CONNECTION_NETWORK, _('Network')),
         (CONNECTION_TEAM_MEMBER, _('Team Member')),
     )
-    connecter = models.ForeignKey('users.Candidate', related_name='connecter_requests', verbose_name=_('Requested By'))
-    connectee = models.ForeignKey('users.Candidate', related_name='connectee_requests', verbose_name=_('Request Recipient'))
+    connecter = models.ForeignKey('users.Candidate', related_name='connecter_requests', verbose_name=_('Connecter'))
+    connectee = models.ForeignKey('users.Candidate', related_name='connectee_requests', verbose_name=_('Connectee'))
     connection_type = models.IntegerField(_('Connection Type'), choices=CONNECTION_TYPE_CHOICES)
     uuid = models.SlugField(_('UUID'), default=uuid.uuid4, editable=False)
 
@@ -102,4 +102,4 @@ class ConnectionRequest(AbstractTimeStampedModel):
         verbose_name_plural = _('Connection Requests')
 
     def __str__(self):
-        return self.uuid
+        return str(self.uuid)
