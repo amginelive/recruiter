@@ -1,4 +1,6 @@
 from django import forms
+from django.db.models import Q
+from django.utils.translation import ugettext_lazy as _
 
 from .models import (
     ConnectionRequest,
@@ -40,19 +42,32 @@ class ConnectionRequestForm(forms.ModelForm):
     """
     class Meta:
         model = ConnectionRequest
-        fields = ('request_recipient', 'connection_type',)
+        fields = ('connectee', 'connection_type',)
 
     def __init__(self, *args, **kwargs):
         super(ConnectionRequestForm, self).__init__(*args, **kwargs)
         if not self.instance.pk:
             initial = self.initial
-            self.user = initial.get('user')
+            self.candidate = initial.get('candidate')
+
+    def clean(self):
+        connectee = self.cleaned_data.get('connectee')
+
+        connections = self.candidate.connections.through.objects.filter(
+            (Q(connecter=self.candidate) & Q(connectee=connectee)) |
+            (Q(connecter=connectee) & Q(connectee=self.candidate))
+        )
+
+        if connections.exists():
+            raise forms.ValidationError(_('You are already connected to this candidate.'))
+
+        return self.cleaned_data
 
     def save(self, *args, **kwargs):
         connection_request = super(ConnectionRequestForm, self).save(commit=False)
 
         if not self.instance.pk:
-            connection_request.requested_by = self.user.candidate
+            connection_request.connecter = self.candidate
         connection_request.save()
 
         return connection_request

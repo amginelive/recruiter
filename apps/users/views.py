@@ -159,13 +159,13 @@ class CandidateSearchView(CandidateRequiredMixin, TemplateView):
         context['candidates'] = candidates
         context['connection_request'] = ConnectionRequest
 
-        connection_requests = ConnectionRequest.objects.filter(request_recipient__in=candidates)
+        connection_requests = ConnectionRequest.objects.filter(connectee__in=candidates)
         context['team_member_requests'] = connection_requests\
             .filter(connection_type=ConnectionRequest.CONNECTION_TEAM_MEMBER)\
-            .values_list('request_recipient__pk', flat=True)
+            .values_list('connectee__pk', flat=True)
         context['network_requests'] = connection_requests\
             .filter(connection_type=ConnectionRequest.CONNECTION_NETWORK)\
-            .values_list('request_recipient__pk', flat=True)
+            .values_list('connectee__pk', flat=True)
 
         return context
 
