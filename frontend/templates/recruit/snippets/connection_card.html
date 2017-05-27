@@ -1,0 +1,19 @@
+{% load staticfiles %}
+
+<div class="connection-request-card col-md-4">
+    {% if connection.connecter == user.candidate %}
+        <div class="col-md-4">
+            <img src="{% if connection.connecter.photo %}{{ connection.connecter.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+        </div>
+        <div class="col-md-8 text-left">
+            <span class="search-info">{{ connection.connecter.user.get_full_name }}</span>
+        </div>
+    {% elif connection.connectee == user.candidate %}
+        <div class="col-md-4">
+            <img src="{% if connection.connectee.photo %}{{ connection.connectee.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+        </div>
+        <div class="col-md-8 text-left">
+            <span class="search-info">{{ connection.connectee.user.get_full_name }}</span>
+        </div>
+    {% endif %}
+</div>

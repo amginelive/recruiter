@@ -1398,3 +1398,7 @@ section#cart .code_error span {
     solid #dfdfdf;
     padding:15px;
 }
+
+.badge-new {
+    background-color: #d9534f;
+}
