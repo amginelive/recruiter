@@ -68,6 +68,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, *args, **kwargs):
         context = super(DashboardView, self).get_context_data(*args, **kwargs)
         connection_requests = ConnectionRequest.objects.filter(connectee=self.request.user.candidate)
+        context['connection_requests'] = connection_requests
         context['network_requests'] = connection_requests.filter(connection_type=ConnectionRequest.CONNECTION_NETWORK)
         context['team_member_requests'] = connection_requests.filter(connection_type=ConnectionRequest.CONNECTION_TEAM_MEMBER)
         return context
