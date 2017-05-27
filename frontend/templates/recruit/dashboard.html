@@ -19,14 +19,14 @@
 
                     <div class="tab-content">
                         <div role="tabpanel" class="tab-pane active" id="activity-feed">
-                            <h1>Acitivity Feed</h1>
+                            <h1>Activity Feed</h1>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="notifications">
-                            <div class="row">
+                            <div class="col-md-6">
                                 <h1>Network</h1>
                                 <div class="row">
                                     {% for network_request in network_requests %}
-                                        <div class="connection-request-card col-md-4">
+                                        <div class="connection-request-card col-md-8 col-md-offset-2">
                                             <div class="col-md-4">
                                                 <img src="{% if network_request.connecter.photo %}{{ network_request.connecter.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
                                             </div>
@@ -42,11 +42,11 @@
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="col-md-6">
                                 <h1>Team Member</h1>
                                 <div class="row">
                                     {% for team_member_request in team_member_requests %}
-                                        <div class="connection-request-card col-md-4">
+                                        <div class="connection-request-card col-md-8 col-md-offset-2">
                                             <div class="col-md-4">
                                                 <img src="{% if team_member_request.connecter.photo %}{{ team_member_request.connecter.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
                                             </div>
