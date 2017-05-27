@@ -15,6 +15,12 @@
                         <li role="presentation">
                             <a href="#notifications" aria-controls="notifications" role="tab" data-toggle="tab">Notifications {% if connection_requests %}<span class="badge badge-new badge-notification"><span class="badge-notification-count">{{ connection_requests.count }}</span> New</span>{% endif %}</a>
                         </li>
+                        <li role="presentation">
+                            <a href="#my-team" aria-controls="my-team" role="tab" data-toggle="tab">My Team</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#my-network" aria-controls="my-network" role="tab" data-toggle="tab">My Network</a>
+                        </li>
                     </ul>
 
                     <div class="tab-content">
@@ -25,17 +31,10 @@
                             <div class="col-md-6">
                                 <h1>Network</h1>
                                 <div class="row">
-                                    {% for network_request in network_requests %}
-                                        <div class="connection-request-card col-md-8 col-md-offset-2">
-                                            <div class="col-md-4">
-                                                <img src="{% if network_request.connecter.photo %}{{ network_request.connecter.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
-                                            </div>
-                                            <div class="col-md-8 text-left">
-                                                <span class="search-info">{{ network_request.connecter.user.get_full_name }}</span>
-                                                <button class="btn btn-primary btn-xs btn-connection-request" data-action="accept" data-uuid="{{ network_request.uuid }}">Accept</button>
-                                                <button class="btn btn-primary btn-xs btn-connection-request" data-action="decline" data-uuid="{{ network_request.uuid }}">Decline</button>
-                                            </div>
-                                        </div>
+                                    {% for connection_request in connection_requests %}
+                                        {% if connection_request.connection_type == connection_request.CONNECTION_NETWORK %}
+                                            {% include "recruit/snippets/connection_request_card.html" %}
+                                        {% endif %}
                                     {% empty %}
                                         <p>No requests as of the moment.</p>
                                     {% endfor %}
@@ -45,17 +44,36 @@
                             <div class="col-md-6">
                                 <h1>Team Member</h1>
                                 <div class="row">
-                                    {% for team_member_request in team_member_requests %}
-                                        <div class="connection-request-card col-md-8 col-md-offset-2">
-                                            <div class="col-md-4">
-                                                <img src="{% if team_member_request.connecter.photo %}{{ team_member_request.connecter.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
-                                            </div>
-                                            <div class="col-md-8 text-left">
-                                                <span class="search-info">{{ team_member_request.connecter.user.get_full_name }}</span>
-                                                <button class="btn btn-primary btn-xs btn-connection-request" data-action="accept" data-uuid="{{ team_member_request.uuid }}">Accept</button>
-                                                <button class="btn btn-primary btn-xs btn-connection-request" data-action="decline" data-uuid="{{ team_member_request.uuid }}">Decline</button>
-                                            </div>
-                                        </div>
+                                    {% for connection_request in connection_requests %}
+                                        {% if connection_request.connection_type == connection_request.CONNECTION_NETWORK %}
+                                            {% include "recruit/snippets/connection_request_card.html" %}
+                                        {% endif %}
+                                    {% empty %}
+                                        <p>No requests as of the moment.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="my-team">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    {% for connection in connections %}
+                                        {% if connection.connection_type == connection.CONNECTION_TEAM_MEMBER %}
+                                            {% include "recruit/snippets/connection_card.html" %}
+                                        {% endif %}
+                                    {% empty %}
+                                        <p>No requests as of the moment.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="my-network">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    {% for connection in connections %}
+                                        {% if connection.connection_type == connection.CONNECTION_NETWORK %}
+                                            {% include "recruit/snippets/connection_card.html" %}
+                                        {% endif %}
                                     {% empty %}
                                         <p>No requests as of the moment.</p>
                                     {% endfor %}

@@ -4,6 +4,7 @@ from django.contrib.postgres.search import (
     SearchQuery,
     SearchVector,
 )
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.views.generic import (
     CreateView,
@@ -26,7 +27,10 @@ from companies.models import (
     Company,
     CompanyRequestInvitation,
 )
-from recruit.models import ConnectionRequest
+from recruit.models import (
+    Connection,
+    ConnectionRequest,
+)
 from users.models import Candidate
 from users.mixins import AgentRequiredMixin
 
@@ -67,10 +71,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(DashboardView, self).get_context_data(*args, **kwargs)
-        connection_requests = ConnectionRequest.objects.filter(connectee=self.request.user.candidate)
-        context['connection_requests'] = connection_requests
-        context['network_requests'] = connection_requests.filter(connection_type=ConnectionRequest.CONNECTION_NETWORK)
-        context['team_member_requests'] = connection_requests.filter(connection_type=ConnectionRequest.CONNECTION_TEAM_MEMBER)
+        context['connection_requests'] = ConnectionRequest.objects.filter(connectee=self.request.user.candidate)
+        context['connections'] = Connection.objects.filter(
+            Q(connecter=self.request.user.candidate) | Q(connectee=self.request.user.candidate)
+        )
         return context
 
 dashboard = DashboardView.as_view()
