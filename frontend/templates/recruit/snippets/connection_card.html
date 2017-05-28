@@ -2,18 +2,26 @@
 
 <div class="connection-request-card col-md-4">
     {% if connection.connecter == user.candidate %}
-        <div class="col-md-4">
-            <img src="{% if connection.connecter.photo %}{{ connection.connecter.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
-        </div>
-        <div class="col-md-8 text-left">
-            <span class="search-info">{{ connection.connecter.user.get_full_name }}</span>
-        </div>
+        <a href="{% url 'users:profile_detail' connection.connectee.user.slug %}">
+            <div class="col-md-4">
+                <img src="{% if connection.connectee.photo %}{{ connection.connectee.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+            </div>
+            <div class="col-md-8 text-left">
+                <span class="search-info">{{ connection.connectee.user.get_full_name }}</span>
+                <span class="search-info">{{ connection.connectee.title|default_if_none:"" }}</span>
+                <span class="search-info">{{ connection.connectee.location|default_if_none:"" }}</span>
+            </div>
+        </a>
     {% elif connection.connectee == user.candidate %}
-        <div class="col-md-4">
-            <img src="{% if connection.connectee.photo %}{{ connection.connectee.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
-        </div>
-        <div class="col-md-8 text-left">
-            <span class="search-info">{{ connection.connectee.user.get_full_name }}</span>
-        </div>
+        <a href="{% url 'users:profile_detail' connection.connecter.user.slug %}">
+            <div class="col-md-4">
+                <img src="{% if connection.connecter.photo %}{{ connection.connecter.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+            </div>
+            <div class="col-md-8 text-left">
+                <span class="search-info">{{ connection.connecter.user.get_full_name }}</span>
+                <span class="search-info">{{ connection.connecter.title|default_if_none:"" }}</span>
+                <span class="search-info">{{ connection.connecter.location|default_if_none:"" }}</span>
+            </div>
+        </a>
     {% endif %}
 </div>

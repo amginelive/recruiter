@@ -222,6 +222,10 @@ class Candidate(ProfileBase):
     def __str__(self):
         return self.user.get_full_name()
 
+    @property
+    def location(self):
+        return '{}, {}'.format(self.city, self.country.name)
+
 
 class Agent(ProfileBase):
     """

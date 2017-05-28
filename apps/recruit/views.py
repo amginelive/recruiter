@@ -32,7 +32,10 @@ from recruit.models import (
     ConnectionRequest,
 )
 from users.models import Candidate
-from users.mixins import AgentRequiredMixin
+from users.mixins import (
+    AgentRequiredMixin,
+    CandidateRequiredMixin,
+)
 
 
 User = get_user_model()
@@ -226,3 +229,12 @@ class JobPostDeleteView(AgentRequiredMixin, DeleteView):
         return JobPost.objects.get(uuid=self.kwargs.get('uuid'))
 
 job_post_delete = JobPostDeleteView.as_view()
+
+
+class ApplicationView(CandidateRequiredMixin, TemplateView):
+    """
+    View for the My Application Page
+    """
+    template_name = "recruit/application.html"
+
+application = ApplicationView.as_view()
