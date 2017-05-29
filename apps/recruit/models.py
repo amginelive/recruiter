@@ -103,3 +103,26 @@ class ConnectionRequest(AbstractTimeStampedModel):
 
     def __str__(self):
         return str(self.uuid)
+
+
+class ConnectionInvite(AbstractTimeStampedModel):
+    """
+    Model for inviting to join the site and be in their network or team.
+    """
+    CONNECTION_NETWORK = 1
+    CONNECTION_TEAM_MEMBER = 2
+    CONNECTION_TYPE_CHOICES = (
+        (CONNECTION_NETWORK, _('Network')),
+        (CONNECTION_TEAM_MEMBER, _('Team Member')),
+    )
+    connecter = models.ForeignKey('users.Candidate', related_name='+', verbose_name=_('Connecter'))
+    connectee = models.ForeignKey('users.Candidate', related_name='+', verbose_name=_('Connectee'))
+    connection_type = models.IntegerField(_('Connection Type'), choices=CONNECTION_TYPE_CHOICES)
+    uuid = models.SlugField(_('UUID'), default=uuid.uuid4, editable=False)
+
+    class Meta:
+        verbose_name = _('Connection invitation')
+        verbose_name_plural = _('Connection invitations')
+
+    def __str__(self):
+        return self.connecter.user.get_full_name()

@@ -9,6 +9,7 @@ from . import (
 urlpatterns = (
     url(r'^$', views.HomeView.as_view(), name='home'),
     url(r'^dashboard/$', views.dashboard, name='dashboard'),
+    url(r'^dashboard/applications/$', views.application, name='application'),
     url(r'^search/$', views.SearchView.as_view(), name='search'),
     url(r'^job/posts/$', views.job_post_list, name='job_post_list'),
     url(r'^job/posts/:uuid/$', views.job_post_detail, name='job_post_detail'),
