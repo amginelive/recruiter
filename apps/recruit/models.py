@@ -94,7 +94,7 @@ class ConnectionRequest(AbstractTimeStampedModel):
     connecter = models.ForeignKey('users.Candidate', related_name='connecter_requests', verbose_name=_('Connecter'))
     connectee = models.ForeignKey('users.Candidate', related_name='connectee_requests', verbose_name=_('Connectee'))
     connection_type = models.IntegerField(_('Connection Type'), choices=CONNECTION_TYPE_CHOICES)
-    uuid = models.SlugField(_('UUID'), default=uuid.uuid4, editable=False)
+    uuid = models.SlugField(_('UUID'), default=uuid.uuid4, unique=True, editable=False)
 
     class Meta:
         verbose_name = _('Connection Request')
@@ -117,7 +117,7 @@ class ConnectionInvite(AbstractTimeStampedModel):
     connecter = models.ForeignKey('users.Candidate', related_name='+', verbose_name=_('Connecter'))
     connectee_email = models.EmailField(_('Connectee'), unique=True, max_length=255)
     connection_type = models.IntegerField(_('Connection Type'), choices=CONNECTION_TYPE_CHOICES)
-    uuid = models.SlugField(_('UUID'), default=uuid.uuid4, editable=False)
+    uuid = models.SlugField(_('UUID'), default=uuid.uuid4, unique=True, editable=False)
 
     class Meta:
         verbose_name = _('Connection Invitation')
