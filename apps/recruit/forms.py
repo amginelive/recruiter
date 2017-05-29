@@ -1,11 +1,18 @@
 from django import forms
+from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 
 from .models import (
+    ConnectionInvite,
     ConnectionRequest,
     JobPost,
 )
+from core.utils import send_email
+
+
+User = get_user_model()
 
 
 class JobPostForm(forms.ModelForm):
@@ -71,3 +78,46 @@ class ConnectionRequestForm(forms.ModelForm):
         connection_request.save()
 
         return connection_request
+
+
+class ConnectionInviteForm(forms.ModelForm):
+    """
+    Form for Connection Invite.
+    """
+    class Meta:
+        model = ConnectionInvite
+        fields = ('connectee_email', 'connection_type',)
+
+    def __init__(self, *args, **kwargs):
+        super(ConnectionInviteForm, self).__init__(*args, **kwargs)
+        if not self.instance.pk:
+            initial = self.initial
+            self.candidate = initial.get('candidate')
+
+    def clean_connectee_email(self):
+        connectee_email = self.cleaned_data.get('connectee_email')
+
+        if User.objects.filter(email=connectee_email).exists():
+            raise forms.ValidationError(_('A user with this email already exists.'))
+
+        return connectee_email
+
+    def save(self, *args, **kwargs):
+        connection_invite = super(ConnectionInviteForm, self).save(commit=False)
+
+        with transaction.atomic():
+            if not self.instance.pk:
+                connection_invite.connecter = self.candidate
+            connection_invite.save()
+
+            send_email(
+                _('Candidate Invitation, SquareBalloon'),
+                [connection_invite.connectee_email,],
+                'recruit/email/connection_invitation',
+                {
+                    'connection_invite': connection_invite,
+                    'user': User,
+                },
+            )
+
+        return connection_invite
