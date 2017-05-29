@@ -108,6 +108,9 @@ class ConnectionInviteForm(forms.ModelForm):
         with transaction.atomic():
             if not self.instance.pk:
                 connection_invite.connecter = self.candidate
+                connection_invites = ConnectionInvite.objects.filter(connectee_email=connection_invite.connectee_email)
+                if connection_invites.exists():
+                    connection_invite.pk = connection_invites.first().pk
             connection_invite.save()
 
             send_email(
