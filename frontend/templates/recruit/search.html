@@ -1,6 +1,6 @@
 {% extends 'users/index.html' %}
 
-{% load staticfiles i18n %}
+{% load staticfiles i18n bootstrap %}
 
 {% block content %}
 <section id="internal-wrap">
@@ -97,6 +97,9 @@
                                                 {% endfor %}
                                             </div>
                                         </div>
+                                        <div class="col-md-8 text-right" style="margin-top: 40px;">
+                                            <button class="btn btn-primary btn-refer-team-member-modal" data-toggle="modal" data-target="#refer_team_member_modal" data-job-post-pk="{{ result.pk }}">Refer to a team member</button>
+                                        </div>
                                     </div>
                                 {% elif user.account_type == user.ACCOUNT_AGENT %}
                                     <div class="search_job_post col-md-6">
@@ -127,11 +130,55 @@
         </div>
     <!-- end internal block -->
 </section>
+
+<div class="modal fade" id="refer_team_member_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Refer to a team member</h4>
+      </div>
+      <form class="job-referral-form" action="{% url 'recruit:job_referral_create' %}" method="POST">
+          <div class="modal-body">
+            <div class="row">
+                {% csrf_token %}
+                <div class="refer-success text-center"></div>
+                <input id="id_job_post" type="hidden" name="job_post">
+                <div class="form-group">
+                    <label class="control-label" for="id_refer_to">Refer to</label>
+                    <select name="refer_to" class="form-control" id="id_refer_to" multiple>
+                        {% for key, value in job_referral_form.refer_to.field.choices %}
+                            <option value="{{ key }}">{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="refer_to_error error"></div>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary btn-send-referral">Send Referral</button>
+          </div>
+     </form>
+    </div>
+  </div>
+</div>
 <!-- end new admin content -->
 {% endblock %}
 
 {% block footer_js %}
+<script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script type="text/javascript">
+    $('.btn-refer-team-member-modal').on('click', function() {
+        var job_post_pk = $(this).attr('data-job-post-pk');
+        $('#id_job_post').val(job_post_pk);
+    })
+
+    $("#id_refer_to").select2({
+        tags: true,
+    })
+    $('.select2-container').attr('style', 'width:500px');
+
     $('.add-filter').on("click", function(event) {
         event.preventDefault();
         var add_filter = $(this).html();
@@ -156,6 +203,25 @@
         $('input[name=filters]').val(filters.join(','));
 
         $('.search-form').submit();
+    });
+
+    $('.btn-send-referral').on('click', function(event) {
+        event.preventDefault();
+        $(".reffer-success").html('');
+        $(".error").html('');
+        $(".job-referral-form").ajaxSubmit({
+            success: function (response) {
+                if (response.success) {
+                    $(".refer-success").html('Referral Sent.');
+                }
+                else {
+                    $.each(response.errors, function(key, value){
+                        var form_error = key + '_error';
+                        $('.' + form_error).html(value);
+                    });
+                }
+            }
+        });
     });
 </script>
 {% endblock footer_js %}

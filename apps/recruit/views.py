@@ -28,6 +28,7 @@ from .models import (
 from .forms import (
     ConnectionInviteForm,
     JobPostForm,
+    JobReferralForm,
 )
 from companies.models import (
     Company,
@@ -145,11 +146,12 @@ class SearchView(LoginRequiredMixin, TemplateView):
                     .filter(search=search_query)\
                     .distinct('id')
 
-        # list the cities and countries that can be filtered
         if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
             model = JobPost
+            context['job_referral_form'] = JobReferralForm(initial={'candidate': self.request.user.candidate})
         elif self.request.user.account_type == User.ACCOUNT_AGENT:
             model = Candidate
+        # list the cities and countries that can be filtered
         countries_search = model.objects.all().distinct('country').values_list('country', flat=True)
         cities_search = model.objects.all().distinct('city').values_list('city', flat=True)
 

@@ -1,14 +1,19 @@
 from django.views.generic import (
     CreateView,
     DeleteView,
+    FormView,
 )
 
 from braces.views import JSONResponseMixin
 
-from .forms import ConnectionRequestForm
+from .forms import (
+    ConnectionRequestForm,
+    JobReferralForm,
+)
 from .models import (
     Connection,
     ConnectionRequest,
+    JobReferral,
 )
 from users.mixins import CandidateRequiredMixin
 
@@ -61,3 +66,28 @@ class ConnectionRequestDeleteAPIView(CandidateRequiredMixin, DeleteView, JSONRes
         return self.render_json_response({'success': True})
 
 connection_request_delete = ConnectionRequestDeleteAPIView.as_view()
+
+
+class JobReferralCreateView(CandidateRequiredMixin, FormView, JSONResponseMixin):
+    """
+    View for referring a job post to a team member.
+    """
+    model = JobReferral
+    form_class = JobReferralForm
+
+    def get_initial(self):
+        return {'candidate': self.request.user.candidate}
+
+    def form_valid(self, form):
+        form.save()
+        return self.render_json_response({
+            'success': True,
+        })
+
+    def form_invalid(self, form):
+        return self.render_json_response({
+            'success': False,
+            'errors': form.errors,
+        })
+
+job_referral_create = JobReferralCreateView.as_view()

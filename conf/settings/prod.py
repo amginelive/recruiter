@@ -3,7 +3,7 @@ from .common import *
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['www.squareballoon.com', 'squareballoon.com']
+ALLOWED_HOSTS = ['*']
 
 DATABASES = {
     'default': {
