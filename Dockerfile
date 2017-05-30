@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED=1 \
     DJANGO_SETTINGS_MODULE=conf.settings.prod \
     NGINX_VERSION=1.11.10-1~jessie
 
-EXPOSE 8000
+EXPOSE 80
 
 ## INSTALL NGINX
 RUN echo "deb http://nginx.org/packages/mainline/debian/ jessie nginx" >> /etc/apt/sources.list \
