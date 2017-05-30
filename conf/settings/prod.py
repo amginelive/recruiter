@@ -11,9 +11,20 @@ DATABASES = {
         'NAME': 'recruiter',
         'USER': 'recruiter',
         'PASSWORD': 'recruiter!',
-        'HOST': '',
+        'HOST': 'postgres',
         'PORT': '',
     }
+}
+
+# Django-channels settings
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
+        },
+        "ROUTING": "conf.routing.channel_routing",
+    },
 }
 
 
@@ -77,9 +88,3 @@ LOGGING = {
         },
     }
 }
-
-
-try:
-    from .local import *
-except ImportError:
-    pass

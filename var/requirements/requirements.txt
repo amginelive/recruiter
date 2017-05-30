@@ -27,3 +27,4 @@ requests-oauthlib==0.8.0
 six==1.10.0
 sqlparse==0.2.3
 Unidecode==0.4.20
+channels==1.1.3

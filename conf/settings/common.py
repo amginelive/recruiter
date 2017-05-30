@@ -59,6 +59,7 @@ INSTALLED_APPS = (
 #    'djangoseo',
     'easy_thumbnails',
     'phonenumber_field',
+    'channels',
 
     'companies',
     'recruit',
@@ -218,6 +219,14 @@ CACHES = {
 #        'LOCATION': '127.0.0.1:11211',
 #    }
 #}
+
+# Django-channels settings
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "ROUTING": "conf.routing.channel_routing",
+    },
+}
 
 
 # Start allauth settings
