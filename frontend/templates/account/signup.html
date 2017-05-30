@@ -38,7 +38,7 @@
                     {{ form.phone.errors }}
                     <div class="form-group">
                         <div>
-                            <input type="email" name="email" class="form-control" placeholder="E-mail address" required id="id_email" value="{{ form.email.value|default_if_none:'' }}"/>
+                            <input type="email" name="email" class="form-control" placeholder="E-mail address" required id="id_email" value="{% if request.GET.email %}{{ request.GET.email }}{% else %}{{ form.email.value|default_if_none:'' }}{% endif %}"/>
                         </div>
                     </div>
                     {{ form.email.errors }}

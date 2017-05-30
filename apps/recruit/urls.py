@@ -16,6 +16,7 @@ urlpatterns = (
     url(r'^job/posts/create/$', views.job_post_create, name='job_post_create'),
     url(r'^job/posts/:uuid/update/$', views.job_post_update, name='job_post_update'),
     url(r'^job/posts/:uuid/delete/$', views.job_post_delete, name='job_post_delete'),
+    url(r'^connection/invite/$', views.connection_invite_create, name='connection_invite_create'),
 
     url(r'^connection/request/create/api/$', api.connection_request_create, name='connection_request_create'),
     url(r'^connection/request/:uuid/delete/api/$', api.connection_request_delete, name='connection_request_delete'),

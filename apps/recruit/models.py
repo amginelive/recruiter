@@ -78,8 +78,7 @@ class Connection(AbstractTimeStampedModel):
         verbose_name_plural = _('Connections')
 
     def __str__(self):
-        return self.connecter.user.get_full_name()
-
+        return self.connectee.user.get_full_name()
 
 
 class ConnectionRequest(AbstractTimeStampedModel):
@@ -116,13 +115,13 @@ class ConnectionInvite(AbstractTimeStampedModel):
         (CONNECTION_TEAM_MEMBER, _('Team Member')),
     )
     connecter = models.ForeignKey('users.Candidate', related_name='+', verbose_name=_('Connecter'))
-    connectee = models.ForeignKey('users.Candidate', related_name='+', verbose_name=_('Connectee'))
+    connectee_email = models.EmailField(_('Connectee'), max_length=255)
     connection_type = models.IntegerField(_('Connection Type'), choices=CONNECTION_TYPE_CHOICES)
     uuid = models.SlugField(_('UUID'), default=uuid.uuid4, editable=False)
 
     class Meta:
-        verbose_name = _('Connection invitation')
-        verbose_name_plural = _('Connection invitations')
+        verbose_name = _('Connection Invitation')
+        verbose_name_plural = _('Connection Invitations')
 
     def __str__(self):
-        return self.connecter.user.get_full_name()
+        return str(self.uuid)

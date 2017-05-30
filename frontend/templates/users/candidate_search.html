@@ -5,73 +5,79 @@
 {% block content %}
 <section id="internal-wrap">
     <!-- internal block -->
-        <div class="container">
-            <ol class="breadcrumb">
-                <li><a href="{% url 'recruit:dashboard' %}">Activity Feed</a></li>
-                <li><a href="{% url 'recruit:search' %}">Find job positions</a></li>
-                <li class="active">Search Candidates</li>
-                <li><a href="#">My Application</a></li>
-            </ol>
-            <div class="row" style="padding-top:40px;">
-                <div class="col-md-12 text-center">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <form class="search-form" action="{% url 'users:candidate_search' %}" method="GET">
-                                <div class="search_block">
-                                    <input type="text" placeholder="Search..." name="search" value="{{ search|default_if_none:'' }}"/>
-                                    <button class="btn search-btn" type="submit" value="Search"><i class="glyphicon glyphicon-search"></i> Search</button>
+    <div class="container">
+        <ol class="breadcrumb">
+            <li><a href="{% url 'recruit:dashboard' %}">Activity Feed</a></li>
+            <li><a href="{% url 'recruit:search' %}">Find job positions</a></li>
+            <li class="active">Search Candidates</li>
+            <li><a href="#">My Application</a></li>
+        </ol>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <a href="{% url 'recruit:connection_invite_create' %}?connection_type={{ connection_request.CONNECTION_TEAM_MEMBER }}" class="btn btn-primary">Invite as team member</a>
+                <a href="{% url 'recruit:connection_invite_create' %}?connection_type={{ connection_request.CONNECTION_NETWORK }}" class="btn btn-primary">Invite as network</a>
+            </div>
+        </div>
+        <div class="row" style="padding-top:40px;">
+            <div class="col-md-12 text-center">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form class="search-form" action="{% url 'users:candidate_search' %}" method="GET">
+                            <div class="search_block">
+                                <input type="text" placeholder="Search..." name="search" value="{{ search|default_if_none:'' }}"/>
+                                <button class="btn search-btn" type="submit" value="Search"><i class="glyphicon glyphicon-search"></i> Search</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-12 search_candidates">
+                        {% for candidate in candidates %}
+                            <div class="search_job_post col-md-4">
+                                <div class="col-md-4">
+                                    <img src="{% if candidate.photo %}{{ candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
                                 </div>
-                            </form>
-                        </div>
-                        <div class="col-md-12 search_candidates">
-                            {% for candidate in candidates %}
-                                <div class="search_job_post col-md-4">
-                                    <div class="col-md-4">
-                                        <img src="{% if candidate.photo %}{{ candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
-                                    </div>
-                                    <div class="col-md-8 text-left">
-                                        <span class="search-info">{{ candidate.user.get_full_name }}</span>
-                                        {% with user.candidate|connections:candidate as connections %}
-                                            {% if connections %}
-                                                {% if connections.connection_type == connection_request.CONNECTION_TEAM_MEMBER %}
-                                                    <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Team Member</button>
-                                                {% elif connections.connection_type == connection_request.CONNECTION_NETWORK %}
-                                                    <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Network</button>
-                                                {% endif %}
-                                            {% else %}
-                                                {% if candidate.pk in team_member_requests %}
-                                                    <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Team Member Approval</button>
-                                                {% elif candidate.pk in network_requests %}
-                                                    <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Network Approval</button>
-                                                {% else %}
-                                                    <form action="{% url 'recruit:connection_request_create' %}" method="POST">
-                                                        {% csrf_token %}
-                                                        <input type="hidden" name="connectee" value="{{ candidate.pk }}">
-                                                        <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_TEAM_MEMBER }}">
-
-                                                        <button class="btn btn-primary btn-xs add-connection">Add as team member</button>
-                                                    </form>
-
-                                                    <form action="{% url 'recruit:connection_request_create' %}" method="POST">
-                                                        {% csrf_token %}
-                                                        <input type="hidden" name="connectee" value="{{ candidate.pk }}">
-                                                        <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_NETWORK }}">
-
-                                                        <button class="btn btn-primary btn-xs add-connection">Add to my network</button>
-                                                    </form>
-                                                {% endif %}
+                                <div class="col-md-8 text-left">
+                                    <span class="search-info">{{ candidate.user.get_full_name }}</span>
+                                    {% with user.candidate|connections:candidate as connections %}
+                                        {% if connections %}
+                                            {% if connections.connection_type == connection_request.CONNECTION_TEAM_MEMBER %}
+                                                <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Team Member</button>
+                                            {% elif connections.connection_type == connection_request.CONNECTION_NETWORK %}
+                                                <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Network</button>
                                             {% endif %}
-                                        {% endwith %}
-                                    </div>
+                                        {% else %}
+                                            {% if candidate.pk in team_member_requests %}
+                                                <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Team Member Approval</button>
+                                            {% elif candidate.pk in network_requests %}
+                                                <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Network Approval</button>
+                                            {% else %}
+                                                <form action="{% url 'recruit:connection_request_create' %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="connectee" value="{{ candidate.pk }}">
+                                                    <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_TEAM_MEMBER }}">
+
+                                                    <button class="btn btn-primary btn-xs add-connection">Add as team member</button>
+                                                </form>
+
+                                                <form action="{% url 'recruit:connection_request_create' %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="connectee" value="{{ candidate.pk }}">
+                                                    <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_NETWORK }}">
+
+                                                    <button class="btn btn-primary btn-xs add-connection">Add to my network</button>
+                                                </form>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endwith %}
                                 </div>
-                            {% empty %}
-                                <p>No results matching your criteria found.</p>
-                            {% endfor %}
-                        </div>
+                            </div>
+                        {% empty %}
+                            <p>No results matching your criteria found.</p>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
+    </div>
     <!-- end internal block -->
 </section>
 <!-- end new admin content -->

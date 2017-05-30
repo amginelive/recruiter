@@ -15,20 +15,27 @@ from django.views.generic import (
     UpdateView,
 )
 
-from braces.views import LoginRequiredMixin
+from braces.views import (
+    JSONResponseMixin,
+    LoginRequiredMixin,
+)
 from django_countries import countries
 
 from .models import (
     JobPost,
     Skill,
 )
-from .forms import JobPostForm
+from .forms import (
+    ConnectionInviteForm,
+    JobPostForm,
+)
 from companies.models import (
     Company,
     CompanyRequestInvitation,
 )
 from recruit.models import (
     Connection,
+    ConnectionInvite,
     ConnectionRequest,
 )
 from users.models import Candidate
@@ -233,8 +240,41 @@ job_post_delete = JobPostDeleteView.as_view()
 
 class ApplicationView(CandidateRequiredMixin, TemplateView):
     """
-    View for the My Application Page
+    View for the My Application Page.
     """
     template_name = "recruit/application.html"
 
 application = ApplicationView.as_view()
+
+
+class ConnectionInviteCreateView(CandidateRequiredMixin, CreateView, JSONResponseMixin):
+    """
+    View for inviting new users to be part of their network or team.
+    """
+    model = ConnectionInvite
+    form_class = ConnectionInviteForm
+    template_name = "recruit/connection_invite_create.html"
+
+    def get_initial(self):
+        return {
+            'candidate': self.request.user.candidate
+        }
+
+    def form_valid(self, form):
+        form.save()
+        return self.render_json_response({
+            'success': True,
+        })
+
+    def form_invalid(self, form):
+        return self.render_json_response({
+            'success': False,
+            'errors': form.errors,
+        })
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(ConnectionInviteCreateView, self).get_context_data(*args, **kwargs)
+        context['connection_invite'] = ConnectionInvite
+        return context
+
+connection_invite_create = ConnectionInviteCreateView.as_view()

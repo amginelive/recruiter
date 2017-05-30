@@ -1,12 +1,17 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 
 from phonenumber_field.formfields import PhoneNumberField
 from PIL import Image
 
 from .models import Candidate, Agent
+from recruit.models import (
+    Connection,
+    ConnectionInvite,
+)
 
 
 User = get_user_model()
@@ -56,21 +61,35 @@ class CustomSignupForm(forms.Form):
     account_type = forms.ChoiceField(choices=ACCOUNT_TYPE_CHOICES)
 
     def signup(self, request, user):
-        if type(user).__name__ == 'SocialLogin':
-            user = user.user
+        with transaction.atomic():
+            if type(user).__name__ == 'SocialLogin':
+                user = user.user
 
-        user.account_type = int(self.cleaned_data.get('account_type'))
-        user.save()
+            user.account_type = int(self.cleaned_data.get('account_type'))
+            user.save()
 
-        # create profile for new user
-        data = {
-            'user': user,
-            'phone': self.cleaned_data['phone']
-        }
-        if user.account_type == User.ACCOUNT_CANDIDATE:
-            Candidate.objects.create(**data)
-        elif user.account_type == User.ACCOUNT_AGENT:
-            Agent.objects.create(**data)
+            # create profile for new user
+            data = {
+                'user': user,
+                'phone': self.cleaned_data['phone']
+            }
+            if user.account_type == User.ACCOUNT_CANDIDATE:
+                candidate = Candidate.objects.create(**data)
+
+                # save connection
+                uuid = request.GET.get('uuid')
+                if uuid:
+                    connection_invitation = ConnectionInvite.objects.filter(uuid=uuid)
+                    if connection_invitation.exists():
+                        connection_invitation = connection_invitation.first()
+                        Connection.objects.create(
+                            connecter=connection_invitation.connecter,
+                            connectee=candidate,
+                            connection_type=connection_invitation.connection_type
+                        )
+                        connection_invitation.delete()
+            elif user.account_type == User.ACCOUNT_AGENT:
+                Agent.objects.create(**data)
 
 
 class CandidateUpdateForm(forms.ModelForm):
