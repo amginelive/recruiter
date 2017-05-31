@@ -9,12 +9,12 @@ const extractSass = new ExtractTextPlugin({filename: '[name].[contenthash].css',
 module.exports = {
     context: __dirname,
     entry: {
-        chat: '.frontend/assets/js/index.jsx'
+        chat: './frontend/assets/js/index.jsx'
     },
     output: {
-        path: path.resolve('.dist/'),
+        path: path.resolve('./dist/'),
         filename: '[name].js',
-        publicPath: '/static/dist/'
+        publicPath: '/static/'
     },
     plugins: [
         new BundleTracker({filename: './webpack-stats.json'}),
@@ -22,7 +22,7 @@ module.exports = {
         new CopyWebpackPlugin([{
             context: './frontend/static.prod',
             from: '**/*',
-            to: './dist'
+            to: './'
         }])
     ],
     module: {
