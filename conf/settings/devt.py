@@ -13,7 +13,7 @@ ALLOWED_HOSTS = (
 )
 
 # Webpack development server
-STATIC_URL = 'http://localhost:3000/static/dist/'
+STATIC_URL = 'http://localhost:3000/static/'
 
 WSGI_APPLICATION = 'conf.wsgi.devt.application'
 
