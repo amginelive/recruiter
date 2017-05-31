@@ -28,15 +28,17 @@ from .models import (
 from .forms import (
     ConnectionInviteForm,
     JobPostForm,
+    JobReferralForm,
+)
+from .models import (
+    Connection,
+    ConnectionInvite,
+    ConnectionRequest,
+    JobReferral,
 )
 from companies.models import (
     Company,
     CompanyRequestInvitation,
-)
-from recruit.models import (
-    Connection,
-    ConnectionInvite,
-    ConnectionRequest,
 )
 from users.models import Candidate
 from users.mixins import (
@@ -85,6 +87,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['connections'] = Connection.objects.filter(
             Q(connecter=self.request.user.candidate) | Q(connectee=self.request.user.candidate)
         )
+        context['job_referrals'] = JobReferral.objects.filter(referred_to=self.request.user.candidate)
         return context
 
 dashboard = DashboardView.as_view()
@@ -145,11 +148,12 @@ class SearchView(LoginRequiredMixin, TemplateView):
                     .filter(search=search_query)\
                     .distinct('id')
 
-        # list the cities and countries that can be filtered
         if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
             model = JobPost
+            context['job_referral_form'] = JobReferralForm(initial={'candidate': self.request.user.candidate})
         elif self.request.user.account_type == User.ACCOUNT_AGENT:
             model = Candidate
+        # list the cities and countries that can be filtered
         countries_search = model.objects.all().distinct('country').values_list('country', flat=True)
         cities_search = model.objects.all().distinct('city').values_list('city', flat=True)
 

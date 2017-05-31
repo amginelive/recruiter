@@ -2,14 +2,18 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.db import transaction
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from .models import (
+    Connection,
     ConnectionInvite,
     ConnectionRequest,
     JobPost,
+    JobReferral,
 )
 from core.utils import send_email
+from users.models import Candidate
 
 
 User = get_user_model()
@@ -60,7 +64,7 @@ class ConnectionRequestForm(forms.ModelForm):
     def clean(self):
         connectee = self.cleaned_data.get('connectee')
 
-        connections = self.candidate.connections.through.objects.filter(
+        connections = Connection.objects.filter(
             (Q(connecter=self.candidate) & Q(connectee=connectee)) |
             (Q(connecter=connectee) & Q(connectee=self.candidate))
         )
@@ -124,3 +128,52 @@ class ConnectionInviteForm(forms.ModelForm):
             )
 
         return connection_invite
+
+
+class JobReferralForm(forms.Form):
+    """
+    Form for referring a job post.
+    """
+    job_post = forms.IntegerField()
+    refer_to = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple)
+
+    def __init__(self, *args, **kwargs):
+        super(JobReferralForm, self).__init__(*args, **kwargs)
+        initial = self.initial
+        self.candidate = initial.get('candidate')
+        connections = Connection.objects\
+            .filter(Q(connecter=self.candidate) | Q(connectee=self.candidate))\
+            .filter(connection_type=Connection.CONNECTION_TEAM_MEMBER)
+
+        choices = []
+        for connection in connections:
+            if connection.connecter == self.candidate:
+                choices.append((connection.connectee.pk, connection.connectee.user.get_full_name()))
+            elif connection.connectee == self.candidate:
+                choices.append((connection.connecter.pk, connection.connecter.user.get_full_name()))
+        self.fields['refer_to'].choices = choices
+
+    def clean_job_post(self):
+        job_post = self.cleaned_data.get('job_post')
+        return JobPost.objects.get(pk=job_post)
+
+    def clean_refer_to(self):
+        refer_to = self.cleaned_data.get('refer_to')
+        return Candidate.objects.filter(pk__in=refer_to)
+
+    def save(self, *args, **kwargs):
+        refer_to = self.cleaned_data.get('refer_to')
+        job_post = self.cleaned_data.get('job_post')
+
+        referrals = []
+        for candidate in refer_to:
+            referrals.append(
+                JobReferral(
+                    job_post=job_post,
+                    referred_by=self.candidate,
+                    referred_to=candidate,
+                    created_at=timezone.now(),
+                    updated_at=timezone.now(),
+                )
+            )
+        JobReferral.objects.bulk_create(referrals)

@@ -20,4 +20,5 @@ urlpatterns = (
 
     url(r'^connection/request/create/api/$', api.connection_request_create, name='connection_request_create'),
     url(r'^connection/request/:uuid/delete/api/$', api.connection_request_delete, name='connection_request_delete'),
+    url(r'^referral/create/api/$', api.job_referral_create, name='job_referral_create'),
 )

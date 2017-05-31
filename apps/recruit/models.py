@@ -125,3 +125,19 @@ class ConnectionInvite(AbstractTimeStampedModel):
 
     def __str__(self):
         return str(self.uuid)
+
+
+class JobReferral(AbstractTimeStampedModel):
+    """
+    Model for referring a job post.
+    """
+    job_post = models.ForeignKey('recruit.JobPost', related_name='+', verbose_name=_('Job Post'))
+    referred_by = models.ForeignKey('users.Candidate', related_name='+', verbose_name=_('Referred By'))
+    referred_to = models.ForeignKey('users.Candidate', related_name='+', verbose_name=_('Referred To'))
+
+    class Meta:
+        verbose_name = _('Job Referral')
+        verbose_name_plural = _('Job Referrals')
+
+    def __str__(self):
+        return self.job_post.title
