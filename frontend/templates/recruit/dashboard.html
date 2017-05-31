@@ -33,7 +33,43 @@
 
                     <div class="tab-content">
                         <div role="tabpanel" class="tab-pane active" id="activity-feed">
-                            <h1>Activity Feed</h1>
+                            <h1>Job Referrals by Team Members</h1>
+                            <div class="row">
+                                {% for job_referral in job_referrals %}
+                                    <div class="item-card col-md-6">
+                                        <div class="col-md-4">
+                                            <img class="search-company-image" src="{% if job_referral.job_post.posted_by.company.logo %}{{ job_referral.job_post.posted_by.company.logo.url }}{% else %}{% static 'img/default_logo.png' %}{% endif %}">
+                                            <div class="job-posted-by pull-right">
+                                                <span class="search-info">{{ job_referral.job_post.created_at|date }}</span>
+                                                <span class="search-info"><strong>Posted By:</strong></span>
+                                                <a href="{% url 'users:profile_detail' job_referral.job_post.posted_by.user.slug %}">
+                                                    <img src="{% if job_referral.job_post.posted_by.photo %}{{ job_referral.job_post.posted_by.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:20px; border-radius:50%">
+                                                    <span>{{ job_referral.job_post.posted_by.user.get_full_name }}</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8 text-left">
+                                            <span class="search-info"><a href="{% url 'recruit:job_post_detail' job_referral.job_post.uuid %}">{{ job_referral.job_post.title }}</a></span>
+                                            <span class="search-info">{{ job_referral.job_post.posted_by.company.name }}</span>
+                                            <span class="search-info">{{ job_referral.job_post.city }}, {{ job_referral.job_post.country.name }}</span>
+                                            <div class="job-post-skills search-info">
+                                                {% for skill in job_referral.job_post.skills.all %}
+                                                    <span class="skill">{{ skill.name }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8 text-right" style="margin-top: 40px;">
+                                            <span class="search-info"><strong>Referred By:</strong></span>
+                                                <a href="{% url 'users:profile_detail' job_referral.referred_by.user.slug %}">
+                                                    <img src="{% if job_referral.referred_by.photo %}{{ job_referral.referred_by.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:20px; border-radius:50%">
+                                                    <span>{{ job_referral.referred_by.user.get_full_name }}</span>
+                                                </a>
+                                        </div>
+                                    </div>
+                                {% empty %}
+                                    <p>No referrals as of the moment.</p>
+                                {% endfor %}
+                            </div>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="notifications">
                             <div class="col-md-6">

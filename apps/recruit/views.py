@@ -30,14 +30,15 @@ from .forms import (
     JobPostForm,
     JobReferralForm,
 )
-from companies.models import (
-    Company,
-    CompanyRequestInvitation,
-)
-from recruit.models import (
+from .models import (
     Connection,
     ConnectionInvite,
     ConnectionRequest,
+    JobReferral,
+)
+from companies.models import (
+    Company,
+    CompanyRequestInvitation,
 )
 from users.models import Candidate
 from users.mixins import (
@@ -86,6 +87,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['connections'] = Connection.objects.filter(
             Q(connecter=self.request.user.candidate) | Q(connectee=self.request.user.candidate)
         )
+        context['job_referrals'] = JobReferral.objects.filter(referred_to=self.request.user.candidate)
         return context
 
 dashboard = DashboardView.as_view()
