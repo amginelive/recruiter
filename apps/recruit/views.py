@@ -81,11 +81,29 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             return HttpResponseRedirect(reverse_lazy('companies:company_create'))
         return super(DashboardView, self).dispatch(request, *args, **kwargs)
 
+    def get_template_names(self):
+        if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
+            return ['recruit/candidate_dashboard.html']
+        elif self.request.user.account_type == User.ACCOUNT_AGENT:
+            return ['recruit/agent_dashboard.html']
+
     def get_context_data(self, *args, **kwargs):
         context = super(DashboardView, self).get_context_data(*args, **kwargs)
-        context['connection_requests'] = ConnectionRequest.objects.filter(connectee=self.request.user)
-        context['connections'] = Connection.objects.filter(Q(connecter=self.request.user) | Q(connectee=self.request.user))
-        context['job_referrals'] = JobReferral.objects.filter(referred_to=self.request.user.candidate)
+
+        connection_requests = ConnectionRequest.objects.filter(connectee=self.request.user)
+        context['connection_requests'] = connection_requests
+        context['network_requests'] = connection_requests.filter(connection_type=ConnectionRequest.CONNECTION_NETWORK)
+        context['team_member_requests'] = connection_requests.filter(connection_type=ConnectionRequest.CONNECTION_TEAM_MEMBER)
+        context['agent_requests'] = connection_requests.filter(connection_type=ConnectionRequest.CONNECTION_AGENT)
+
+        connections = Connection.objects.filter(Q(connecter=self.request.user) | Q(connectee=self.request.user))
+        context['network_connections'] = connections.filter(connection_type=ConnectionRequest.CONNECTION_NETWORK)
+        context['team_member_connections'] = connections.filter(connection_type=ConnectionRequest.CONNECTION_TEAM_MEMBER)
+        context['agent_connections'] = connections.filter(connection_type=ConnectionRequest.CONNECTION_AGENT)
+
+        if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
+            context['job_referrals'] = JobReferral.objects.filter(referred_to=self.request.user.candidate)
+
         return context
 
 dashboard = DashboardView.as_view()
@@ -155,6 +173,7 @@ class SearchView(LoginRequiredMixin, TemplateView):
         countries_search = model.objects.all().distinct('country').values_list('country', flat=True)
         cities_search = model.objects.all().distinct('city').values_list('city', flat=True)
 
+        context['connection_request'] = ConnectionRequest
         context['countries'] = [dict(countries).get(country) for country in countries_search if dict(countries).get(country)]
         context['cities'] = set([city.title() for city in cities_search])
         context['skills'] = Skill.objects.all()

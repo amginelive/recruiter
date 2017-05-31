@@ -9,21 +9,15 @@
         <ol class="breadcrumb">
             <li><a href="{% url 'recruit:dashboard' %}">Activity Feed</a></li>
             <li><a href="{% url 'recruit:search' %}">Find job positions</a></li>
-            <li class="active">Search Candidates</li>
-            <li><a href="{% url 'users:agent_search' %}">Search Agents</a></li>
+            <li><a href="{% url 'users:candidate_search' %}">Search Candidates</a></li>
+            <li class="active">Search Agents</li>
             <li><a href="#">My Application</a></li>
         </ol>
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <a href="{% url 'recruit:connection_invite_create' %}?connection_type={{ connection_request.CONNECTION_TEAM_MEMBER }}" class="btn btn-primary">Invite as team member</a>
-                <a href="{% url 'recruit:connection_invite_create' %}?connection_type={{ connection_request.CONNECTION_NETWORK }}" class="btn btn-primary">Invite as network</a>
-            </div>
-        </div>
         <div class="row" style="padding-top:40px;">
             <div class="col-md-12 text-center">
                 <div class="row">
                     <div class="col-md-12">
-                        <form class="search-form" action="{% url 'users:candidate_search' %}" method="GET">
+                        <form class="search-form" action="{% url 'users:agent_search' %}" method="GET">
                             <div class="search_block">
                                 <input type="text" placeholder="Search..." name="search" value="{{ search|default_if_none:'' }}"/>
                                 <button class="btn search-btn" type="submit" value="Search"><i class="glyphicon glyphicon-search"></i> Search</button>
@@ -31,39 +25,27 @@
                         </form>
                     </div>
                     <div class="col-md-12 search_candidates">
-                        {% for candidate in candidates %}
+                        {% for agent in agents %}
                             <div class="search_job_post col-md-4">
                                 <div class="col-md-4">
-                                    <img src="{% if candidate.photo %}{{ candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+                                    <img src="{% if agent.photo %}{{ agent.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
                                 </div>
                                 <div class="col-md-8 text-left">
-                                    <span class="search-info">{{ candidate.user.get_full_name }}</span>
+                                    <span class="search-info">{{ agent.user.get_full_name }}</span>
                                     <div class="connection-buttons">
-                                        {% with user|connections:candidate.user as connections %}
+                                        {% with user|connections:agent.user as connections %}
                                             {% if connections %}
-                                                {% if connections.connection_type == connection_request.CONNECTION_TEAM_MEMBER %}
-                                                    <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Team Member</button>
-                                                {% elif connections.connection_type == connection_request.CONNECTION_NETWORK %}
+                                                {% if connections.connection_type == connection_request.CONNECTION_AGENT %}
                                                     <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Network</button>
                                                 {% endif %}
                                             {% else %}
-                                                {% if candidate.user.pk in team_member_requests %}
-                                                    <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Team Member Approval</button>
-                                                {% elif candidate.user.pk in network_requests %}
+                                                {% if agent.user.pk in agent_requests %}
                                                     <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Network Approval</button>
                                                 {% else %}
                                                     <form action="{% url 'recruit:connection_request_create' %}" method="POST">
                                                         {% csrf_token %}
-                                                        <input type="hidden" name="connectee" value="{{ candidate.user.pk }}">
-                                                        <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_TEAM_MEMBER }}">
-
-                                                        <button class="btn btn-primary btn-xs add-connection">Add as team member</button>
-                                                    </form>
-
-                                                    <form action="{% url 'recruit:connection_request_create' %}" method="POST">
-                                                        {% csrf_token %}
-                                                        <input type="hidden" name="connectee" value="{{ candidate.user.pk }}">
-                                                        <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_NETWORK }}">
+                                                        <input type="hidden" name="connectee" value="{{ agent.user.pk }}">
+                                                        <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_AGENT }}">
 
                                                         <button class="btn btn-primary btn-xs add-connection">Add to my network</button>
                                                     </form>
@@ -93,7 +75,6 @@
         event.preventDefault()
         var candidateId = $(this).attr('data-candidate-id');
         var form = $(this).closest('form');
-        var connection_type = form.find('input[name=connection_type]').val();
 
         $.ajax({
             context: this,
@@ -103,12 +84,7 @@
             dataType: "json",
             success: function(response) {
                 if (response.success) {
-                    if (connection_type == 1)
-                        var button_text = 'Awating Network Approval'
-                    else if (connection_type == 2)
-                        var button_text = 'Awating Team Member Approval'
-
-                    form.closest('.connection-buttons').before('<button class="btn btn-primary btn-xs add-connection" disabled="disabled">' + button_text + '</button>');
+                    form.closest('.connection-buttons').before('<button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Network Approval</button>');
                     form.closest('.connection-buttons').remove();
                 }
                 else {

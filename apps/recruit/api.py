@@ -18,7 +18,7 @@ from .models import (
 from users.mixins import CandidateRequiredMixin
 
 
-class ConnectionRequestCreateAPIView(CandidateRequiredMixin, CreateView, JSONResponseMixin):
+class ConnectionRequestCreateAPIView(CreateView, JSONResponseMixin):
     """
     API view for requesting a connection to another candnidate.
     """
@@ -43,7 +43,7 @@ class ConnectionRequestCreateAPIView(CandidateRequiredMixin, CreateView, JSONRes
 connection_request_create = ConnectionRequestCreateAPIView.as_view()
 
 
-class ConnectionRequestDeleteAPIView(CandidateRequiredMixin, DeleteView, JSONResponseMixin):
+class ConnectionRequestDeleteAPIView(DeleteView, JSONResponseMixin):
     """
     API View for accepting or declining a connection request.
     """

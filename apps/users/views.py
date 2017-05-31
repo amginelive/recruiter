@@ -157,6 +157,7 @@ class CandidateSearchView(CandidateRequiredMixin, TemplateView):
                 .exclude(user=self.request.user)\
                 .distinct('id')
 
+        context['search'] = search
         context['candidates'] = candidates
         context['connection_request'] = ConnectionRequest
 
@@ -180,7 +181,7 @@ class AgentSearchView(CandidateRequiredMixin, TemplateView):
     template_name = "users/agent_search.html"
 
     def get_context_data(self, *args, **kwargs):
-        context = super(CandidateSearchView, self).get_context_data(*args, **kwargs)
+        context = super(AgentSearchView, self).get_context_data(*args, **kwargs)
         search = self.request.GET.get('search', None)
         agents = []
 
@@ -197,7 +198,14 @@ class AgentSearchView(CandidateRequiredMixin, TemplateView):
                 .filter(search=search_query)\
                 .exclude(user=self.request.user)\
                 .distinct('id')
-            context['agents'] = agents
+
+        context['search'] = search
+        context['agents'] = agents
+        context['connection_request'] = ConnectionRequest
+        context['agent_requests'] = ConnectionRequest.objects\
+            .filter(connectee__agent__in=agents)\
+            .filter(connection_type=ConnectionRequest.CONNECTION_AGENT)\
+            .values_list('connectee__pk', flat=True)
 
         return context
 

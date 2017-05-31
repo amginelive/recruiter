@@ -1,12 +1,23 @@
 {% load staticfiles %}
 
-<div class="connection-request-card col-md-8 col-md-offset-2">
-    <div class="col-md-4">
-        <img src="{% if connection_request.connecter.candidate.photo %}{{ connection_request.connecter.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
-    </div>
-    <div class="col-md-8 text-left">
-        <span class="search-info">{{ connection_request.connecter.get_full_name }}</span>
-        <button class="btn btn-primary btn-xs btn-connection-request" data-action="accept" data-uuid="{{ connection_request.uuid }}">Accept</button>
-        <button class="btn btn-primary btn-xs btn-connection-request" data-action="decline" data-uuid="{{ connection_request.uuid }}">Decline</button>
-    </div>
+<div class="connection-request-card col-md-12">
+    {% if connection_request.connection_type == connection_request.CONNECTION_AGENT %}
+        <div class="col-md-4">
+            <img src="{% if connection_request.connecter.agent.photo %}{{ connection_request.connecter.agent.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+        </div>
+        <div class="col-md-8 text-left">
+            <span class="search-info">{{ connection_request.connecter.get_full_name }}</span>
+            <button class="btn btn-primary btn-xs btn-connection-request" data-action="accept" data-uuid="{{ connection_request.uuid }}">Accept</button>
+            <button class="btn btn-primary btn-xs btn-connection-request" data-action="decline" data-uuid="{{ connection_request.uuid }}">Decline</button>
+        </div>
+    {% else %}
+        <div class="col-md-4">
+            <img src="{% if connection_request.connecter.candidate.photo %}{{ connection_request.connecter.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+        </div>
+        <div class="col-md-8 text-left">
+            <span class="search-info">{{ connection_request.connecter.get_full_name }}</span>
+            <button class="btn btn-primary btn-xs btn-connection-request" data-action="accept" data-uuid="{{ connection_request.uuid }}">Accept</button>
+            <button class="btn btn-primary btn-xs btn-connection-request" data-action="decline" data-uuid="{{ connection_request.uuid }}">Decline</button>
+        </div>
+    {% endif %}
 </div>
