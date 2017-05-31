@@ -64,6 +64,7 @@ INSTALLED_APPS = (
     'companies',
     'recruit',
     'users',
+    'chat'
 )
 
 MIDDLEWARE_CLASSES = (
