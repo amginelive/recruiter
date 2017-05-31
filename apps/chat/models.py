@@ -16,7 +16,8 @@ class Message(AbstractTimeStampedModel):
 class Conversation(AbstractTimeStampedModel):
     users = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                    verbose_name=_('Conversation participants'),
-                                   through='Participant')
+                                   through='Participant',
+                                   related_name='+')
 
 
 class Participant(AbstractTimeStampedModel):
