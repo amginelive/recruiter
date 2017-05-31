@@ -60,6 +60,7 @@ INSTALLED_APPS = (
     'easy_thumbnails',
     'phonenumber_field',
     'channels',
+    'webpack_loader',
 
     'companies',
     'recruit',
@@ -158,7 +159,21 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'frontend', 'static.prod')
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'frontend', 'static'),
+    os.path.join(BASE_DIR, 'frontend', 'assets')
 )
+
+# Webpack loader settings
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': 'frontend/static.prod/', # must end with slash
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'TIMEOUT': None,
+        'IGNORE': ['.+\.hot-update.js', '.+\.map']
+    }
+}
 
 # Media files
 
