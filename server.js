@@ -8,7 +8,7 @@ new WebpackDevServer(webpack(config), {
     hot: true,
     inline: true,
     historyApiFallback: true,
-    contentBase: path.resolve('./static/'),
+    contentBase: path.resolve('.frontend/assets/'),
     headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",

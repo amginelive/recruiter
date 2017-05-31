@@ -1,6 +1,7 @@
 const path = require('path');
 const BundleTracker = require('webpack-bundle-tracker');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 
 const extractSass = new ExtractTextPlugin({filename: '[name].[contenthash].css', allChunks: true, disable: process.env.NODE_ENV !== "production"});
@@ -8,16 +9,21 @@ const extractSass = new ExtractTextPlugin({filename: '[name].[contenthash].css',
 module.exports = {
     context: __dirname,
     entry: {
-        init: '.frontend/assets/js/chat.jsx'
+        chat: '.frontend/assets/js/index.jsx'
     },
     output: {
-        path: path.resolve('.frontend/static.prod/'),
+        path: path.resolve('.dist/'),
         filename: '[name].js',
-        publicPath: '/static/'
+        publicPath: '/static/dist/'
     },
     plugins: [
         new BundleTracker({filename: './webpack-stats.json'}),
-        extractSass
+        extractSass,
+        new CopyWebpackPlugin([{
+            context: './frontend/static.prod',
+            from: '**/*',
+            to: './dist'
+        }])
     ],
     module: {
         rules: [

@@ -1,13 +1,29 @@
 {% extends 'base.html' %}
 
 {% load staticfiles i18n %}
+{% load render_bundle from webpack_loader %}
+
+
+{% block extra_css %}
+{% if not DEBUG %}
+    {% render_bundle 'chat-vendor' 'css' %}
+    {% render_bundle 'chat' 'css' %}
+{% endif %}
+{% endblock %}
 
 {% block content %}
 <div id='app'></div>
 {% endblock %}
 
 {% block footer_js %}
-<script src="{% static 'js/jquery.form.min.js' %}"></script>
+{% if not DEBUG %}
+    {% render_bundle 'manifest' 'js' %}
+    {% render_bundle 'chat-vendor' 'js' %}
+    {% render_bundle 'chat' 'js' %}
+{% else %}
+    {% render_bundle 'main' %}
+{% endif %}
+<!-- <script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script type="text/javascript">
 (function($) {
     $(function() {
@@ -63,5 +79,5 @@
         window.socket.createWebSocket();
     });
 })(jQuery);
-</script>
+</script> -->
 {% endblock footer_js %}

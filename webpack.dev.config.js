@@ -10,7 +10,7 @@ config.entry = [
     'react-hot-loader/patch',
     'webpack-dev-server/client?http://localhost:3000',
     'webpack/hot/only-dev-server',
-    './assets/js/chat.jsx'
+    './frontend/assets/js/index.jsx'
 ];
 
 config.output.publicPath = 'http://localhost:3000/static/';
