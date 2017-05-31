@@ -72,7 +72,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     """
     ACCOUNT_CANDIDATE = 1
     ACCOUNT_AGENT = 2
-
     ACCOUNT_TYPE_CHOICES = (
         (ACCOUNT_CANDIDATE, _('Candidate')),
         (ACCOUNT_AGENT, _('Agent')),
@@ -224,7 +223,9 @@ class Candidate(ProfileBase):
 
     @property
     def location(self):
-        return '{}, {}'.format(self.city, self.country.name)
+        if self.city and self.country:
+            return '{}, {}'.format(self.city, self.country.name)
+        return None
 
 
 class Agent(ProfileBase):

@@ -89,7 +89,7 @@
                                 <h1>Team Member</h1>
                                 <div class="row">
                                     {% for connection_request in connection_requests %}
-                                        {% if connection_request.connection_type == connection_request.CONNECTION_NETWORK %}
+                                        {% if connection_request.connection_type == connection_request.CONNECTION_TEAM_MEMBER %}
                                             {% include "recruit/snippets/connection_request_card.html" %}
                                         {% endif %}
                                     {% empty %}

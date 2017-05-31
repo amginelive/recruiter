@@ -37,37 +37,39 @@
                                 </div>
                                 <div class="col-md-8 text-left">
                                     <span class="search-info">{{ candidate.user.get_full_name }}</span>
-                                    {% with user.candidate|connections:candidate as connections %}
-                                        {% if connections %}
-                                            {% if connections.connection_type == connection_request.CONNECTION_TEAM_MEMBER %}
-                                                <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Team Member</button>
-                                            {% elif connections.connection_type == connection_request.CONNECTION_NETWORK %}
-                                                <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Network</button>
-                                            {% endif %}
-                                        {% else %}
-                                            {% if candidate.pk in team_member_requests %}
-                                                <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Team Member Approval</button>
-                                            {% elif candidate.pk in network_requests %}
-                                                <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Network Approval</button>
+                                    <div class="connection-buttons">
+                                        {% with user|connections:candidate.user as connections %}
+                                            {% if connections %}
+                                                {% if connections.connection_type == connection_request.CONNECTION_TEAM_MEMBER %}
+                                                    <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Team Member</button>
+                                                {% elif connections.connection_type == connection_request.CONNECTION_NETWORK %}
+                                                    <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Network</button>
+                                                {% endif %}
                                             {% else %}
-                                                <form action="{% url 'recruit:connection_request_create' %}" method="POST">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="connectee" value="{{ candidate.pk }}">
-                                                    <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_TEAM_MEMBER }}">
+                                                {% if candidate.user.pk in team_member_requests %}
+                                                    <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Team Member Approval</button>
+                                                {% elif candidate.user.pk in network_requests %}
+                                                    <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Network Approval</button>
+                                                {% else %}
+                                                    <form action="{% url 'recruit:connection_request_create' %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="connectee" value="{{ candidate.user.pk }}">
+                                                        <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_TEAM_MEMBER }}">
 
-                                                    <button class="btn btn-primary btn-xs add-connection">Add as team member</button>
-                                                </form>
+                                                        <button class="btn btn-primary btn-xs add-connection">Add as team member</button>
+                                                    </form>
 
-                                                <form action="{% url 'recruit:connection_request_create' %}" method="POST">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="connectee" value="{{ candidate.pk }}">
-                                                    <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_NETWORK }}">
+                                                    <form action="{% url 'recruit:connection_request_create' %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="connectee" value="{{ candidate.user.pk }}">
+                                                        <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_NETWORK }}">
 
-                                                    <button class="btn btn-primary btn-xs add-connection">Add to my network</button>
-                                                </form>
+                                                        <button class="btn btn-primary btn-xs add-connection">Add to my network</button>
+                                                    </form>
+                                                {% endif %}
                                             {% endif %}
-                                        {% endif %}
-                                    {% endwith %}
+                                        {% endwith %}
+                                    </div>
                                 </div>
                             </div>
                         {% empty %}
@@ -105,10 +107,8 @@
                     else if (connection_type == 2)
                         var button_text = 'Awating Team Member Approval'
 
-                    form.before('<button class="btn btn-primary btn-xs add-connection" disabled="disabled">' + button_text + '</button>');
-                    $.each($('.search_candidates form'), function(key, value){
-                        $(this).remove();
-                    })
+                    form.closest('.connection-buttons').before('<button class="btn btn-primary btn-xs add-connection" disabled="disabled">' + button_text + '</button>');
+                    form.closest('.connection-buttons').remove();
                 }
                 else {
                     $.each(response.errors, function(key, value){

@@ -83,10 +83,8 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(DashboardView, self).get_context_data(*args, **kwargs)
-        context['connection_requests'] = ConnectionRequest.objects.filter(connectee=self.request.user.candidate)
-        context['connections'] = Connection.objects.filter(
-            Q(connecter=self.request.user.candidate) | Q(connectee=self.request.user.candidate)
-        )
+        context['connection_requests'] = ConnectionRequest.objects.filter(connectee=self.request.user)
+        context['connections'] = Connection.objects.filter(Q(connecter=self.request.user) | Q(connectee=self.request.user))
         context['job_referrals'] = JobReferral.objects.filter(referred_to=self.request.user.candidate)
         return context
 
@@ -260,9 +258,7 @@ class ConnectionInviteCreateView(CandidateRequiredMixin, CreateView, JSONRespons
     template_name = "recruit/connection_invite_create.html"
 
     def get_initial(self):
-        return {
-            'candidate': self.request.user.candidate
-        }
+        return {'user': self.request.user}
 
     def form_valid(self, form):
         form.save()

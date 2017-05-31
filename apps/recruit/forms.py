@@ -59,18 +59,18 @@ class ConnectionRequestForm(forms.ModelForm):
         super(ConnectionRequestForm, self).__init__(*args, **kwargs)
         if not self.instance.pk:
             initial = self.initial
-            self.candidate = initial.get('candidate')
+            self.user = initial.get('user')
 
     def clean(self):
         connectee = self.cleaned_data.get('connectee')
 
         connections = Connection.objects.filter(
-            (Q(connecter=self.candidate) & Q(connectee=connectee)) |
-            (Q(connecter=connectee) & Q(connectee=self.candidate))
+            (Q(connecter=self.user) & Q(connectee=connectee)) |
+            (Q(connecter=connectee) & Q(connectee=self.user))
         )
 
         if connections.exists():
-            raise forms.ValidationError(_('You are already connected to this candidate.'))
+            raise forms.ValidationError(_('You are already connected to this user.'))
 
         return self.cleaned_data
 
@@ -78,7 +78,7 @@ class ConnectionRequestForm(forms.ModelForm):
         connection_request = super(ConnectionRequestForm, self).save(commit=False)
 
         if not self.instance.pk:
-            connection_request.connecter = self.candidate
+            connection_request.connecter = self.user
         connection_request.save()
 
         return connection_request
@@ -96,7 +96,7 @@ class ConnectionInviteForm(forms.ModelForm):
         super(ConnectionInviteForm, self).__init__(*args, **kwargs)
         if not self.instance.pk:
             initial = self.initial
-            self.candidate = initial.get('candidate')
+            self.user = initial.get('user')
 
     def clean_connectee_email(self):
         connectee_email = self.cleaned_data.get('connectee_email')
@@ -111,7 +111,7 @@ class ConnectionInviteForm(forms.ModelForm):
 
         with transaction.atomic():
             if not self.instance.pk:
-                connection_invite.connecter = self.candidate
+                connection_invite.connecter = self.user
                 connection_invites = ConnectionInvite.objects.filter(connectee_email=connection_invite.connectee_email)
                 if connection_invites.exists():
                     connection_invite.pk = connection_invites.first().pk

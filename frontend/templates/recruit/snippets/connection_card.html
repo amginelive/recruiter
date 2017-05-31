@@ -1,26 +1,26 @@
 {% load staticfiles %}
 
 <div class="connection-request-card col-md-4">
-    {% if connection.connecter == user.candidate %}
-        <a href="{% url 'users:profile_detail' connection.connectee.user.slug %}">
+    {% if connection.connecter == user %}
+        <a href="{% url 'users:profile_detail' connection.connectee.slug %}">
             <div class="col-md-4">
-                <img src="{% if connection.connectee.photo %}{{ connection.connectee.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+                <img src="{% if connection.connectee.candidate.photo %}{{ connection.connectee.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
             </div>
             <div class="col-md-8 text-left">
-                <span class="search-info">{{ connection.connectee.user.get_full_name }}</span>
-                <span class="search-info">{{ connection.connectee.title|default_if_none:"" }}</span>
-                <span class="search-info">{{ connection.connectee.location|default_if_none:"" }}</span>
+                <span class="search-info">{{ connection.connectee.get_full_name }}</span>
+                <span class="search-info">{{ connection.connectee.candidate.title|default_if_none:"" }}</span>
+                <span class="search-info">{{ connection.connectee.candidate.location|default_if_none:"" }}</span>
             </div>
         </a>
-    {% elif connection.connectee == user.candidate %}
-        <a href="{% url 'users:profile_detail' connection.connecter.user.slug %}">
+    {% elif connection.connectee == user %}
+        <a href="{% url 'users:profile_detail' connection.connecter.slug %}">
             <div class="col-md-4">
-                <img src="{% if connection.connecter.photo %}{{ connection.connecter.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+                <img src="{% if connection.connecter.candidate.photo %}{{ connection.connecter.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
             </div>
             <div class="col-md-8 text-left">
-                <span class="search-info">{{ connection.connecter.user.get_full_name }}</span>
-                <span class="search-info">{{ connection.connecter.title|default_if_none:"" }}</span>
-                <span class="search-info">{{ connection.connecter.location|default_if_none:"" }}</span>
+                <span class="search-info">{{ connection.connecter.get_full_name }}</span>
+                <span class="search-info">{{ connection.connecter.candidate.title|default_if_none:"" }}</span>
+                <span class="search-info">{{ connection.connecter.candidate.location|default_if_none:"" }}</span>
             </div>
         </a>
     {% endif %}

@@ -26,7 +26,7 @@ class ConnectionRequestCreateAPIView(CandidateRequiredMixin, CreateView, JSONRes
     form_class = ConnectionRequestForm
 
     def get_initial(self):
-        return {'candidate': self.request.user.candidate}
+        return {'user': self.request.user}
 
     def form_valid(self, form):
         form.save()
