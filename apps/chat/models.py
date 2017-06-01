@@ -16,14 +16,4 @@ class Message(AbstractTimeStampedModel):
 class Conversation(AbstractTimeStampedModel):
     users = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                    verbose_name=_('Conversation participants'),
-                                   through='Participant',
                                    related_name='+')
-
-
-class Participant(AbstractTimeStampedModel):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE,
-                             verbose_name=_('Conversation participant'))
-    conversation = models.ForeignKey('Conversation',
-                                     on_delete=models.CASCADE,
-                                     verbose_name=_('Conversation'))
