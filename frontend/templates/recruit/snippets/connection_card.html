@@ -1,53 +1,31 @@
 {% load staticfiles %}
 
 <div class="connection-request-card col-md-4">
-    {% if connection.connection_type == connection.CONNECTION_AGENT %}
-        {% if connection.connecter == user %}
-            <a href="{% url 'users:profile_detail' connection.connectee.slug %}">
-                <div class="col-md-4">
-                    <img src="{% if connection.connectee.agent.photo %}{{ connection.connectee.agent.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
-                </div>
-                <div class="col-md-8 text-left">
-                    <span class="search-info">{{ connection.connectee.get_full_name }}</span>
-                    <span class="search-info">{{ connection.connectee.agent.company.name|default_if_none:"" }}</span>
-                    <span class="search-info">{{ connection.connectee.agent.company.location|default_if_none:"" }}</span>
-                </div>
-            </a>
-        {% elif connection.connectee == user %}
-            <a href="{% url 'users:profile_detail' connection.connecter.slug %}">
-                <div class="col-md-4">
-                    <img src="{% if connection.connecter.candidate.photo %}{{ connection.connecter.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
-                </div>
-                <div class="col-md-8 text-left">
-                    <span class="search-info">{{ connection.connecter.get_full_name }}</span>
-                    <span class="search-info">{{ connection.connecter.agent.company.name|default_if_none:"" }}</span>
-                    <span class="search-info">{{ connection.connecter.agent.company.location|default_if_none:"" }}</span>
-                </div>
-            </a>
+    {% for connection_user in connection.users %}
+        {% if connection_user != user %}
+            {% if connection.connection_type == connection.CONNECTION_AGENT %}
+                <a href="{% url 'users:profile_detail' connection_user.slug %}">
+                    <div class="col-md-4">
+                        <img src="{% if connection_user.agent.photo %}{{ connection_user.agent.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+                    </div>
+                    <div class="col-md-8 text-left">
+                        <span class="search-info">{{ connection_user.get_full_name }}</span>
+                        <span class="search-info">{{ connection_user.agent.company.name|default_if_none:"" }}</span>
+                        <span class="search-info">{{ connection_user.agent.company.location|default_if_none:"" }}</span>
+                    </div>
+                </a>
+            {% else %}
+                <a href="{% url 'users:profile_detail' connection_user.slug %}">
+                    <div class="col-md-4">
+                        <img src="{% if connection_user.candidate.photo %}{{ connection_user.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+                    </div>
+                    <div class="col-md-8 text-left">
+                        <span class="search-info">{{ connection_user.get_full_name }}</span>
+                        <span class="search-info">{{ connection_user.candidate.title|default_if_none:"" }}</span>
+                        <span class="search-info">{{ connection_user.candidate.location|default_if_none:"" }}</span>
+                    </div>
+                </a>
+            {% endif %}
         {% endif %}
-    {% else %}
-        {% if connection.connecter == user %}
-            <a href="{% url 'users:profile_detail' connection.connectee.slug %}">
-                <div class="col-md-4">
-                    <img src="{% if connection.connectee.candidate.photo %}{{ connection.connectee.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
-                </div>
-                <div class="col-md-8 text-left">
-                    <span class="search-info">{{ connection.connectee.get_full_name }}</span>
-                    <span class="search-info">{{ connection.connectee.candidate.title|default_if_none:"" }}</span>
-                    <span class="search-info">{{ connection.connectee.candidate.location|default_if_none:"" }}</span>
-                </div>
-            </a>
-        {% elif connection.connectee == user %}
-            <a href="{% url 'users:profile_detail' connection.connecter.slug %}">
-                <div class="col-md-4">
-                    <img src="{% if connection.connecter.candidate.photo %}{{ connection.connecter.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
-                </div>
-                <div class="col-md-8 text-left">
-                    <span class="search-info">{{ connection.connecter.get_full_name }}</span>
-                    <span class="search-info">{{ connection.connecter.candidate.title|default_if_none:"" }}</span>
-                    <span class="search-info">{{ connection.connecter.candidate.location|default_if_none:"" }}</span>
-                </div>
-            </a>
-        {% endif %}
-    {% endif %}
+    {% endfor %}
 </div>

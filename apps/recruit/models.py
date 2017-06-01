@@ -83,6 +83,10 @@ class Connection(AbstractTimeStampedModel):
     def __str__(self):
         return self.connectee.get_full_name()
 
+    @property
+    def users(self):
+        return [self.connecter, self.connectee]
+
 
 class ConnectionRequest(AbstractTimeStampedModel):
     """

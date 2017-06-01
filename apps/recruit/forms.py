@@ -140,9 +140,9 @@ class JobReferralForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(JobReferralForm, self).__init__(*args, **kwargs)
         initial = self.initial
-        self.candidate = initial.get('candidate')
+        self.user = initial.get('user')
         connections = Connection.objects\
-            .filter(Q(connecter=self.candidate) | Q(connectee=self.candidate))\
+            .filter(Q(connecter=self.user) | Q(connectee=self.user))\
             .filter(connection_type=Connection.CONNECTION_TEAM_MEMBER)
 
         choices = []

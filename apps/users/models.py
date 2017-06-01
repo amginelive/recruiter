@@ -207,12 +207,6 @@ class Candidate(ProfileBase):
     country = CountryField(_('Country'))
     experience = models.SmallIntegerField(_('Experience (full years)'), **optional)
     cv = models.FileField(_("CV"), upload_to=get_upload_path, max_length=150, editable=True, **optional)
-    connections = models.ManyToManyField(
-        'users.Candidate',
-        related_name='+',
-        through='recruit.Connection',
-        verbose_name=_('Connections')
-    )
 
     class Meta:
         verbose_name = _('Candidate')
