@@ -13,8 +13,8 @@ class MessageList extends React.Component {
         const { messages } = this.props;
         return (
             <div className='message-list'>
-                {messages.map(message => {
-                    return <Message user={message.get('user')} text={message.get('text')} time={message.get('time')}/>;
+                {messages.get('messageList').map((message, index) => {
+                    return <Message key={index} user={message.get('user')} text={message.get('text')} time={message.get('time')}/>;
                 }).toArray()}
             </div>
         );
