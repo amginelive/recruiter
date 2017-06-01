@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import * as actions from './actions/index.js';
+import UserList from './user-list.jsx';
 
 
 class App extends React.Component {
@@ -11,7 +12,7 @@ class App extends React.Component {
     }
 
     render() {
-        return <div>Hello, world!!</div>;
+        return <UserList />;
     }
 }
 
