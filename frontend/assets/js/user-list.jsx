@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import * as actions from './actions/index.js';
+import User from './user.jsx';
 
 
 class UserList extends React.Component {
@@ -14,9 +15,12 @@ class UserList extends React.Component {
         fetch('/chat/users/', {
             credentials: 'same-origin'
         }).then(response => response.json()).then(json => {
-            console.log(json);
             this.props.actions.initUserList(json);
         });
+    }
+
+    userInit(id) {
+        this.props.actions.initChat(id);
     }
 
     render() {
@@ -24,11 +28,7 @@ class UserList extends React.Component {
         return (
             <div className='user-list'>
                 {users.map(user => {
-                    return (
-                        <div key={user.get('id')} className='user-list-item'>
-                            <span className='user-list-item-name'>{user.get('name')}</span>
-                        </div>
-                    );
+                    return <User key={user.get('id')} name={user.get('name')} id={user.get('id')} onUserInit={this.userInit.bind(this)} />;
                 }).toArray()}
             </div>
         );
