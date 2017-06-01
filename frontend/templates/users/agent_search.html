@@ -13,6 +13,11 @@
             <li class="active">Search Agents</li>
             <li><a href="#">My Application</a></li>
         </ol>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <a href="{% url 'recruit:connection_invite_create' %}?connection_type={{ connection_request.CONNECTION_AGENT }}" class="btn btn-primary">Invite as network</a>
+            </div>
+        </div>
         <div class="row" style="padding-top:40px;">
             <div class="col-md-12 text-center">
                 <div class="row">
