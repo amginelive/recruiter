@@ -33,7 +33,8 @@ class ChatServer(JsonWebsocketConsumer):
             conversation.save()
         self.message.channel_session['conversation_id'] = conversation.id
 
-        query = Message.objects.filter(conversation=conversation)
+        query = Message.objects.filter(conversation=conversation)\
+            .order_by('created_at')
         messages = []
         for message in query:
             messages.append(  # TODO: Refactor message creation
