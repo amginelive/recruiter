@@ -1,24 +1,19 @@
 import React from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-
-import * as actions from './actions/index.js';
 
 
-class App extends React.Component {
+class UserList extends React.Component {
     constructor(props) {
         super(props);
     }
 
     render() {
-        return <div>Hello, world!!</div>;
+        return '';
     }
 }
 
 function mapStateToProps (state) {
     return {
-        messages: state.get('messages'),
-        typing: state.get('typing')
+        users: state.get('users')
     };
 }
 
@@ -32,4 +27,4 @@ function mapDispatchToProps (dispatch) {
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(App);
+)(UserList);
