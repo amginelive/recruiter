@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import * as actions from './actions/index.js';
 import UserList from './user-list.jsx';
 import MessageList from './message-list.jsx';
+import MessageForm from './message-send-form.jsx';
 
 
 class App extends React.Component {
@@ -17,6 +18,7 @@ class App extends React.Component {
             <div>
                 <UserList />
                 <MessageList />
+                <MessageForm />
             </div>
         );
     }

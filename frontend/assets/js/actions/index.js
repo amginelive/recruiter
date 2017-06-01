@@ -6,7 +6,7 @@ const { messageTypes } = config;
 
 export function sendMessage(message) {
     return (dispatch, getState, {emit}) => {
-        emit(messageTypes.newMessage, { message });
+        emit(messageTypes.newMessage, message);
     }
 }
 

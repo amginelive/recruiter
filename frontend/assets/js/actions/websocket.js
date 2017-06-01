@@ -18,16 +18,16 @@ class ChatSocket {
         this.listenMap.set(type, callback);
     }
 
-    createWebSocket() {
+    createWebSocket(that) {
         this.websocket = new WebSocket(uri);
 
         this.websocket.onopen = () => {
-            this.attempts = 1;
+            that.attempts = 1;
         };
 
         this.websocket.onmessage = event => {
             const data = JSON.parse(event.data);
-            const callback = this.listenMap[data.type];
+            const callback = that.listenMap.get(data.type);
             if (callback) {
                 callback(data.payload);
             }
@@ -37,14 +37,14 @@ class ChatSocket {
             return Math.min(30, (Math.pow(2, k) - 1)) * 1000;
         }
         this.websocket.onclose = () => {
-            const time = generateInterval(this.attempts);
+            const time = generateInterval(that.attempts);
 
             setTimeout(() => {
                 // We've tried to reconnect so increment the attempts by 1
-                this.attempts++;
+                that.attempts++;
 
                 // Connection has closed so try to reconnect every 10 seconds.
-                this.createWebSocket();
+                that.createWebSocket(that);
             }, time);
         }
     }
@@ -55,7 +55,7 @@ window.socket = socket;
 
 const init = (store) => {
     // add listeners to socket messages so we can re-dispatch them as actions
-    socket.createWebSocket();
+    socket.createWebSocket(socket);
     Object.keys(messageTypes)
         .forEach(type => socket.on(type, (payload) => store.dispatch({ type, payload })));
 };

@@ -36,17 +36,32 @@ class ChatServer(JsonWebsocketConsumer):
         query = Message.objects.filter(conversation=conversation)
         messages = []
         for message in query:
-            messages.append(
+            messages.append(  # TODO: Refactor message creation
                 {'user': {'name': message.author.email,
                           'id': message.author.id},
+                 'conversation_id': message.conversation.id,
                  'text': message.text,
                  'time': message.created_at.isoformat()}
             )
         self.send({'type': 'initChat', 'payload': messages})
 
-
     def cmd_message(self, payload):
-        pass
+        try:
+            conversation = Conversation.objects.get(id=self.message.channel_session.get('conversation_id'))
+        except ObjectDoesNotExist:
+            return
+
+        message = Message.objects.create(text=payload,
+                                         author=self.message.user,
+                                         conversation=conversation)
+        response = {'type': 'newMessage',
+                    'payload': {'user': {'name': message.author.email,
+                                         'id': message.author.id},
+                                'conversation_id': message.conversation.id,
+                                'text': message.text,
+                                'time': message.created_at.isoformat()}}
+        for user in conversation.users.all():
+            self.group_send(str(user.id), response)
 
     def disconnect(self, message, **kwargs):
         pass
