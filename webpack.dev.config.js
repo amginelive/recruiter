@@ -4,7 +4,7 @@ const webpack = require('webpack');
 
 let config = require('./webpack.base.config.js');
 
-config.devtool = 'eval-source-map';
+config.devtool = 'source-map';
 
 config.entry = [
     'react-hot-loader/patch',

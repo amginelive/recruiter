@@ -14,7 +14,8 @@ module.exports = {
     output: {
         path: path.resolve('./dist/'),
         filename: '[name].js',
-        publicPath: '/static/'
+        sourceMapFilename: '[name].js.map',
+        publicPath: '/static/',
     },
     plugins: [
         new BundleTracker({filename: './webpack-stats.json'}),
