@@ -140,17 +140,17 @@ class JobReferralForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(JobReferralForm, self).__init__(*args, **kwargs)
         initial = self.initial
-        self.user = initial.get('user')
+        self.candidate = initial.get('candidate')
         connections = Connection.objects\
-            .filter(Q(connecter=self.user) | Q(connectee=self.user))\
+            .filter(Q(connecter=self.candidate.user) | Q(connectee=self.candidate.user))\
             .filter(connection_type=Connection.CONNECTION_TEAM_MEMBER)
 
         choices = []
         for connection in connections:
-            if connection.connecter == self.candidate:
-                choices.append((connection.connectee.pk, connection.connectee.user.get_full_name()))
-            elif connection.connectee == self.candidate:
-                choices.append((connection.connecter.pk, connection.connecter.user.get_full_name()))
+            if connection.connecter == self.candidate.user:
+                choices.append((connection.connectee.candidate.pk, connection.connectee.get_full_name()))
+            elif connection.connectee == self.candidate.user:
+                choices.append((connection.connecter.candidate.pk, connection.connecter.get_full_name()))
         self.fields['refer_to'].choices = choices
 
     def clean_job_post(self):

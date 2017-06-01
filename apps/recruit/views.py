@@ -166,7 +166,7 @@ class SearchView(LoginRequiredMixin, TemplateView):
 
         if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
             model = JobPost
-            context['job_referral_form'] = JobReferralForm(initial={'user': self.request.user})
+            context['job_referral_form'] = JobReferralForm(initial={'candidate': self.request.user.candidate})
         elif self.request.user.account_type == User.ACCOUNT_AGENT:
             model = Candidate
         # list the cities and countries that can be filtered
