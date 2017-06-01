@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import Immutable from 'immutable';
 import { createStore, applyMiddleware } from 'redux';
 import thunkMiddleware from 'redux-thunk';
+import 'whatwg-fetch';
 import { AppContainer } from 'react-hot-loader';
 
 import App from './chat.jsx';
