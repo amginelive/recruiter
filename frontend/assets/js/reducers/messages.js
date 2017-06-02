@@ -15,7 +15,7 @@ const messages = (state = new Immutable.Map().withMutations(ctx => ctx.set('acti
     }
     if (action.type === messageTypes.newMessage && action.payload['conversation_id'] === state.get('activeChat')) {
         // TODO: There may be an optimization here, consult Immutable.JS docs
-        const messageList = state.get('messageList').push(Immutable.fromJS(action.payload))
+        const messageList = state.get('messageList').push(Immutable.fromJS(action.payload));
         return state.set('messageList', messageList);
     }
     return state;

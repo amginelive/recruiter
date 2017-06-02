@@ -7,6 +7,8 @@ import UserList from './user-list.jsx';
 import MessageList from './message-list.jsx';
 import MessageForm from './message-send-form.jsx';
 
+import '../css/chat.scss';
+
 
 class App extends React.Component {
     constructor(props) {
@@ -15,9 +17,11 @@ class App extends React.Component {
 
     render() {
         return (
-            <div>
-                <UserList />
-                <MessageList />
+            <div className='app-container'>
+                <div className='app-inner-row'>
+                    <UserList />
+                    <MessageList />
+                </div>
                 <MessageForm />
             </div>
         );
