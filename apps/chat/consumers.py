@@ -1,6 +1,7 @@
-from django.db.models import ObjectDoesNotExist, Q
-from channels.generic.websockets import JsonWebsocketConsumer
+from django.db.models import ObjectDoesNotExist
 from django.contrib.auth import get_user_model
+
+from channels.generic.websockets import JsonWebsocketConsumer
 
 from .models import Conversation, Message
 
@@ -17,18 +18,20 @@ class ChatServer(JsonWebsocketConsumer):
         self.send({'accept': True})
 
     def receive(self, content, **kwargs):
-        if content['type'] == 'initChat':
-            self.cmd_init(content['payload'])
-        elif content['type'] == 'newMessage':
-            self.cmd_message(content['payload'])
+        if content.get('type') == 'initChat':
+            self.cmd_init(content.get('payload'))
+        elif content.get('type') == 'newMessage':
+            self.cmd_message(content.get('payload'))
 
     def cmd_init(self, payload):
-        conversation = Conversation.objects.distinct().filter(
-            users=User.objects.get(id=payload['user_id'])).filter(
-            users=self.message.user).first()
+        conversation = Conversation.objects\
+            .distinct()\
+            .filter(users__id=payload.get('user_id'))\
+            .filter(users=self.message.user)\
+            .first()
         if not conversation:
             conversation = Conversation.objects.create()
-            conversation.users.add(User.objects.get(id=payload['user_id']),
+            conversation.users.add(User.objects.get(id=payload.get('user_id')),
                              self.message.user)
             conversation.save()
         self.message.channel_session['conversation_id'] = conversation.id

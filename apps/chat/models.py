@@ -1,19 +1,18 @@
 from django.db import models
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from core.models import AbstractTimeStampedModel
 
 
 class Message(AbstractTimeStampedModel):
-    text = models.CharField(_('Message text'), max_length=1024)
-    author = models.ForeignKey(settings.AUTH_USER_MODEL,
+    text = models.TextField(_('Message text'))
+    author = models.ForeignKey('users.User',
                                verbose_name=_('Message author'),)
     conversation = models.ForeignKey('Conversation', on_delete=models.CASCADE,
                                      verbose_name=_('Conversation'))
 
 
 class Conversation(AbstractTimeStampedModel):
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL,
+    users = models.ManyToManyField('users.User',
                                    verbose_name=_('Conversation participants'),
                                    related_name='+')

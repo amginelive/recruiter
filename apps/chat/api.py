@@ -1,5 +1,6 @@
-from django.views.generic import View
 from django.contrib.auth import get_user_model
+from django.views.generic import View
+
 from braces.views import JSONResponseMixin, LoginRequiredMixin
 
 User = get_user_model()
@@ -13,3 +14,5 @@ class UsersListAPIView(LoginRequiredMixin, View, JSONResponseMixin):
         user_list = User.objects.exclude(id=request.user.id)
         response = [{'id': user.id, 'name': user.email} for user in user_list]
         return self.render_json_response(response)
+
+user_list_api = UsersListAPIView.as_view()

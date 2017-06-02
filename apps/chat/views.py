@@ -10,3 +10,5 @@ class ChatView(LoginRequiredMixin, TemplateView):
         context = super(ChatView, self).get_context_data(**kwargs)
         context['DEBUG'] = settings.DEBUG
         return context
+
+chat_view = ChatView.as_view()
