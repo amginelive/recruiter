@@ -25,7 +25,7 @@ class UserList extends React.Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (this.props.users.size > 0 && this.state.activeUser === 0) {
-            this.setState({activeUser: this.props.users.toArray()[0].get('id')});
+            this.userInit(this.props.users.toArray()[0].get('id'));
         }
     }
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import moment from 'moment';
 
 import * as actions from './actions/index.js';
 
@@ -9,7 +10,12 @@ class MessageForm extends React.Component {
     constructor(props){
         super(props);
 
-        this.state = { valid: false, message: '' };
+        this.state = {
+            valid: false,
+            message: '',
+            lastInput: null,
+            typingThrottleTime: 1
+        };
     }
 
     onSend(event) {
@@ -23,6 +29,11 @@ class MessageForm extends React.Component {
     }
 
     checkInput(event) {
+        if (this.state.lastInput === null || (moment().unix() - this.state.lastInput >= this.state.typingThrottleTime)) {
+            this.setState({lastInput: moment().unix()});
+            this.props.actions.userTyping();
+        }
+
         const message = event.target.value;
         const valid = message && message.length > 0;
         this.setState({ valid, message });

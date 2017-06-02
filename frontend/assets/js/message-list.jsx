@@ -1,7 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { Scrollbars } from 'react-custom-scrollbars';
 
+import * as actions from './actions/index.js';
 import Message from './message.jsx';
 
 
@@ -10,6 +12,9 @@ class MessageList extends React.Component {
         super(props);
 
         this.scrollList = this.scrollList.bind(this);
+        this.state = {
+            userTypingExpireTime: 3
+        };
     }
 
     scrollList(value) {
@@ -25,8 +30,41 @@ class MessageList extends React.Component {
         );
     }
 
+    componentWillReceiveProps(nextProps) {
+        const { typing } = nextProps;
+        if (typing.size === 0) {
+            return;
+        }
+        typing.get('typingMap').entrySeq().forEach(entry => {
+            if (entry[1].get('timer_id') === 0) {
+                const timer_id = setTimeout(() => {
+                    this.props.actions.typeTimerExpire({
+                        user_id: entry[0],
+                        user_name: entry[1].get('user_name'),
+                        timer_id
+                    });
+                }, this.state.userTypingExpireTime*1000);
+                this.props.actions.typeTimerStart({
+                    user_id: entry[0],
+                    user_name: entry[1].get('user_name'),
+                    timer_id
+                });
+            }
+        });
+    }
+
     render() {
-        const { messages } = this.props;
+        const { messages, typing } = this.props;
+        let typingUI = (<div></div>);
+        if (typing.size > 0) {
+            typingUI = (
+                <div className='user-type-list'>
+                    {typing.get('typingMap').map((user, index) => {
+                        return <div key={index} className='user-type-list-item'>{user.get('user_name') + ' is typing...'}</div>
+                    }).toArray()}
+                </div>
+            );
+        }
         return (
             <div className='message-list-container'>
                 <Scrollbars ref={(scroll) => {this.scroll = scroll;}}
@@ -39,6 +77,7 @@ class MessageList extends React.Component {
                         }).toArray()}
                     </div>
                 </Scrollbars>
+                {typingUI}
             </div>
         );
     }
@@ -46,10 +85,19 @@ class MessageList extends React.Component {
 
 function mapStateToProps (state) {
     return {
-        messages: state.get('messages')
+        messages: state.get('messages'),
+        typing: state.get('typing')
+    };
+}
+
+function mapDispatchToProps (dispatch) {
+    return {
+        dispatch: dispatch,
+        actions: bindActionCreators(actions, dispatch)
     };
 }
 
 export default connect(
-    mapStateToProps
+    mapStateToProps,
+    mapDispatchToProps
 )(MessageList);

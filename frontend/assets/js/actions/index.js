@@ -16,6 +16,14 @@ export function userTyping() {
     }
 }
 
+export function typeTimerStart(payload) {
+    return {type: actionTypes.typeTimerStart, payload}
+}
+
+export function typeTimerExpire(payload) {
+    return {type: actionTypes.typeTimerExpire, payload}
+}
+
 export function initUserList(userList) {
     return {type: actionTypes.userListInit, payload: userList};
 }

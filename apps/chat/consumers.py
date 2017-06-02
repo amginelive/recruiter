@@ -22,6 +22,8 @@ class ChatServer(JsonWebsocketConsumer):
             self.cmd_init(content.get('payload'))
         elif content.get('type') == 'newMessage':
             self.cmd_message(content.get('payload'))
+        elif content.get('type') == 'userTyping':
+            self.cmd_typing()
 
     def cmd_init(self, payload):
         conversation = Conversation.objects\
@@ -67,6 +69,19 @@ class ChatServer(JsonWebsocketConsumer):
                                 'text': message.text,
                                 'time': message.created_at.isoformat()}}
         for user in conversation.users.all():
+            self.group_send(str(user.id), response)
+
+    def cmd_typing(self):
+        try:
+            conversation = Conversation.objects.get(id=self.message.channel_session.get('conversation_id'))
+        except ObjectDoesNotExist:
+            return
+
+        response = {'type': 'userTyping',
+                    'payload': {'name': self.message.user.email,
+                                'id': self.message.user.id,
+                                'conversation_id': conversation.id}}
+        for user in conversation.users.exclude(id=self.message.user.id):
             self.group_send(str(user.id), response)
 
     def disconnect(self, message, **kwargs):
