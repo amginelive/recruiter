@@ -3,12 +3,15 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import * as actions from './actions/index.js';
-import User from './user.jsx';
 
 
 class UserList extends React.Component {
     constructor(props) {
         super(props);
+
+        this.state = {
+            activeUser: 0
+        };
     }
 
     componentDidMount() {
@@ -19,8 +22,15 @@ class UserList extends React.Component {
         });
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if (this.props.users.size > 0 && this.state.activeUser === 0) {
+            this.setState({activeUser: this.props.users.toArray()[0].get('id')});
+        }
+    }
+
     userInit(id) {
         this.props.actions.initChat(id);
+        this.setState({activeUser: id});
     }
 
     render() {
@@ -28,7 +38,17 @@ class UserList extends React.Component {
         return (
             <div className='user-list'>
                 {users.map(user => {
-                    return <User key={user.get('id')} name={user.get('name')} id={user.get('id')} onUserInit={this.userInit.bind(this)} />;
+                    return (
+                        <div
+                            onClick={() => {this.userInit(user.get('id'))}}
+                            key={user.get('id')}
+                            name={user.get('name')}
+                            id={user.get('id')}
+                            className={'user-list-item' + (user.get('id') === this.state.activeUser ? ' active-user' : '')}
+                        >
+                            <span className='user-list-item-name'>{user.get('name')}</span>
+                        </div>
+                    )
                 }).toArray()}
             </div>
         );
