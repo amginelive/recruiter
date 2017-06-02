@@ -1,6 +1,6 @@
 {% extends 'users/index.html' %}
 
-{% load staticfiles i18n bootstrap %}
+{% load staticfiles i18n bootstrap recruit_tags %}
 
 {% block content %}
 <section id="internal-wrap">
@@ -11,6 +11,7 @@
                     <li><a href="{% url 'recruit:dashboard' %}">Activity Feed</a></li>
                     <li class="active">Find job positions</li>
                     <li><a href="{% url 'users:candidate_search' %}">Search Candidates</a></li>
+                    <li><a href="{% url 'users:agent_search' %}">Search Agents</a></li>
                     <li><a href="#">My Application</a></li>
                 </ol>
             {% endif %}
@@ -110,12 +111,33 @@
                                             <span class="search-info"><a href="{% url 'users:profile_detail' result.user.slug %}">{{ result.user.get_full_name }}</a></span>
                                             <span class="search-info">{{ result.user.email }}</span>
                                             <span class="search-info">{{ result.phone }}</span>
-                                            <span class="search-info">{{ result.city }}, {{ result.country.name }}</span>
-                                            <span class="search-info">{{ result.title }}</span>
+                                            <span class="search-info">{{ result.location|default_if_none:"" }}</span>
+                                            <span class="search-info">{{ result.title|default_if_none:"" }}</span>
                                             <div class="job-post-skills search-info">
                                                 {% for skill in result.skills.all %}
                                                     <span class="skill">{{ skill.name }}</span>
                                                 {% endfor %}
+                                            </div>
+                                            <div class="search-info connection-buttons">
+                                                {% with user|connections:result.user as connections %}
+                                                    {% if connections %}
+                                                        {% if connections.connection_type == connection_request.CONNECTION_AGENT %}
+                                                            <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Network</button>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {% if result.user.pk in result.user|connection_requests:connection_request.CONNECTION_AGENT %}
+                                                            <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Network Approval</button>
+                                                        {% else %}
+                                                            <form action="{% url 'recruit:connection_request_create' %}" method="POST">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" name="connectee" value="{{ result.user.pk }}">
+                                                                <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_AGENT }}">
+
+                                                                <button class="btn btn-primary btn-xs add-connection">Add to my network</button>
+                                                            </form>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endwith %}
                                             </div>
                                         </div>
                                     </div>
@@ -169,6 +191,31 @@
 {% block footer_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script type="text/javascript">
+    $('.add-connection').on("click", function(event) {
+        event.preventDefault()
+        var candidateId = $(this).attr('data-candidate-id');
+        var form = $(this).closest('form');
+
+        $.ajax({
+            context: this,
+            type: 'POST',
+            url: form.attr('action'),
+            data: form.serialize(),
+            dataType: "json",
+            success: function(response) {
+                if (response.success) {
+                    form.closest('.connection-buttons').before('<button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Network Approval</button>');
+                    form.closest('.connection-buttons').remove();
+                }
+                else {
+                    $.each(response.errors, function(key, value){
+                        alert(value);
+                    })
+                }
+            }
+        });
+    });
+
     $('.btn-refer-team-member-modal').on('click', function() {
         var job_post_pk = $(this).attr('data-job-post-pk');
         $('#id_job_post').val(job_post_pk);

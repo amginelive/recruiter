@@ -53,7 +53,7 @@
                     </div>
                 </div>
                 <div class="col-md-3 profile-right">
-                    <h4>{% trans 'Your company' %}</h4>
+                    <h4>{% trans 'Company' %}</h4>
                     {% if not profile.company %}
                         <p>{% trans 'No company attached to account yet.' %}</p>
                     {% else %}
@@ -90,6 +90,7 @@
                             <h4>{% trans "Invitation Requests" %}</h4>
                             <div class="invitation-request-row">
                                 {% for invitation_request in invitation_requests %}
+                                <div class="invitation-request-item">
                                     <div class="text-left pull-left">
                                         <span class="request-users">{{ invitation_request.user.get_full_name }}</span>
                                     </div>
@@ -97,6 +98,7 @@
                                         <button class="btn btn-success btn-invitation-request" data-action="accept" data-uuid="{{ invitation_request.uuid }}">Accept</button>
                                         <button class="btn btn-danger btn-invitation-request" data-action="reject" data-uuid="{{ invitation_request.uuid }}">Reject</button>
                                     </div>
+                                </div>
                                 {% endfor %}
                             </div>
                             </div>
@@ -176,7 +178,7 @@
             },
             dataType: "json",
             success: function(response) {
-                $(this).closest('.invitation-request-row').remove();
+                $(this).closest('.invitation-request-item').remove();
             }
         });
     });

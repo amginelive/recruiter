@@ -21,6 +21,7 @@ from .forms import (
 )
 from .mixins import CandidateRequiredMixin
 from .models import (
+    Agent,
     Candidate,
 )
 from .utils import get_profile_completeness
@@ -156,10 +157,11 @@ class CandidateSearchView(CandidateRequiredMixin, TemplateView):
                 .exclude(user=self.request.user)\
                 .distinct('id')
 
+        context['search'] = search
         context['candidates'] = candidates
         context['connection_request'] = ConnectionRequest
 
-        connection_requests = ConnectionRequest.objects.filter(connectee__in=candidates)
+        connection_requests = ConnectionRequest.objects.filter(connectee__candidate__in=candidates)
         context['team_member_requests'] = connection_requests\
             .filter(connection_type=ConnectionRequest.CONNECTION_TEAM_MEMBER)\
             .values_list('connectee__pk', flat=True)
@@ -170,3 +172,41 @@ class CandidateSearchView(CandidateRequiredMixin, TemplateView):
         return context
 
 candidate_search = CandidateSearchView.as_view()
+
+
+class AgentSearchView(CandidateRequiredMixin, TemplateView):
+    """
+    View for candidates to search for agents to add to their network.
+    """
+    template_name = "users/agent_search.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(AgentSearchView, self).get_context_data(*args, **kwargs)
+        search = self.request.GET.get('search', None)
+        agents = []
+
+        if search:
+            search_list = search.split()
+
+            for index, item in enumerate(search_list):
+                if index == 0:
+                    search_query = SearchQuery(item)
+                search_query |= SearchQuery(item)
+
+            agents = Agent.objects\
+                .annotate(search=SearchVector('user__first_name', 'user__last_name'))\
+                .filter(search=search_query)\
+                .exclude(user=self.request.user)\
+                .distinct('id')
+
+        context['search'] = search
+        context['agents'] = agents
+        context['connection_request'] = ConnectionRequest
+        context['agent_requests'] = ConnectionRequest.objects\
+            .filter(connectee__agent__in=agents)\
+            .filter(connection_type=ConnectionRequest.CONNECTION_AGENT)\
+            .values_list('connectee__pk', flat=True)
+
+        return context
+
+agent_search = AgentSearchView.as_view()
