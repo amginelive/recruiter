@@ -44,7 +44,33 @@
 }
 
 .message-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.message-list-item {
+  display: flex;
+  flex-direction: column;
   padding: 10px;
+}
+
+.message-list-item:nth-child(even) {
+    background: whitesmoke;
+}
+
+
+.message-list-item-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.message-list-item-time {
+  font-style: italic;
+  font-size: 1.2rem;
+}
+
+.message-list-item-name {
+  font-weight: 700;
 }
 
 #message-form {
