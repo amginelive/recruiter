@@ -143,7 +143,7 @@ class JobReferralForm(forms.Form):
         self.candidate = initial.get('candidate')
         connections = Connection.objects\
             .filter(Q(connecter=self.candidate.user) | Q(connectee=self.candidate.user))\
-            .filter(connection_type=Connection.CONNECTION_TEAM_MEMBER)
+            .filter(connection_type=Connection.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER)
 
         choices = []
         for connection in connections:

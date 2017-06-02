@@ -26,7 +26,7 @@
                             <div class="col-md-12">
                                 <h1>Network</h1>
                                 <div class="row">
-                                    {% for connection_request in agent_requests %}
+                                    {% for connection_request in candidate_to_agent_network_requests %}
                                         <div class="connection-request-card col-md-4">
                                             <div class="col-md-4">
                                                 <img src="{% if connection_request.connecter.candidate.photo %}{{ connection_request.connecter.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
@@ -46,7 +46,7 @@
                         <div role="tabpanel" class="tab-pane" id="my-network">
                             <div class="col-md-12">
                                 <div class="row">
-                                    {% for connection in agent_connections %}
+                                    {% for connection in candidate_to_agent_network_connections %}
                                         <div class="connection-request-card col-md-4">
                                             {% if connection.connecter == user %}
                                                 <a href="{% url 'users:profile_detail' connection.connectee.slug %}">

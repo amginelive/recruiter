@@ -77,7 +77,7 @@
                             <div class="col-md-4">
                                 <h1>Network</h1>
                                 <div class="row">
-                                    {% for connection_request in network_requests %}
+                                    {% for connection_request in candidate_to_candidate_network_requests %}
                                         {% include "recruit/snippets/connection_request_card.html" %}
                                     {% empty %}
                                         <p>No requests as of the moment.</p>
@@ -88,7 +88,7 @@
                             <div class="col-md-4">
                                 <h1>Team Member</h1>
                                 <div class="row">
-                                    {% for connection_request in team_member_requests %}
+                                    {% for connection_request in candidate_to_candidate_team_member_requests %}
                                         {% include "recruit/snippets/connection_request_card.html" %}
                                     {% empty %}
                                         <p>No requests as of the moment.</p>
@@ -99,7 +99,7 @@
                             <div class="col-md-4">
                                 <h1>Agents</h1>
                                 <div class="row">
-                                    {% for connection_request in agent_requests %}
+                                    {% for connection_request in candidate_to_agent_network_requests %}
                                         {% include "recruit/snippets/connection_request_card.html" %}
                                     {% empty %}
                                         <p>No requests as of the moment.</p>
@@ -110,7 +110,7 @@
                         <div role="tabpanel" class="tab-pane" id="my-team">
                             <div class="col-md-12">
                                 <div class="row">
-                                    {% for connection in team_member_connections %}
+                                    {% for connection in candidate_to_candidate_team_member_connections %}
                                         {% include "recruit/snippets/connection_card.html" %}
                                     {% empty %}
                                         <p>You have no team members yet.</p>
@@ -121,7 +121,7 @@
                         <div role="tabpanel" class="tab-pane" id="my-network">
                             <div class="col-md-12">
                                 <div class="row">
-                                    {% for connection in network_connections %}
+                                    {% for connection in candidate_to_candidate_network_connections %}
                                         {% include "recruit/snippets/connection_card.html" %}
                                     {% empty %}
                                         <p>You don't have anyone in your network yet.</p>
@@ -132,7 +132,7 @@
                         <div role="tabpanel" class="tab-pane" id="my-agent-network">
                             <div class="col-md-12">
                                 <div class="row">
-                                    {% for connection in agent_connections %}
+                                    {% for connection in candidate_to_agent_network_connections %}
                                         {% include "recruit/snippets/connection_card.html" %}
                                     {% empty %}
                                         <p>You don't have anyone in your network yet.</p>

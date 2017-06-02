@@ -14,11 +14,11 @@
                 <li><a href="#">My Application</a></li>
             </ol>
             <div class="col-md-12 text-center">
-                {% if request.GET.connection_type|add:"0" == connection_invite.CONNECTION_NETWORK %}
+                {% if request.GET.connection_type|add:"0" == connection_invite.CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK %}
                     <h1>Invite Candidate as Network</h1>
-                {% elif request.GET.connection_type|add:"0" == connection_invite.CONNECTION_TEAM_MEMBER %}
+                {% elif request.GET.connection_type|add:"0" == connection_invite.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER %}
                     <h1>Invite Candidate as Team Member</h1>
-                {% elif request.GET.connection_type|add:"0" == connection_invite.CONNECTION_AGENT %}
+                {% elif request.GET.connection_type|add:"0" == connection_invite.CONNECTION_CANDIDATE_TO_AGENT_NETWORK %}
                     <h1>Invite Agent as Network</h1>
                 {% endif %}
             </div>

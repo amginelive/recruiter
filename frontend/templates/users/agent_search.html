@@ -15,7 +15,7 @@
         </ol>
         <div class="row">
             <div class="col-md-12 text-center">
-                <a href="{% url 'recruit:connection_invite_create' %}?connection_type={{ connection_request.CONNECTION_AGENT }}" class="btn btn-primary">Invite as network</a>
+                <a href="{% url 'recruit:connection_invite_create' %}?connection_type={{ connection_request.CONNECTION_CANDIDATE_TO_AGENT_NETWORK }}" class="btn btn-primary">Invite as network</a>
             </div>
         </div>
         <div class="row" style="padding-top:40px;">
@@ -40,17 +40,17 @@
                                     <div class="connection-buttons">
                                         {% with user|connections:agent.user as connections %}
                                             {% if connections %}
-                                                {% if connections.connection_type == connection_request.CONNECTION_AGENT %}
+                                                {% if connections.connection_type == connection_request.CONNECTION_CANDIDATE_TO_AGENT_NETWORK %}
                                                     <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Network</button>
                                                 {% endif %}
                                             {% else %}
-                                                {% if agent.user.pk in agent_requests %}
+                                                {% if agent.user.pk in candidate_to_agent_network_requests %}
                                                     <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Network Approval</button>
                                                 {% else %}
                                                     <form action="{% url 'recruit:connection_request_create' %}" method="POST">
                                                         {% csrf_token %}
                                                         <input type="hidden" name="connectee" value="{{ agent.user.pk }}">
-                                                        <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_AGENT }}">
+                                                        <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_CANDIDATE_TO_AGENT_NETWORK }}">
 
                                                         <button class="btn btn-primary btn-xs add-connection">Add to my network</button>
                                                     </form>

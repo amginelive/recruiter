@@ -1,7 +1,7 @@
 {% load staticfiles %}
 
 <div class="connection-request-card col-md-12">
-    {% if connection_request.connection_type == connection_request.CONNECTION_AGENT %}
+    {% if connection_request.connection_type == connection_request.CONNECTION_CANDIDATE_TO_AGENT_NETWORK %}
         <div class="col-md-4">
             <img src="{% if connection_request.connecter.agent.photo %}{{ connection_request.connecter.agent.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
         </div>

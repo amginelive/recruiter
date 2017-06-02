@@ -3,7 +3,7 @@
 <div class="connection-request-card col-md-4">
     {% for connection_user in connection.users %}
         {% if connection_user != user %}
-            {% if connection.connection_type == connection.CONNECTION_AGENT %}
+            {% if connection.connection_type == connection.CONNECTION_CANDIDATE_TO_AGENT_NETWORK %}
                 <a href="{% url 'users:profile_detail' connection_user.slug %}">
                     <div class="col-md-4">
                         <img src="{% if connection_user.agent.photo %}{{ connection_user.agent.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">

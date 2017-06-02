@@ -15,8 +15,8 @@
         </ol>
         <div class="row">
             <div class="col-md-12 text-center">
-                <a href="{% url 'recruit:connection_invite_create' %}?connection_type={{ connection_request.CONNECTION_TEAM_MEMBER }}" class="btn btn-primary">Invite as team member</a>
-                <a href="{% url 'recruit:connection_invite_create' %}?connection_type={{ connection_request.CONNECTION_NETWORK }}" class="btn btn-primary">Invite as network</a>
+                <a href="{% url 'recruit:connection_invite_create' %}?connection_type={{ connection_request.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER }}" class="btn btn-primary">Invite as team member</a>
+                <a href="{% url 'recruit:connection_invite_create' %}?connection_type={{ connection_request.CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK }}" class="btn btn-primary">Invite as network</a>
             </div>
         </div>
         <div class="row" style="padding-top:40px;">
@@ -41,21 +41,21 @@
                                     <div class="connection-buttons">
                                         {% with user|connections:candidate.user as connections %}
                                             {% if connections %}
-                                                {% if connections.connection_type == connection_request.CONNECTION_TEAM_MEMBER %}
+                                                {% if connections.connection_type == connection_request.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER %}
                                                     <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Team Member</button>
-                                                {% elif connections.connection_type == connection_request.CONNECTION_NETWORK %}
+                                                {% elif connections.connection_type == connection_request.CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK %}
                                                     <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Network</button>
                                                 {% endif %}
                                             {% else %}
-                                                {% if candidate.user.pk in team_member_requests %}
+                                                {% if candidate.user.pk in candidate_to_candidate_team_member_requests %}
                                                     <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Team Member Approval</button>
-                                                {% elif candidate.user.pk in network_requests %}
+                                                {% elif candidate.user.pk in candidate_to_candidate_network_requests %}
                                                     <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Network Approval</button>
                                                 {% else %}
                                                     <form action="{% url 'recruit:connection_request_create' %}" method="POST">
                                                         {% csrf_token %}
                                                         <input type="hidden" name="connectee" value="{{ candidate.user.pk }}">
-                                                        <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_TEAM_MEMBER }}">
+                                                        <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER }}">
 
                                                         <button class="btn btn-primary btn-xs add-connection">Add as team member</button>
                                                     </form>
@@ -63,7 +63,7 @@
                                                     <form action="{% url 'recruit:connection_request_create' %}" method="POST">
                                                         {% csrf_token %}
                                                         <input type="hidden" name="connectee" value="{{ candidate.user.pk }}">
-                                                        <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_NETWORK }}">
+                                                        <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK }}">
 
                                                         <button class="btn btn-primary btn-xs add-connection">Add to my network</button>
                                                     </form>

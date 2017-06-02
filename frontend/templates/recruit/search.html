@@ -121,17 +121,17 @@
                                             <div class="search-info connection-buttons">
                                                 {% with user|connections:result.user as connections %}
                                                     {% if connections %}
-                                                        {% if connections.connection_type == connection_request.CONNECTION_AGENT %}
+                                                        {% if connections.connection_type == connection_request.CONNECTION_CANDIDATE_TO_AGENT_NETWORK %}
                                                             <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Network</button>
                                                         {% endif %}
                                                     {% else %}
-                                                        {% if result.user.pk in result.user|connection_requests:connection_request.CONNECTION_AGENT %}
+                                                        {% if result.user.pk in result.user|connection_requests:connection_request.CONNECTION_CANDIDATE_TO_AGENT_NETWORK %}
                                                             <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Network Approval</button>
                                                         {% else %}
                                                             <form action="{% url 'recruit:connection_request_create' %}" method="POST">
                                                                 {% csrf_token %}
                                                                 <input type="hidden" name="connectee" value="{{ result.user.pk }}">
-                                                                <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_AGENT }}">
+                                                                <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_CANDIDATE_TO_AGENT_NETWORK }}">
 
                                                                 <button class="btn btn-primary btn-xs add-connection">Add to my network</button>
                                                             </form>

@@ -63,13 +63,13 @@ class Connection(AbstractTimeStampedModel):
     """
     Model for requesting to be added to network or team.
     """
-    CONNECTION_NETWORK = 1
-    CONNECTION_TEAM_MEMBER = 2
-    CONNECTION_AGENT = 3
+    CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK = 1
+    CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER = 2
+    CONNECTION_CANDIDATE_TO_AGENT_NETWORK = 3
     CONNECTION_TYPE_CHOICES = (
-        (CONNECTION_NETWORK, _('Network')),
-        (CONNECTION_TEAM_MEMBER, _('Team Member')),
-        (CONNECTION_AGENT, _('Agent')),
+        (CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK, _('Candidate to Candidate Network')),
+        (CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER, _('Candidate to Candidate Team Member')),
+        (CONNECTION_CANDIDATE_TO_AGENT_NETWORK, _('Candidate to Agent Network')),
     )
 
     connecter = models.ForeignKey('users.User', related_name='+', verbose_name=_('Connecter'))
@@ -92,13 +92,13 @@ class ConnectionRequest(AbstractTimeStampedModel):
     """
     Model for requesting to be added to network or team.
     """
-    CONNECTION_NETWORK = 1
-    CONNECTION_TEAM_MEMBER = 2
-    CONNECTION_AGENT = 3
+    CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK = 1
+    CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER = 2
+    CONNECTION_CANDIDATE_TO_AGENT_NETWORK = 3
     CONNECTION_TYPE_CHOICES = (
-        (CONNECTION_NETWORK, _('Network')),
-        (CONNECTION_TEAM_MEMBER, _('Team Member')),
-        (CONNECTION_AGENT, _('Agent')),
+        (CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK, _('Candidate to Candidate Network')),
+        (CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER, _('Candidate to Candidate Team Member')),
+        (CONNECTION_CANDIDATE_TO_AGENT_NETWORK, _('Candidate to Agent Network')),
     )
 
     connecter = models.ForeignKey('users.User', related_name='connecter_requests', verbose_name=_('Connecter'))
@@ -118,13 +118,13 @@ class ConnectionInvite(AbstractTimeStampedModel):
     """
     Model for inviting to join the site and be in their network or team.
     """
-    CONNECTION_NETWORK = 1
-    CONNECTION_TEAM_MEMBER = 2
-    CONNECTION_AGENT = 3
+    CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK = 1
+    CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER = 2
+    CONNECTION_CANDIDATE_TO_AGENT_NETWORK = 3
     CONNECTION_TYPE_CHOICES = (
-        (CONNECTION_NETWORK, _('Network')),
-        (CONNECTION_TEAM_MEMBER, _('Team Member')),
-        (CONNECTION_AGENT, _('Agent')),
+        (CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK, _('Candidate to Candidate Network')),
+        (CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER, _('Candidate to Candidate Team Member')),
+        (CONNECTION_CANDIDATE_TO_AGENT_NETWORK, _('Candidate to Agent Network')),
     )
 
     connecter = models.ForeignKey('users.User', related_name='+', verbose_name=_('Connecter'))
