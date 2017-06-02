@@ -6,15 +6,14 @@
 <section id="internal-wrap">
     <div class="container">
         <div class="row">
-            {% if user.account_type == user.ACCOUNT_CANDIDATE  %}
-                <ol class="breadcrumb">
-                    <li class="active">Activity Feed</li>
-                    <li><a href="{% url 'recruit:search' %}">Find job positions</a></li>
-                    <li><a href="{% url 'users:candidate_search' %}">Search Candidates</a></li>
-                    <li><a href="{% url 'recruit:application' %}">My Application</a></li>
-                </ol>
-            {% endif %}
-            <div class="col-md-10 col-md-offset-1 text-center">
+            <ol class="breadcrumb">
+                <li class="active">Activity Feed</li>
+                <li><a href="{% url 'recruit:search' %}">Find job positions</a></li>
+                <li><a href="{% url 'users:candidate_search' %}">Search Candidates</a></li>
+                <li><a href="{% url 'users:agent_search' %}">Search Agents</a></li>
+                <li><a href="{% url 'recruit:application' %}">My Application</a></li>
+            </ol>
+            <div class="col-md-12 text-center">
                 <div style="padding-top: 20px;">
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active">
@@ -28,6 +27,9 @@
                         </li>
                         <li role="presentation">
                             <a href="#my-network" aria-controls="my-network" role="tab" data-toggle="tab">My Network</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#my-agent-network" aria-controls="my-agent-network" role="tab" data-toggle="tab">My Agent Network</a>
                         </li>
                     </ul>
 
@@ -72,26 +74,33 @@
                             </div>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="notifications">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <h1>Network</h1>
                                 <div class="row">
-                                    {% for connection_request in connection_requests %}
-                                        {% if connection_request.connection_type == connection_request.CONNECTION_NETWORK %}
-                                            {% include "recruit/snippets/connection_request_card.html" %}
-                                        {% endif %}
+                                    {% for connection_request in network_requests %}
+                                        {% include "recruit/snippets/connection_request_card.html" %}
                                     {% empty %}
                                         <p>No requests as of the moment.</p>
                                     {% endfor %}
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <h1>Team Member</h1>
                                 <div class="row">
-                                    {% for connection_request in connection_requests %}
-                                        {% if connection_request.connection_type == connection_request.CONNECTION_NETWORK %}
-                                            {% include "recruit/snippets/connection_request_card.html" %}
-                                        {% endif %}
+                                    {% for connection_request in team_member_requests %}
+                                        {% include "recruit/snippets/connection_request_card.html" %}
+                                    {% empty %}
+                                        <p>No requests as of the moment.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <h1>Agents</h1>
+                                <div class="row">
+                                    {% for connection_request in agent_requests %}
+                                        {% include "recruit/snippets/connection_request_card.html" %}
                                     {% empty %}
                                         <p>No requests as of the moment.</p>
                                     {% endfor %}
@@ -101,10 +110,8 @@
                         <div role="tabpanel" class="tab-pane" id="my-team">
                             <div class="col-md-12">
                                 <div class="row">
-                                    {% for connection in connections %}
-                                        {% if connection.connection_type == connection.CONNECTION_TEAM_MEMBER %}
-                                            {% include "recruit/snippets/connection_card.html" %}
-                                        {% endif %}
+                                    {% for connection in team_member_connections %}
+                                        {% include "recruit/snippets/connection_card.html" %}
                                     {% empty %}
                                         <p>You have no team members yet.</p>
                                     {% endfor %}
@@ -114,10 +121,19 @@
                         <div role="tabpanel" class="tab-pane" id="my-network">
                             <div class="col-md-12">
                                 <div class="row">
-                                    {% for connection in connections %}
-                                        {% if connection.connection_type == connection.CONNECTION_NETWORK %}
-                                            {% include "recruit/snippets/connection_card.html" %}
-                                        {% endif %}
+                                    {% for connection in network_connections %}
+                                        {% include "recruit/snippets/connection_card.html" %}
+                                    {% empty %}
+                                        <p>You don't have anyone in your network yet.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="my-agent-network">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    {% for connection in agent_connections %}
+                                        {% include "recruit/snippets/connection_card.html" %}
                                     {% empty %}
                                         <p>You don't have anyone in your network yet.</p>
                                     {% endfor %}

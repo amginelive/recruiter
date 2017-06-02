@@ -72,7 +72,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     """
     ACCOUNT_CANDIDATE = 1
     ACCOUNT_AGENT = 2
-
     ACCOUNT_TYPE_CHOICES = (
         (ACCOUNT_CANDIDATE, _('Candidate')),
         (ACCOUNT_AGENT, _('Agent')),
@@ -208,12 +207,6 @@ class Candidate(ProfileBase):
     country = CountryField(_('Country'))
     experience = models.SmallIntegerField(_('Experience (full years)'), **optional)
     cv = models.FileField(_("CV"), upload_to=get_upload_path, max_length=150, editable=True, **optional)
-    connections = models.ManyToManyField(
-        'users.Candidate',
-        related_name='+',
-        through='recruit.Connection',
-        verbose_name=_('Connections')
-    )
 
     class Meta:
         verbose_name = _('Candidate')
@@ -224,7 +217,9 @@ class Candidate(ProfileBase):
 
     @property
     def location(self):
-        return '{}, {}'.format(self.city, self.country.name)
+        if self.city and self.country:
+            return '{}, {}'.format(self.city, self.country.name)
+        return None
 
 
 class Agent(ProfileBase):

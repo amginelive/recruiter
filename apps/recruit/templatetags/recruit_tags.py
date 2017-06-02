@@ -16,3 +16,10 @@ def connections(connecter, connectee):
         (Q(connecter=connecter) & Q(connectee=connectee)) |
         (Q(connecter=connectee) & Q(connectee=connecter))
     ).first()
+
+
+@register.filter
+def connection_requests(user, connection_type):
+    return user.connectee_requests\
+        .filter(connection_type=connection_type)\
+        .values_list('connectee__pk', flat=True)

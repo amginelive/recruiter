@@ -65,12 +65,15 @@ class Connection(AbstractTimeStampedModel):
     """
     CONNECTION_NETWORK = 1
     CONNECTION_TEAM_MEMBER = 2
+    CONNECTION_AGENT = 3
     CONNECTION_TYPE_CHOICES = (
         (CONNECTION_NETWORK, _('Network')),
         (CONNECTION_TEAM_MEMBER, _('Team Member')),
+        (CONNECTION_AGENT, _('Agent')),
     )
-    connecter = models.ForeignKey('users.Candidate', related_name='+', verbose_name=_('Connecter'))
-    connectee = models.ForeignKey('users.Candidate', related_name='+', verbose_name=_('Connectee'))
+
+    connecter = models.ForeignKey('users.User', related_name='+', verbose_name=_('Connecter'))
+    connectee = models.ForeignKey('users.User', related_name='+', verbose_name=_('Connectee'))
     connection_type = models.IntegerField(_('Connection Type'), choices=CONNECTION_TYPE_CHOICES)
 
     class Meta:
@@ -78,7 +81,11 @@ class Connection(AbstractTimeStampedModel):
         verbose_name_plural = _('Connections')
 
     def __str__(self):
-        return self.connectee.user.get_full_name()
+        return self.connectee.get_full_name()
+
+    @property
+    def users(self):
+        return [self.connecter, self.connectee]
 
 
 class ConnectionRequest(AbstractTimeStampedModel):
@@ -87,12 +94,15 @@ class ConnectionRequest(AbstractTimeStampedModel):
     """
     CONNECTION_NETWORK = 1
     CONNECTION_TEAM_MEMBER = 2
+    CONNECTION_AGENT = 3
     CONNECTION_TYPE_CHOICES = (
         (CONNECTION_NETWORK, _('Network')),
         (CONNECTION_TEAM_MEMBER, _('Team Member')),
+        (CONNECTION_AGENT, _('Agent')),
     )
-    connecter = models.ForeignKey('users.Candidate', related_name='connecter_requests', verbose_name=_('Connecter'))
-    connectee = models.ForeignKey('users.Candidate', related_name='connectee_requests', verbose_name=_('Connectee'))
+
+    connecter = models.ForeignKey('users.User', related_name='connecter_requests', verbose_name=_('Connecter'))
+    connectee = models.ForeignKey('users.User', related_name='connectee_requests', verbose_name=_('Connectee'))
     connection_type = models.IntegerField(_('Connection Type'), choices=CONNECTION_TYPE_CHOICES)
     uuid = models.SlugField(_('UUID'), default=uuid.uuid4, editable=False)
 
@@ -110,11 +120,14 @@ class ConnectionInvite(AbstractTimeStampedModel):
     """
     CONNECTION_NETWORK = 1
     CONNECTION_TEAM_MEMBER = 2
+    CONNECTION_AGENT = 3
     CONNECTION_TYPE_CHOICES = (
         (CONNECTION_NETWORK, _('Network')),
         (CONNECTION_TEAM_MEMBER, _('Team Member')),
+        (CONNECTION_AGENT, _('Agent')),
     )
-    connecter = models.ForeignKey('users.Candidate', related_name='+', verbose_name=_('Connecter'))
+
+    connecter = models.ForeignKey('users.User', related_name='+', verbose_name=_('Connecter'))
     connectee_email = models.EmailField(_('Connectee'), max_length=255)
     connection_type = models.IntegerField(_('Connection Type'), choices=CONNECTION_TYPE_CHOICES)
     uuid = models.SlugField(_('UUID'), default=uuid.uuid4, editable=False)

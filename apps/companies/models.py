@@ -71,6 +71,12 @@ class Company(AbstractTimeStampedModel):
     def get_absolute_url(self):
         return '/company/%s' % self.id
 
+    @property
+    def location(self):
+        if self.city and self.country:
+            return '{}, {}'.format(self.city, self.country.name)
+        return None
+
     def __str__(self):
         return self.name
 

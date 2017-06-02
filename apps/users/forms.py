@@ -74,22 +74,23 @@ class CustomSignupForm(forms.Form):
                 'phone': self.cleaned_data['phone']
             }
             if user.account_type == User.ACCOUNT_CANDIDATE:
-                candidate = Candidate.objects.create(**data)
-
-                # save connection
-                uuid = request.GET.get('uuid')
-                if uuid:
-                    connection_invitation = ConnectionInvite.objects.filter(uuid=uuid)
-                    if connection_invitation.exists():
-                        connection_invitation = connection_invitation.first()
-                        Connection.objects.create(
-                            connecter=connection_invitation.connecter,
-                            connectee=candidate,
-                            connection_type=connection_invitation.connection_type
-                        )
-                        connection_invitation.delete()
+                Candidate.objects.create(**data)
             elif user.account_type == User.ACCOUNT_AGENT:
                 Agent.objects.create(**data)
+
+            # save connection
+            uuid = request.GET.get('uuid')
+            if uuid:
+                connection_invitation = ConnectionInvite.objects.filter(uuid=uuid)
+                import pdb; pdb.set_trace()
+                if connection_invitation.exists():
+                    connection_invitation = connection_invitation.first()
+                    Connection.objects.create(
+                        connecter=connection_invitation.connecter,
+                        connectee=user,
+                        connection_type=connection_invitation.connection_type
+                    )
+                    connection_invitation.delete()
 
 
 class CandidateUpdateForm(forms.ModelForm):

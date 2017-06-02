@@ -10,6 +10,7 @@
                 <li><a href="{% url 'recruit:dashboard' %}">Activity Feed</a></li>
                 <li><a href="{% url 'recruit:search' %}">Find job positions</a></li>
                 <li class="active">Search Candidates</li>
+                <li><a href="{% url 'users:agent_search' %}">Search Agents</a></li>
                 <li><a href="#">My Application</a></li>
             </ol>
             <div class="col-md-12 text-center">
@@ -17,6 +18,8 @@
                     <h1>Invite Candidate as Network</h1>
                 {% elif request.GET.connection_type|add:"0" == connection_invite.CONNECTION_TEAM_MEMBER %}
                     <h1>Invite Candidate as Team Member</h1>
+                {% elif request.GET.connection_type|add:"0" == connection_invite.CONNECTION_AGENT %}
+                    <h1>Invite Agent as Network</h1>
                 {% endif %}
             </div>
             <div class="col-md-4 col-md-offset-4">

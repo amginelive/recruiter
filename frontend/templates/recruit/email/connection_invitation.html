@@ -5,9 +5,15 @@ You received this email because {{ connection_invite.connecter.get_full_name }} 
 you to join as their {{ connection_invite.get_connection_type_display }} on SquareBalloon.<br>
 <br>
 To accept invitation please signup here:<br>
-<a href="http://www.squareballoon.com{% url 'account_signup' %}?account_type={{ user.ACCOUNT_CANDIDATE }}&uuid={{ connection_invite.uuid }}&email={{ connection_invite.connectee_email }}">
-    http://www.squareballoon.com{% url 'account_signup' %}?account_type={{ user.ACCOUNT_CANDIDATE }}&uuid={{ connection_invite.uuid }}&email={{ connection_invite.connectee_email }}
-</a>
+{% if connection_invite.connection_type == connection_invite.CONNECTION_AGENT %}
+    <a href="http://www.squareballoon.com{% url 'account_signup' %}?account_type={{ user.ACCOUNT_AGENT }}&uuid={{ connection_invite.uuid }}&email={{ connection_invite.connectee_email }}">
+        http://www.squareballoon.com{% url 'account_signup' %}?account_type={{ user.ACCOUNT_AGENT }}&uuid={{ connection_invite.uuid }}&email={{ connection_invite.connectee_email }}
+    </a>
+{% else %}
+    <a href="http://www.squareballoon.com{% url 'account_signup' %}?account_type={{ user.ACCOUNT_CANDIDATE }}&uuid={{ connection_invite.uuid }}&email={{ connection_invite.connectee_email }}">
+        http://www.squareballoon.com{% url 'account_signup' %}?account_type={{ user.ACCOUNT_CANDIDATE }}&uuid={{ connection_invite.uuid }}&email={{ connection_invite.connectee_email }}
+    </a>
+{% endif %}
 <br>
 With best regards,<br>
 SquareBalloon.com
