@@ -44,7 +44,9 @@ class ChatServer(JsonWebsocketConsumer):
                  'text': message.text,
                  'time': message.created_at.isoformat()}
             )
-        self.send({'type': 'initChat', 'payload': messages})
+        self.send({'type': 'initChat',
+                   'payload': {'conversation_id': conversation.id,
+                               'messages': messages}})
 
     def cmd_message(self, payload):
         try:
