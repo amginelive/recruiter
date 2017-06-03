@@ -1,6 +1,7 @@
-from django.views.generic import TemplateView
-from braces.views import LoginRequiredMixin
 from django.conf import settings
+from django.views.generic import TemplateView
+
+from braces.views import LoginRequiredMixin
 
 
 class ChatView(LoginRequiredMixin, TemplateView):

@@ -54,18 +54,18 @@ INSTALLED_APPS = (
 #    'allauth.socialaccount.providers.google',
 #    'snowpenguin.django.recaptcha2',
     'bootstrapform',
+    'channels',
     'django_extensions',
     'django_js_reverse',
 #    'djangoseo',
     'easy_thumbnails',
     'phonenumber_field',
-    'channels',
     'webpack_loader',
 
+    'chat',
     'companies',
     'recruit',
-    'users',
-    'chat'
+    'users'
 )
 
 MIDDLEWARE_CLASSES = (

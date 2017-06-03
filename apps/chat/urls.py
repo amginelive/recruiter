@@ -1,7 +1,7 @@
 from macrosurl import url
 
-from . import views
 from . import api
+from . import views
 
 
 urlpatterns = (
