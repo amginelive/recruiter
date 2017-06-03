@@ -6,16 +6,28 @@
 <section id="internal-wrap">
     <!-- internal block -->
     <div class="container">
-        <ol class="breadcrumb">
-            <li><a href="{% url 'recruit:dashboard' %}">Activity Feed</a></li>
-            <li><a href="{% url 'recruit:search' %}">Find job positions</a></li>
-            <li><a href="{% url 'users:candidate_search' %}">Search Candidates</a></li>
-            <li class="active">Search Agents</li>
-            <li><a href="#">My Application</a></li>
-        </ol>
+        {% if user.account_type == user.ACCOUNT_AGENT %}
+            <ol class="breadcrumb">
+                <li><a href="{% url 'recruit:dashboard' %}">Activity Feed</a></li>
+                <li><a href="{% url 'recruit:search' %}">Search Candidates</a></li>
+                <li class="active">Search Agents</li>
+            </ol>
+        {% elif user.account_type == user.ACCOUNT_CANDIDATE %}
+            <ol class="breadcrumb">
+                <li><a href="{% url 'recruit:dashboard' %}">Activity Feed</a></li>
+                <li><a href="{% url 'recruit:search' %}">Find job positions</a></li>
+                <li><a href="{% url 'users:candidate_search' %}">Search Candidates</a></li>
+                <li class="active">Search Agents</li>
+                <li><a href="#">My Application</a></li>
+            </ol>
+        {% endif %}
         <div class="row">
             <div class="col-md-12 text-center">
-                <a href="{% url 'recruit:connection_invite_create' %}?connection_type={{ connection_request.CONNECTION_CANDIDATE_TO_AGENT_NETWORK }}" class="btn btn-primary">Invite as network</a>
+                {% if user.account_type == user.ACCOUNT_AGENT %}
+                    <a href="{% url 'recruit:connection_invite_create' %}?connection_type={{ connection_request.CONNECTION_AGENT_TO_AGENT_NETWORK }}" class="btn btn-primary">Invite as network</a>
+                {% elif user.account_type == user.ACCOUNT_CANDIDATE %}
+                    <a href="{% url 'recruit:connection_invite_create' %}?connection_type={{ connection_request.CONNECTION_CANDIDATE_TO_AGENT_NETWORK }}" class="btn btn-primary">Invite as network</a>
+                {% endif %}
             </div>
         </div>
         <div class="row" style="padding-top:40px;">
@@ -40,17 +52,19 @@
                                     <div class="connection-buttons">
                                         {% with user|connections:agent.user as connections %}
                                             {% if connections %}
-                                                {% if connections.connection_type == connection_request.CONNECTION_CANDIDATE_TO_AGENT_NETWORK %}
-                                                    <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Network</button>
-                                                {% endif %}
+                                                <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Network</button>
                                             {% else %}
-                                                {% if agent.user.pk in candidate_to_agent_network_requests %}
+                                                {% if agent.user.pk in candidate_to_agent_network_requests or agent.user.pk in agent_to_agent_network_requests %}
                                                     <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Network Approval</button>
                                                 {% else %}
                                                     <form action="{% url 'recruit:connection_request_create' %}" method="POST">
                                                         {% csrf_token %}
                                                         <input type="hidden" name="connectee" value="{{ agent.user.pk }}">
-                                                        <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_CANDIDATE_TO_AGENT_NETWORK }}">
+                                                        {% if user.account_type == user.ACCOUNT_CANDIDATE %}
+                                                            <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_CANDIDATE_TO_AGENT_NETWORK }}">
+                                                        {% elif user.account_type == user.ACCOUNT_AGENT %}
+                                                            <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_AGENT_TO_AGENT_NETWORK }}">
+                                                        {% endif %}
 
                                                         <button class="btn btn-primary btn-xs add-connection">Add to my network</button>
                                                     </form>

@@ -118,7 +118,7 @@ class ConnectionInviteForm(forms.ModelForm):
             connection_invite.save()
 
             send_email(
-                _('Candidate Invitation, SquareBalloon'),
+                _('Invitation, SquareBalloon'),
                 [connection_invite.connectee_email,],
                 'recruit/email/connection_invitation',
                 {

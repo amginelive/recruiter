@@ -6,19 +6,27 @@
 <section id="internal-wrap">
     <div class="container">
         <div class="row">
-            <ol class="breadcrumb">
-                <li><a href="{% url 'recruit:dashboard' %}">Activity Feed</a></li>
-                <li><a href="{% url 'recruit:search' %}">Find job positions</a></li>
-                <li class="active">Search Candidates</li>
-                <li><a href="{% url 'users:agent_search' %}">Search Agents</a></li>
-                <li><a href="#">My Application</a></li>
-            </ol>
+            {% if user.account_type == user.ACCOUNT_AGENT %}
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'recruit:dashboard' %}">Activity Feed</a></li>
+                    <li><a href="{% url 'recruit:search' %}">Search Candidates</a></li>
+                    <li><a href="{% url 'users:agent_search' %}">Search Agents</a></li>
+                </ol>
+            {% elif user.account_type == user.ACCOUNT_CANDIDATE %}
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'recruit:dashboard' %}">Activity Feed</a></li>
+                    <li><a href="{% url 'recruit:search' %}">Find job positions</a></li>
+                    <li><a href="{% url 'users:candidate_search' %}">Search Candidates</a></li>
+                    <li><a href="{% url 'users:agent_search' %}">Search Agents</a></li>
+                    <li><a href="#">My Application</a></li>
+                </ol>
+            {% endif %}
             <div class="col-md-12 text-center">
                 {% if request.GET.connection_type|add:"0" == connection_invite.CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK %}
                     <h1>Invite Candidate as Network</h1>
                 {% elif request.GET.connection_type|add:"0" == connection_invite.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER %}
                     <h1>Invite Candidate as Team Member</h1>
-                {% elif request.GET.connection_type|add:"0" == connection_invite.CONNECTION_CANDIDATE_TO_AGENT_NETWORK %}
+                {% elif request.GET.connection_type|add:"0" == connection_invite.CONNECTION_CANDIDATE_TO_AGENT_NETWORK or request.GET.connection_type|add:"0" == connection_invite.CONNECTION_AGENT_TO_AGENT_NETWORK %}
                     <h1>Invite Agent as Network</h1>
                 {% endif %}
             </div>

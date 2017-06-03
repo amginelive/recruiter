@@ -9,6 +9,7 @@
             <ol class="breadcrumb">
                 <li class="active">Activity Feed</li>
                 <li><a href="{% url 'recruit:search' %}">Search Candidates</a></li>
+                <li><a href="{% url 'users:agent_search' %}">Search Agents</a></li>
             </ol>
             <div class="col-md-12 text-center">
                 <div style="padding-top: 20px;">
@@ -17,17 +18,20 @@
                             <a href="#notifications" aria-controls="notifications" role="tab" data-toggle="tab">Notifications {% if connection_requests %}<span class="badge badge-new badge-notification"><span class="badge-notification-count">{{ connection_requests.count }}</span> New</span>{% endif %}</a>
                         </li>
                         <li role="presentation">
-                            <a href="#my-network" aria-controls="my-network" role="tab" data-toggle="tab">My Network</a>
+                            <a href="#candidate-network" aria-controls="candidate-network" role="tab" data-toggle="tab">Candidate Network</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#my-agent-network" aria-controls="my-agent-network" role="tab" data-toggle="tab">My Agent Network</a>
                         </li>
                     </ul>
 
                     <div class="tab-content">
                         <div role="tabpanel" class="tab-pane active" id="notifications">
-                            <div class="col-md-12">
-                                <h1>Network</h1>
+                            <div class="col-md-6">
+                                <h1>Candidate</h1>
                                 <div class="row">
                                     {% for connection_request in candidate_to_agent_network_requests %}
-                                        <div class="connection-request-card col-md-4">
+                                        <div class="connection-request-card col-md-6 col-md-offset-3">
                                             <div class="col-md-4">
                                                 <img src="{% if connection_request.connecter.candidate.photo %}{{ connection_request.connecter.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
                                             </div>
@@ -42,36 +46,43 @@
                                     {% endfor %}
                                 </div>
                             </div>
+
+                            <div class="col-md-6">
+                                <h1>Agent</h1>
+                                <div class="row">
+                                    {% for connection_request in agent_to_agent_network_requests %}
+                                        <div class="connection-request-card col-md-6 col-md-offset-3">
+                                            <div class="col-md-4">
+                                                <img src="{% if connection_request.connecter.agent.photo %}{{ connection_request.connecter.agent.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+                                            </div>
+                                            <div class="col-md-8 text-left">
+                                                <span class="search-info">{{ connection_request.connecter.get_full_name }}</span>
+                                                <button class="btn btn-primary btn-xs btn-connection-request" data-action="accept" data-uuid="{{ connection_request.uuid }}">Accept</button>
+                                                <button class="btn btn-primary btn-xs btn-connection-request" data-action="decline" data-uuid="{{ connection_request.uuid }}">Decline</button>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p>No requests as of the moment.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </div>
-                        <div role="tabpanel" class="tab-pane" id="my-network">
+                        <div role="tabpanel" class="tab-pane" id="candidate-network">
                             <div class="col-md-12">
                                 <div class="row">
                                     {% for connection in candidate_to_agent_network_connections %}
-                                        <div class="connection-request-card col-md-4">
-                                            {% if connection.connecter == user %}
-                                                <a href="{% url 'users:profile_detail' connection.connectee.slug %}">
-                                                    <div class="col-md-4">
-                                                        <img src="{% if connection.connectee.candidate.photo %}{{ connection.connectee.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
-                                                    </div>
-                                                    <div class="col-md-8 text-left">
-                                                        <span class="search-info">{{ connection.connectee.get_full_name }}</span>
-                                                        <span class="search-info">{{ connection.connectee.candidate.title|default_if_none:"" }}</span>
-                                                        <span class="search-info">{{ connection.connectee.candidate.location|default_if_none:"" }}</span>
-                                                    </div>
-                                                </a>
-                                            {% elif connection.connectee == user %}
-                                                <a href="{% url 'users:profile_detail' connection.connecter.slug %}">
-                                                    <div class="col-md-4">
-                                                        <img src="{% if connection.connecter.candidate.photo %}{{ connection.connecter.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
-                                                    </div>
-                                                    <div class="col-md-8 text-left">
-                                                        <span class="search-info">{{ connection.connecter.get_full_name }}</span>
-                                                        <span class="search-info">{{ connection.connecter.candidate.title|default_if_none:"" }}</span>
-                                                        <span class="search-info">{{ connection.connecter.candidate.location|default_if_none:"" }}</span>
-                                                    </div>
-                                                </a>
-                                            {% endif %}
-                                        </div>
+                                        {% include "recruit/snippets/connection_card.html" %}
+                                    {% empty %}
+                                        <p>You don't have anyone in your network yet.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="my-agent-network">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    {% for connection in agent_to_agent_network_connections %}
+                                        {% include "recruit/snippets/connection_card.html" %}
                                     {% empty %}
                                         <p>You don't have anyone in your network yet.</p>
                                     {% endfor %}

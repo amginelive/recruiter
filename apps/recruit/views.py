@@ -95,11 +95,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['candidate_to_candidate_network_requests'] = connection_requests.filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK)
         context['candidate_to_candidate_team_member_requests'] = connection_requests.filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER)
         context['candidate_to_agent_network_requests'] = connection_requests.filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_AGENT_NETWORK)
+        context['agent_to_agent_network_requests'] = connection_requests.filter(connection_type=ConnectionRequest.CONNECTION_AGENT_TO_AGENT_NETWORK)
 
         connections = Connection.objects.filter(Q(connecter=self.request.user) | Q(connectee=self.request.user))
         context['candidate_to_candidate_network_connections'] = connections.filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK)
         context['candidate_to_candidate_team_member_connections'] = connections.filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER)
         context['candidate_to_agent_network_connections'] = connections.filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_AGENT_NETWORK)
+        context['agent_to_agent_network_connections'] = connections.filter(connection_type=ConnectionRequest.CONNECTION_AGENT_TO_AGENT_NETWORK)
 
         if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
             context['job_referrals'] = JobReferral.objects.filter(referred_to=self.request.user.candidate)
@@ -110,6 +112,9 @@ dashboard = DashboardView.as_view()
 
 
 class SearchView(LoginRequiredMixin, TemplateView):
+    """
+    View for searching job posts as candidates and searching candidates as agents.
+    """
     template_name = 'recruit/search.html'
 
     def get_context_data(self, *args, **kwargs):
@@ -268,7 +273,7 @@ class ApplicationView(CandidateRequiredMixin, TemplateView):
 application = ApplicationView.as_view()
 
 
-class ConnectionInviteCreateView(CandidateRequiredMixin, CreateView, JSONResponseMixin):
+class ConnectionInviteCreateView(LoginRequiredMixin, CreateView, JSONResponseMixin):
     """
     View for inviting new users to be part of their network or team.
     """

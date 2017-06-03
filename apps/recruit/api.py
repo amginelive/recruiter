@@ -4,7 +4,7 @@ from django.views.generic import (
     FormView,
 )
 
-from braces.views import JSONResponseMixin
+from braces.views import LoginRequiredMixin, JSONResponseMixin
 
 from .forms import (
     ConnectionRequestForm,
@@ -18,7 +18,7 @@ from .models import (
 from users.mixins import CandidateRequiredMixin
 
 
-class ConnectionRequestCreateAPIView(CreateView, JSONResponseMixin):
+class ConnectionRequestCreateAPIView(LoginRequiredMixin, CreateView, JSONResponseMixin):
     """
     API view for requesting a connection to another candnidate.
     """
@@ -43,7 +43,7 @@ class ConnectionRequestCreateAPIView(CreateView, JSONResponseMixin):
 connection_request_create = ConnectionRequestCreateAPIView.as_view()
 
 
-class ConnectionRequestDeleteAPIView(DeleteView, JSONResponseMixin):
+class ConnectionRequestDeleteAPIView(LoginRequiredMixin, DeleteView, JSONResponseMixin):
     """
     API View for accepting or declining a connection request.
     """

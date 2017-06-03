@@ -66,10 +66,12 @@ class Connection(AbstractTimeStampedModel):
     CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK = 1
     CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER = 2
     CONNECTION_CANDIDATE_TO_AGENT_NETWORK = 3
+    CONNECTION_AGENT_TO_AGENT_NETWORK = 4
     CONNECTION_TYPE_CHOICES = (
         (CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK, _('Candidate to Candidate Network')),
         (CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER, _('Candidate to Candidate Team Member')),
         (CONNECTION_CANDIDATE_TO_AGENT_NETWORK, _('Candidate to Agent Network')),
+        (CONNECTION_AGENT_TO_AGENT_NETWORK, _('Agent to Agent Network')),
     )
 
     connecter = models.ForeignKey('users.User', related_name='+', verbose_name=_('Connecter'))
@@ -95,10 +97,12 @@ class ConnectionRequest(AbstractTimeStampedModel):
     CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK = 1
     CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER = 2
     CONNECTION_CANDIDATE_TO_AGENT_NETWORK = 3
+    CONNECTION_AGENT_TO_AGENT_NETWORK = 4
     CONNECTION_TYPE_CHOICES = (
         (CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK, _('Candidate to Candidate Network')),
         (CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER, _('Candidate to Candidate Team Member')),
         (CONNECTION_CANDIDATE_TO_AGENT_NETWORK, _('Candidate to Agent Network')),
+        (CONNECTION_AGENT_TO_AGENT_NETWORK, _('Agent to Agent Network')),
     )
 
     connecter = models.ForeignKey('users.User', related_name='connecter_requests', verbose_name=_('Connecter'))
@@ -121,10 +125,12 @@ class ConnectionInvite(AbstractTimeStampedModel):
     CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK = 1
     CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER = 2
     CONNECTION_CANDIDATE_TO_AGENT_NETWORK = 3
+    CONNECTION_AGENT_TO_AGENT_NETWORK = 4
     CONNECTION_TYPE_CHOICES = (
         (CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK, _('Candidate to Candidate Network')),
         (CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER, _('Candidate to Candidate Team Member')),
         (CONNECTION_CANDIDATE_TO_AGENT_NETWORK, _('Candidate to Agent Network')),
+        (CONNECTION_AGENT_TO_AGENT_NETWORK, _('Agent to Agent Network')),
     )
 
     connecter = models.ForeignKey('users.User', related_name='+', verbose_name=_('Connecter'))
