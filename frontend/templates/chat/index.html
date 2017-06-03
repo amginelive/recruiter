@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% load staticfiles i18n %}
+{% load render_bundle from webpack_loader %}
+
+
+{% block extra_css %}
+{% if not DEBUG %}
+    {% render_bundle 'chat-vendor' 'css' %}
+    {% render_bundle 'chat' 'css' %}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<section id='internal-wrap'>
+    <div class='container'>
+        <div class='row'>
+            <div id='app'></div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block footer_js %}
+{% if not DEBUG %}
+    {% render_bundle 'manifest' 'js' %}
+    {% render_bundle 'chat-vendor' 'js' %}
+    {% render_bundle 'chat' 'js' %}
+{% else %}
+    {% render_bundle 'main' %}
+{% endif %}
+{% endblock footer_js %}

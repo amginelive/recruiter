@@ -54,16 +54,18 @@ INSTALLED_APPS = (
 #    'allauth.socialaccount.providers.google',
 #    'snowpenguin.django.recaptcha2',
     'bootstrapform',
+    'channels',
     'django_extensions',
     'django_js_reverse',
 #    'djangoseo',
     'easy_thumbnails',
     'phonenumber_field',
-    'channels',
+    'webpack_loader',
 
+    'chat',
     'companies',
     'recruit',
-    'users',
+    'users'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -157,7 +159,21 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'frontend', 'static.prod')
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'frontend', 'static'),
+    os.path.join(BASE_DIR, 'frontend', 'assets')
 )
+
+# Webpack loader settings
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': 'dist/', # must end with slash
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'TIMEOUT': None,
+        'IGNORE': ['.+\.hot-update.js', '.+\.map']
+    }
+}
 
 # Media files
 

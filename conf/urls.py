@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^', include('recruit.urls', namespace='recruit')),
     url(r'^companies/', include('companies.urls', namespace='companies')),
     url(r'^users/', include('users.urls', namespace='users')),
+    url(r'^chat/', include('chat.urls', namespace='chat')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

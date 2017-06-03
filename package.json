@@ -1,0 +1,55 @@
+{
+  "name": "recruiter",
+  "version": "1.0.0",
+  "description": "Recruiter is an application for finding jobs and hiring employees.",
+  "main": "chat.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "build": "webpack --config webpack.dev.config.js --profile --colors --progress",
+    "dist": "webpack --config webpack.prod.config.js --profile --colors --progress"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/funn17/recruiter.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/funn17/recruiter#readme",
+  "devDependencies": {
+    "react-hot-loader": "^3.0.0-beta.7",
+    "webpack-bundle-analyzer": "^2.8.1",
+    "webpack-dev-server": "^2.4.5"
+  },
+  "dependencies": {
+    "babel": "^6.23.0",
+    "babel-cli": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-preset-env": "^1.4.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "copy-webpack-plugin": "^4.0.1",
+    "css-loader": "^0.28.1",
+    "es6-promise": "^4.1.0",
+    "extract-text-webpack-plugin": "^2.1.0",
+    "glob-all": "^3.1.0",
+    "immutable": "^3.8.1",
+    "moment": "^2.18.1",
+    "node-sass": "^4.5.2",
+    "react": "^15.5.4",
+    "react-custom-scrollbars": "^4.1.2",
+    "react-dom": "^15.5.4",
+    "react-motion": "^0.5.0",
+    "react-redux": "^5.0.4",
+    "redux": "^3.6.0",
+    "redux-immutable": "^4.0.0",
+    "redux-thunk": "^2.2.0",
+    "sass-loader": "^6.0.5",
+    "style-loader": "^0.17.0",
+    "webpack": "^2.4.1",
+    "webpack-bundle-tracker": "^0.2.0",
+    "whatwg-fetch": "^2.0.3"
+  }
+}
