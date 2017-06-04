@@ -80,6 +80,8 @@ MIDDLEWARE = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
+
+    'chat.middleware.ActiveUserMiddleware'
 )
 
 ROOT_URLCONF = 'conf.urls'
@@ -231,12 +233,7 @@ CACHES = {
     }
 }
 
-#CACHES = {
-#    'default': {
-#        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-#        'LOCATION': '127.0.0.1:11211',
-#    }
-#}
+USER_ONLINE_TIMEOUT = 300
 
 # Django-channels settings
 CHANNEL_LAYERS = {
