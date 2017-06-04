@@ -4,7 +4,7 @@ MAINTAINER Ilya Shupta <funn17@gmail.com>
 ENV PYTHONUNBUFFERED=1 \
     NODE_ENV=production \
     DJANGO_SETTINGS_MODULE=conf.settings.prod \
-    NGINX_VERSION=1.11.10-1~jessie \
+    NGINX_VERSION=1.11.13-1~jessie \
     NPM_CONFIG_LOGLEVEL=info \
     NODE_VERSION=7.10.0
 
@@ -24,10 +24,8 @@ RUN echo "deb http://nginx.org/packages/mainline/debian/ jessie nginx" >> /etc/a
 # Make NGINX run on the foreground
     && echo "daemon off;" >> /etc/nginx/nginx.conf \
 # Remove default configuration from Nginx
-    && rm /etc/nginx/conf.d/default.conf \
-# And some custom paths, because why not
-    && mkdir /recruiter \
-    && mkdir /recruiter/var
+    && rm /etc/nginx/conf.d/default.conf
+
 
 ## INSTALL NODE.JS
 RUN set -ex \
@@ -54,19 +52,25 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
   && rm "node-v$NODE_VERSION-linux-x64.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt \
   && ln -s /usr/local/bin/node /usr/local/bin/nodejs
 
-ADD var/requirements /recruiter/var/requirements
 
 ## INSTALL PROJECT REQUIREMENTS
-RUN apt-get install -y $(grep -vE "^\s*#" /recruiter/var/requirements/requirements_deb.txt  | tr "\n" " ") && \
-    ln -s /recruiter/var/supervisor-app.conf /etc/supervisor/conf.d/ && \
-    pip install -r /recruiter/var/requirements/requirements_prod.txt
+RUN apt-get install -y git-core mercurial libpq-dev libfreetype6\
+    libfreetype6-dev zlib1g-dev libxml2-dev libpcre3 libpcre3-dev gcc g++ libbz2-dev libmhash-dev libcurl4-openssl-dev\
+    libpng12-dev libXpm-dev libc-client-dev libmcrypt-dev libedit-dev libxslt1-dev libevent-dev libtool dialog\
+    apt-utils libncurses5-dev libjpeg-dev libcurl4-openssl-dev software-properties-common supervisor
 
-# Copy the modified Nginx conf
+WORKDIR /recruiter
+
+ADD var/requirements /recruiter/var/requirements
+
+RUN pip install -r /recruiter/var/requirements/requirements_prod.txt
+
+# Copy project system configs
 COPY var/nginx.conf /etc/nginx/conf.d/
+RUN ln -s /recruiter/var/supervisor-app.conf /etc/supervisor/conf.d/
 
 ADD package.json /recruiter
 
-WORKDIR /recruiter
 RUN npm install
 
 ADD . /recruiter
