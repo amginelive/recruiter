@@ -4,6 +4,7 @@ from django.db.models import ObjectDoesNotExist
 from channels.generic.websockets import JsonWebsocketConsumer
 
 from .models import Conversation, Message
+from .utils import update_user_presence
 
 User = get_user_model()
 
@@ -27,6 +28,7 @@ class ChatServer(JsonWebsocketConsumer):
             self.cmd_init({'user_id': response[0].get('id')})
 
     def receive(self, content, **kwargs):
+        update_user_presence(self.message.user)
         if content.get('type') == 'initChat':
             self.cmd_init(content.get('payload'))
         elif content.get('type') == 'newMessage':

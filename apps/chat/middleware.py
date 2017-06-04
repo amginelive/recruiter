@@ -2,6 +2,8 @@ from django.core.cache import cache
 from django.conf import settings
 from django.utils import timezone
 
+from .utils import update_user_presence
+
 
 class ActiveUserMiddleware:
     def __init__(self, get_response):
@@ -10,9 +12,7 @@ class ActiveUserMiddleware:
     def __call__(self, request):
         current_user = request.user
         if request.user.is_authenticated():
-            now = timezone.now()
-            cache.set(f'seen_{current_user.email}', now,
-                           settings.USER_ONLINE_TIMEOUT)
+            update_user_presence(current_user)
 
         response = self.get_response(request)
         return response
