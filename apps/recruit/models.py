@@ -160,3 +160,27 @@ class JobReferral(AbstractTimeStampedModel):
 
     def __str__(self):
         return self.job_post.title
+
+
+class UserReferral(AbstractTimeStampedModel):
+    """
+    Model for referring a user to another user.
+    """
+    REFERRAL_CANDIDATE_TO_CANDIDATE = 1
+    REFERRAL_CANDIDATE_TO_AGENT = 2
+    REFERRAL_AGENT_TO_AGENT = 3
+    REFERRAL_TYPE_CHOICES = (
+        (REFERRAL_CANDIDATE_TO_CANDIDATE, _('Candidate to Candidate')),
+        (REFERRAL_CANDIDATE_TO_AGENT, _('Candidate to Agent')),
+        (REFERRAL_AGENT_TO_AGENT, _('Agent to Agent')),
+    )
+    referred_by = models.ForeignKey('users.User', related_name='+', verbose_name=_('Referred By'))
+    referred_to = models.ForeignKey('users.User', related_name='+', verbose_name=_('Referred To'))
+    referral_type = models.IntegerField(_('Referral Type'), choices=REFERRAL_TYPE_CHOICES)
+
+    class Meta:
+        verbose_name = _('User Referral')
+        verbose_name_plural = _('User Referrals')
+
+    def __str__(self):
+        return self.referred_to.get_full_name()
