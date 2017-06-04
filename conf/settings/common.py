@@ -68,7 +68,8 @@ INSTALLED_APPS = (
     'users'
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -78,6 +79,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 ROOT_URLCONF = 'conf.urls'
@@ -219,13 +221,13 @@ AUTHENTICATION_BACKENDS = (
 
 # sessions (optional)
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db" # it's not a default
+SESSION_CACHE_ALIAS = "default"
 
 # cache (optional)
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        'TIMEOUT': 60,
-        'KEY_PREFIX': 'recruiter',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'recruiter-cache',
     }
 }
 
