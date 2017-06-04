@@ -4,6 +4,7 @@ const host = window.location.host;
 const messageTypes = [
     'initChat',
     'initUsers',
+    'userPresence',
     'newMessage',
     'userTyping'
 ].reduce((accum, msg) => {

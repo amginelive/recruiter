@@ -11,8 +11,10 @@ class UserList extends React.Component {
         super(props);
 
         this.state = {
-            activeUser: 0
+            activeUser: 0,
+            userPresencePollingIterval: 30
         };
+        setInterval(() => this.props.actions.userPresence(), this.state.userPresencePollingIterval*1000);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -44,6 +46,7 @@ class UserList extends React.Component {
                                     id={user.get('id')}
                                     className={'user-list-item' + (user.get('id') === this.state.activeUser ? ' active-user' : '')}
                                 >
+                                    <span className={'user-list-item-status' + (user.get('online') === true ? ' user-online' : '')}>●</span>
                                     <span className='user-list-item-name'>{user.get('name')}</span>
                                 </div>
                             )

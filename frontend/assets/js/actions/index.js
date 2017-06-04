@@ -16,6 +16,12 @@ export function userTyping() {
     }
 }
 
+export function userPresence() {
+    return (dispatch, getState, {emit}) => {
+        emit(messageTypes.userPresence, {});
+    }
+}
+
 export function typeTimerStart(payload) {
     return {type: actionTypes.typeTimerStart, payload}
 }

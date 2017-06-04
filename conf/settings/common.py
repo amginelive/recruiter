@@ -225,6 +225,8 @@ AUTHENTICATION_BACKENDS = (
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db" # it's not a default
 SESSION_CACHE_ALIAS = "default"
 
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
 # cache (optional)
 CACHES = {
     'default': {

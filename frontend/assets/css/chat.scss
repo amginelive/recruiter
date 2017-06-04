@@ -73,6 +73,15 @@
   font-weight: 700;
 }
 
+.user-list-item-status {
+  color: transparent;
+  margin-right: 1em;
+}
+
+.user-list-item-status.user-online {
+  color: lawngreen;
+}
+
 #message-form {
   display: flex;
   width: 100%;
