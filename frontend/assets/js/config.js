@@ -3,6 +3,7 @@ const host = window.location.host;
 // makes an object of the form {userJoined: 'userJoined'}
 const messageTypes = [
     'initChat',
+    'initUsers',
     'newMessage',
     'userTyping'
 ].reduce((accum, msg) => {

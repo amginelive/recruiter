@@ -24,10 +24,6 @@ export function typeTimerExpire(payload) {
     return {type: actionTypes.typeTimerExpire, payload}
 }
 
-export function initUserList(userList) {
-    return {type: actionTypes.userListInit, payload: userList};
-}
-
 export function initChat(user_id) {
     return (dispatch, getState, {emit}) => {
         emit(messageTypes.initChat, {user_id});

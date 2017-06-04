@@ -15,17 +15,9 @@ class UserList extends React.Component {
         };
     }
 
-    componentDidMount() {
-        fetch('/chat/users/', {
-            credentials: 'same-origin'
-        }).then(response => response.json()).then(json => {
-            this.props.actions.initUserList(json);
-        });
-    }
-
     componentDidUpdate(prevProps, prevState) {
         if (this.props.users.size > 0 && this.state.activeUser === 0) {
-            this.userInit(this.props.users.toArray()[0].get('id'));
+            this.setState({activeUser: this.props.users.toArray()[0].get('id')});
         }
     }
 

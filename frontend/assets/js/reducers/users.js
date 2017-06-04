@@ -1,10 +1,12 @@
 import Immutable from 'immutable';
 
-import * as actionTypes from '../actions/action-types.js';
+import * as config from '../config.js';
 
+
+const { messageTypes } = config;
 
 const users = (state = new Immutable.List(), action) => {
-    if (action.type === actionTypes.userListInit) {
+    if (action.type === messageTypes.initUsers) {
         return Immutable.fromJS(action.payload);
     }
     return state;

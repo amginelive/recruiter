@@ -16,6 +16,11 @@ class ChatServer(JsonWebsocketConsumer):
 
     def connect(self, message, **kwargs):
         self.send({'accept': True})
+        user_list = User.objects.exclude(id=self.message.user.id)
+        response = [{'id': user.id, 'name': user.email} for user in user_list]
+        self.send({'type': 'initUsers', 'payload': response})
+        if len(response) > 0:
+            self.cmd_init({'user_id': response[0].get('id')})
 
     def receive(self, content, **kwargs):
         if content.get('type') == 'initChat':
