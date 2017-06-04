@@ -11,7 +11,9 @@ from .models import (
     ConnectionRequest,
     JobPost,
     JobReferral,
+    UserReferral,
 )
+from core.forms import NumberMultipleSelectField
 from core.utils import send_email
 from users.models import Candidate
 
@@ -173,7 +175,49 @@ class JobReferralForm(forms.Form):
                     referred_by=self.candidate,
                     referred_to=candidate,
                     created_at=timezone.now(),
-                    updated_at=timezone.now(),
+                    updated_at=timezone.now()
                 )
             )
         JobReferral.objects.bulk_create(referrals)
+
+
+class UserReferralForm(forms.Form):
+    """
+    Form for referring a user to another user.
+    """
+    referred_user = forms.IntegerField()
+    refer_to = NumberMultipleSelectField()
+
+    class Meta:
+        model = UserReferral
+        fields = ('referred_by', 'referred_user',)
+
+    def __init__(self, *args, **kwargs):
+        super(UserReferralForm, self).__init__(*args, **kwargs)
+        initial = self.initial
+        self.user = initial.get('user')
+
+    def clean_referred_user(self):
+        referred_user = self.cleaned_data.get('referred_user')
+        return User.objects.get(pk=referred_user)
+
+    def clean_refer_to(self):
+        refer_to = self.cleaned_data.get('refer_to')
+        return User.objects.filter(pk__in=refer_to)
+
+    def save(self, *args, **kwargs):
+        refer_to = self.cleaned_data.get('refer_to')
+        referred_user = self.cleaned_data.get('referred_user')
+
+        referrals = []
+        for user in refer_to:
+            referrals.append(
+                UserReferral(
+                    referred_by=self.user,
+                    referred_to=user,
+                    referred_user=referred_user,
+                    created_at=timezone.now(),
+                    updated_at=timezone.now()
+                )
+            )
+        UserReferral.objects.bulk_create(referrals)

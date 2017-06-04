@@ -146,10 +146,126 @@
         </div>
     </div>
 </section>
+
+<div class="modal fade" id="refer_agent_to_candidate_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Refer to an Agent</h4>
+      </div>
+      <form class="user-referral-form" action="{% url 'recruit:user_referral_create' %}" method="POST">
+          <div class="modal-body">
+            <div class="row">
+                {% csrf_token %}
+                <div class="refer-success text-center"></div>
+                <input id="id_referred_user" type="hidden" name="referred_user">
+                <div class="form-group">
+                    <label class="control-label" for="id_refer_to">Refer to</label>
+                    <select name="refer_to" class="form-control" id="id_refer_to" multiple>
+                        {% for connection in candidate_to_agent_network_connections %}
+                            {% for connection_user in connection.users %}
+                                {% if connection_user != user %}
+                                    <option value="{{ connection_user.pk }}">{{ connection_user.get_full_name }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </select>
+                    <div class="refer_to_error error"></div>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary btn-send-referral">Send Referral</button>
+          </div>
+     </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="refer_candidate_to_agent_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Refer to a Candidate</h4>
+      </div>
+      <form class="user-referral-form" action="{% url 'recruit:user_referral_create' %}" method="POST">
+          <div class="modal-body">
+            <div class="row">
+                {% csrf_token %}
+                <div class="refer-success text-center"></div>
+                <input id="id_referred_user" type="hidden" name="referred_user">
+                <div class="form-group">
+                    <label class="control-label" for="id_refer_to">Refer to</label>
+                    <select name="refer_to" class="form-control" id="id_refer_to" multiple>
+                        {% for connection in candidate_to_candidate_network_connections %}
+                            {% for connection_user in connection.users %}
+                                {% if connection_user != user %}
+                                    <option value="{{ connection_user.pk }}">{{ connection_user.get_full_name }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                        {% for connection in candidate_to_candidate_team_member_connections %}
+                            {% for connection_user in connection.users %}
+                                {% if connection_user != user %}
+                                    <option value="{{ connection_user.pk }}">{{ connection_user.get_full_name }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </select>
+                    <div class="refer_to_error error"></div>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary btn-send-referral">Send Referral</button>
+          </div>
+     </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block footer_js %}
+<script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script type="text/javascript">
+    $('.btn-refer-agent-to-candidate-modal').on('click', function() {
+        var user_pk = $(this).attr('data-user-pk');
+        $('#refer_agent_to_candidate_modal').find('#id_referred_user').val(user_pk);
+    })
+
+    $('.btn-refer-candidate-to-agent-modal').on('click', function() {
+        var user_pk = $(this).attr('data-user-pk');
+        $('#refer_candidate_to_agent_modal').find('#id_referred_user').val(user_pk);
+    })
+
+    $("select[name='refer_to']").select2({
+        tags: true,
+    })
+    $('.select2-container').attr('style', 'width:500px');
+
+    $('.btn-send-referral').on('click', function(event) {
+        event.preventDefault();
+        $(".reffer-success").html('');
+        $(".error").html('');
+        $(this).closest(".user-referral-form").ajaxSubmit({
+            success: function (response) {
+                if (response.success) {
+                    $(".refer-success").html('Referral Sent.');
+                }
+                else {
+                    $.each(response.errors, function(key, value){
+                        var form_error = key + '_error';
+                        $('.' + form_error).html(value);
+                    });
+                }
+            }
+        });
+    });
+
     $('.btn-connection-request').on("click", function() {
         var uuid = $(this).attr('data-uuid');
         var action = $(this).attr('data-action');

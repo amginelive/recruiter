@@ -9,11 +9,13 @@ from braces.views import LoginRequiredMixin, JSONResponseMixin
 from .forms import (
     ConnectionRequestForm,
     JobReferralForm,
+    UserReferralForm,
 )
 from .models import (
     Connection,
     ConnectionRequest,
     JobReferral,
+    UserReferral,
 )
 from users.mixins import CandidateRequiredMixin
 
@@ -91,3 +93,28 @@ class JobReferralCreateView(CandidateRequiredMixin, FormView, JSONResponseMixin)
         })
 
 job_referral_create = JobReferralCreateView.as_view()
+
+
+class UserReferralCreateView(CandidateRequiredMixin, FormView, JSONResponseMixin):
+    """
+    View for referring a user to another user.
+    """
+    model = UserReferral
+    form_class = UserReferralForm
+
+    def get_initial(self):
+        return {'user': self.request.user}
+
+    def form_valid(self, form):
+        form.save()
+        return self.render_json_response({
+            'success': True,
+        })
+
+    def form_invalid(self, form):
+        return self.render_json_response({
+            'success': False,
+            'errors': form.errors,
+        })
+
+user_referral_create = UserReferralCreateView.as_view()
