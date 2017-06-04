@@ -12,7 +12,7 @@ class UserList extends React.Component {
 
         this.state = {
             activeUser: 0,
-            userPresencePollingIterval: 30
+            userPresencePollingIterval: 10
         };
         setInterval(() => this.props.actions.userPresence(), this.state.userPresencePollingIterval*1000);
     }
