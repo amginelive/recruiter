@@ -40,7 +40,7 @@ RECAPTCHA_PRIVATE_KEY = ''
 # Debug Toolbar
 
 INSTALLED_APPS += ('debug_toolbar',)
-MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
+MIDDLEWARE += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 INTERNAL_IPS = ('127.0.0.1', '192.168.0.101','192.168.1.103','192.168.1.102','192.168.1.106','192.168.1.100','192.168.1.105','192.168.1.108','192.168.56.102')
 DEBUG_TOOLBAR_CONFIG = {
     'EXCLUDE_URLS': ('/baladmin',),

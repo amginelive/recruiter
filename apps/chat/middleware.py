@@ -12,7 +12,7 @@ class ActiveUserMiddleware:
         if request.user.is_authenticated():
             now = timezone.now()
             cache.set(f'seen_{current_user.email}', now,
-                           settings.USER_LASTSEEN_TIMEOUT)
+                           settings.USER_ONLINE_TIMEOUT)
 
         response = self.get_response(request)
         return response
