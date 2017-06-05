@@ -11,7 +11,7 @@
                     <span class="search-info"><a href="{% url 'users:profile_detail' connection_user.slug %}">{{ connection_user.get_full_name }}</a></span>
                     <span class="search-info">{{ connection_user.agent.company.name|default_if_none:"" }}</span>
                     <span class="search-info">{{ connection_user.agent.company.location|default_if_none:"" }}</span>
-                    {% if user.account_type == ACCOUNT_CANDIDATE %}
+                    {% if user.account_type == user.ACCOUNT_CANDIDATE %}
                         <button class="btn btn-primary btn-refer-candidate-to-agent-modal" data-toggle="modal" data-target="#refer_candidate_to_agent_modal" data-user-pk="{{ connection_user.pk }}">Refer to a candidate</button>
                     {% endif %}
                 </div>
@@ -20,10 +20,10 @@
                     <img src="{% if connection_user.candidate.photo %}{{ connection_user.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
                 </div>
                 <div class="col-md-8 text-left">
-                    <span class="search-info"><a href="{% url 'users:profile_detail' connection_user.slug %}"></a>{{ connection_user.get_full_name }}</span>
+                    <span class="search-info"><a href="{% url 'users:profile_detail' connection_user.slug %}">{{ connection_user.get_full_name }}</a></span>
                     <span class="search-info">{{ connection_user.candidate.title|default_if_none:"" }}</span>
                     <span class="search-info">{{ connection_user.candidate.location|default_if_none:"" }}</span>
-                    {% if user.account_type == ACCOUNT_CANDIDATE %}
+                    {% if user.account_type == user.ACCOUNT_CANDIDATE %}
                         <button class="btn btn-primary btn-refer-agent-to-candidate-modal" data-toggle="modal" data-target="#refer_agent_to_candidate_modal" data-user-pk="{{ connection_user.pk }}">Refer to an agent</button>
                     {% endif %}
                 </div>

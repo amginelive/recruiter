@@ -23,6 +23,9 @@
                             <a href="#notifications" aria-controls="notifications" role="tab" data-toggle="tab">Notifications {% if connection_requests %}<span class="badge badge-new badge-notification"><span class="badge-notification-count">{{ connection_requests.count }}</span> New</span>{% endif %}</a>
                         </li>
                         <li role="presentation">
+                            <a href="#referrals" aria-controls="referrals" role="tab" data-toggle="tab">Referrals</a>
+                        </li>
+                        <li role="presentation">
                             <a href="#my-team" aria-controls="my-team" role="tab" data-toggle="tab">My Team</a>
                         </li>
                         <li role="presentation">
@@ -103,6 +106,57 @@
                                         {% include "recruit/snippets/connection_request_card.html" %}
                                     {% empty %}
                                         <p>No requests as of the moment.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="referrals">
+                            <div class="col-md-6">
+                                <h1>Candidates</h1>
+                                <div class="row">
+                                    {% for referral in candidate_referrals %}
+                                        <div class="connection-request-card col-md-8 col-md-offset-2">
+                                            <div class="col-md-4">
+                                                <img src="{% if referral.referred_user.candidate.photo %}{{ referral.referred_user.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+                                            </div>
+                                            <div class="col-md-8 text-left">
+                                                <span class="search-info"><a href="{% url 'users:profile_detail' referral.referred_user.slug %}">{{ referral.referred_user.get_full_name }}</a></span>
+                                                <span class="search-info">{{ referral.referred_user.candidate.title|default_if_none:"" }}</span>
+                                                <span class="search-info">{{ referral.referred_user.candidate.location|default_if_none:"" }}</span>
+                                                <span class="search-info">{{ referral.referred_user.candidate.location|default_if_none:"" }}</span>
+                                                <span class="search-info"><strong>Referred By:</strong></span>
+                                                <a href="{% url 'users:profile_detail' referral.referred_by.slug %}">
+                                                    <img src="{% if referral.referred_by.candidate.photo %}{{ referral.referred_by.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:20px; border-radius:50%">
+                                                    <span>{{ referral.referred_by.candidate.user.get_full_name }}</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p>No referrals as of the moment.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h1>Agents</h1>
+                                <div class="row">
+                                    {% for referral in agent_referrals %}
+                                        <div class="connection-request-card col-md-8 col-md-offset-2">
+                                            <div class="col-md-4">
+                                                <img src="{% if referral.referred_user.candidate.photo %}{{ referral.referred_user.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+                                            </div>
+                                            <div class="col-md-8 text-left">
+                                                <span class="search-info"><a href="{% url 'users:profile_detail' referral.referred_user.slug %}">{{ referral.referred_user.get_full_name }}</a></span>
+                                                <span class="search-info">{{ referral.referred_user.agent.company.name|default_if_none:"" }}</span>
+                                                <span class="search-info">{{ referral.referred_user.agent.company.location|default_if_none:"" }}</span>
+                                                <span class="search-info"><strong>Referred By:</strong></span>
+                                                <a href="{% url 'users:profile_detail' referral.referred_by.slug %}">
+                                                    <img src="{% if referral.referred_by.candidate.photo %}{{ referral.referred_by.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:20px; border-radius:50%">
+                                                    <span>{{ referral.referred_by.candidate.user.get_full_name }}</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p>No referrals as of the moment.</p>
                                     {% endfor %}
                                 </div>
                             </div>

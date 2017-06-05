@@ -35,6 +35,7 @@ from .models import (
     ConnectionInvite,
     ConnectionRequest,
     JobReferral,
+    UserReferral,
 )
 from companies.models import (
     Company,
@@ -105,6 +106,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
         if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
             context['job_referrals'] = JobReferral.objects.filter(referred_to=self.request.user.candidate)
+
+            user_referrals = UserReferral.objects.filter(referred_to=self.request.user)
+            context['candidate_referrals'] = user_referrals.filter(referred_user__account_type=User.ACCOUNT_CANDIDATE)
+            context['agent_referrals'] = user_referrals.filter(referred_user__account_type=User.ACCOUNT_AGENT)
 
         return context
 
