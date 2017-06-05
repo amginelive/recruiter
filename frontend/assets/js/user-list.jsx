@@ -11,21 +11,15 @@ class UserList extends React.Component {
         super(props);
 
         this.state = {
-            activeUser: 0
+            activeUser: 0,
+            userPresencePollingIterval: 10
         };
-    }
-
-    componentDidMount() {
-        fetch('/chat/users/', {
-            credentials: 'same-origin'
-        }).then(response => response.json()).then(json => {
-            this.props.actions.initUserList(json);
-        });
+        setInterval(() => this.props.actions.userPresence(), this.state.userPresencePollingIterval*1000);
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (this.props.users.size > 0 && this.state.activeUser === 0) {
-            this.userInit(this.props.users.toArray()[0].get('id'));
+            this.setState({activeUser: this.props.users.toArray()[0].get('id')});
         }
     }
 
@@ -52,6 +46,7 @@ class UserList extends React.Component {
                                     id={user.get('id')}
                                     className={'user-list-item' + (user.get('id') === this.state.activeUser ? ' active-user' : '')}
                                 >
+                                    <span className={'user-list-item-status' + (user.get('online') === true ? ' user-online' : '')}>●</span>
                                     <span className='user-list-item-name'>{user.get('name')}</span>
                                 </div>
                             )

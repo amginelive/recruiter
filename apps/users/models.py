@@ -1,6 +1,7 @@
 import itertools
 import logging
 
+from django.core.cache import cache
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import (
@@ -134,6 +135,21 @@ class User(AbstractBaseUser, PermissionsMixin):
         Sends an email to this User.
         """
         send_mail(subject, message, from_email, [self.email])
+
+    def last_seen(self):
+        return cache.get(f'seen_{self.email}')
+
+    def online(self):
+        last_seen = self.last_seen()
+        if last_seen:
+            now = timezone.now()
+            if now > last_seen + timezone.timedelta(
+                    seconds=settings.USER_ONLINE_TIMEOUT):
+                return False
+            else:
+                return True
+        else:
+            return False
 
     @property
     def domain(self):

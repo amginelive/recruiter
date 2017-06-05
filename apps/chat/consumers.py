@@ -4,6 +4,7 @@ from django.db.models import ObjectDoesNotExist
 from channels.generic.websockets import JsonWebsocketConsumer
 
 from .models import Conversation, Message
+from .utils import update_user_presence
 
 User = get_user_model()
 
@@ -16,14 +17,26 @@ class ChatServer(JsonWebsocketConsumer):
 
     def connect(self, message, **kwargs):
         self.send({'accept': True})
+        user_list = User.objects.exclude(id=self.message.user.id)
+        self.message.channel_session['user_list'] = user_list
+        response = [{'id': user.id,
+                     'name': user.email,
+                     'online': user.online()}
+                    for user in user_list]
+        self.send({'type': 'initUsers', 'payload': response})
+        if len(response) > 0:
+            self.cmd_init({'user_id': response[0].get('id')})
 
     def receive(self, content, **kwargs):
+        update_user_presence(self.message.user)
         if content.get('type') == 'initChat':
             self.cmd_init(content.get('payload'))
         elif content.get('type') == 'newMessage':
             self.cmd_message(content.get('payload'))
         elif content.get('type') == 'userTyping':
             self.cmd_typing()
+        elif content.get('type') == 'userPresence':
+            self.cmd_presence()
 
     def cmd_init(self, payload):
         conversation = Conversation.objects\
@@ -83,6 +96,13 @@ class ChatServer(JsonWebsocketConsumer):
                                 'conversation_id': conversation.id}}
         for user in conversation.users.exclude(id=self.message.user.id):
             self.group_send(str(user.id), response)
+
+    def cmd_presence(self):
+        # It is tied to the order of users sent in connect
+        user_list = self.message.channel_session['user_list']
+        response = {'type': 'userPresence',
+                    'payload': [{'online': user.online()} for user in user_list]}
+        return self.send(response)
 
     def disconnect(self, message, **kwargs):
         pass

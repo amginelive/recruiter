@@ -17,6 +17,8 @@ services:
 
   recruiter:
     build: .
+    volumes:
+      - recruiter-media:/recruiter/frontend/media
     depends_on:
       - postgres
       - redis
