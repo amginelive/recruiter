@@ -15,36 +15,72 @@ const users = (state = new Immutable.Map().withMutations(ctx => ctx.set('agents'
     if (action.type === messageTypes.userTyping) {
         state = state.updateIn(['agents'],
             list => {
-                return list.update(
-                    list.findIndex(item => {return item.get('id') === action.payload.id}),
-                    item => {if (item) {return item.set('online', true)}}
-                );
+                const index = list.findIndex(item => {return item.get('id') === action.payload.id});
+                if (index > 0) {
+                    return list.update(
+                        index,
+                        item => {
+                            if (item) {
+                                return item.set('online', true)
+                            }
+                        }
+                    );
+                } else {
+                    return list;
+                }
             }
         );
         return state.updateIn(['candidates'],
             list => {
-                return list.update(
-                    list.findIndex(item => {return item.get('id') === action.payload.id}),
-                    item => {if (item) {return item.set('online', true)}}
-                );
+                const index = list.findIndex(item => {return item.get('id') === action.payload.id});
+                if (index > 0) {
+                    return list.update(
+                        index,
+                        item => {
+                            if (item) {
+                                return item.set('online', true)
+                            }
+                        }
+                    );
+                } else {
+                    return list;
+                }
             }
         );
     }
     if (action.type === messageTypes.newMessage) {
         state = state.updateIn(['agents'],
             list => {
-                return list.update(
-                    list.findIndex(item => {return item.get('id') === action.payload.user.id}),
-                    item => {if (item) {return item.set('online', true)}}
-                );
+                const index = list.findIndex(item => {return item.get('id') === action.payload.user.id});
+                if (index > 0) {
+                    return list.update(
+                        index,
+                        item => {
+                            if (item) {
+                                return item.set('online', true)
+                            }
+                        }
+                    );
+                } else {
+                    return list;
+                }
             }
         );
         return state.updateIn(['candidates'],
             list => {
-                return list.update(
-                    list.findIndex(item => {return item.get('id') === action.payload.user.id}),
-                    item => {if (item) {return item.set('online', true)}}
-                );
+                const index = list.findIndex(item => {return item.get('id') === action.payload.user.id});
+                if (index > 0) {
+                    return list.update(
+                        index,
+                        item => {
+                            if (item) {
+                                return item.set('online', true)
+                            }
+                        }
+                    );
+                } else {
+                    return list;
+                }
             }
         );
     }
