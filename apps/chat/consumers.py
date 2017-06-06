@@ -22,8 +22,8 @@ class ChatServer(JsonWebsocketConsumer):
         self.send({'accept': True})
 
         connections = Connection.objects\
-            .filter(Q(connecter_id=message.user.id) |
-                    Q(connectee_id=message.user.id))\
+            .filter(Q(connecter=message.user) |
+                    Q(connectee=message.user))\
             .filter(connection_type__in=(
                 Connection.CONNECTION_CANDIDATE_TO_AGENT_NETWORK,
                 Connection.CONNECTION_AGENT_TO_AGENT_NETWORK if
@@ -37,18 +37,26 @@ class ChatServer(JsonWebsocketConsumer):
         self.message.channel_session['user_list'] = user_list
 
         response = {
-            'agents': [{'id': user.id,
-                        'name': user.email,
-                        'photo': user.get_photo_url(),
-                        'online': user.online()}
-                       for user in user_list if
-                       user.account_type == User.ACCOUNT_AGENT],
-            'candidates': [{'id': user.id,
-                            'name': user.email,
-                            'photo': user.get_photo_url(),
-                            'online': user.online()}
-                           for user in user_list if
-                           user.account_type == User.ACCOUNT_CANDIDATE]
+            'agents': [
+                {
+                    'id': user.id,
+                    'name': user.email,
+                    'photo': user.get_photo_url(),
+                    'online': user.online()
+                }
+                for user in user_list if
+                user.account_type == User.ACCOUNT_AGENT
+            ],
+            'candidates': [
+                {
+                    'id': user.id,
+                    'name': user.email,
+                    'photo': user.get_photo_url(),
+                    'online': user.online()
+                }
+                for user in user_list if
+                user.account_type == User.ACCOUNT_CANDIDATE
+            ]
         }
         self.send({'type': 'initUsers', 'payload': response})
         #if len(response) > 0:
