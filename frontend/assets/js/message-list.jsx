@@ -14,7 +14,8 @@ class MessageList extends React.Component {
 
         this.scrollList = this.scrollList.bind(this);
         this.state = {
-            userTypingExpireTime: 3
+            userTypingExpireTime: 3,
+            prevScrollHeight: 0,
         };
     }
 
@@ -22,17 +23,7 @@ class MessageList extends React.Component {
         this.scroll.scrollTop(value);
     }
 
-    componentDidUpdate() {
-        setTimeout(
-            () => {
-                this.scrollList(this.scroll.getScrollHeight());
-            },
-            10
-        );
-    }
-
-    componentWillReceiveProps(nextProps) {
-        const { typing } = nextProps;
+    handleTypingProps(typing) {
         if (typing.size === 0) {
             return;
         }
@@ -54,6 +45,31 @@ class MessageList extends React.Component {
         });
     }
 
+    componentDidUpdate(prevProps, prevState) { // This is keeping scroll in place on requesting more messages.
+        if (prevProps.messages.get('messageList').size !== 0 && (this.props.messages.get('messageList').size - prevProps.messages.get('messageList').size > 1)) {
+            this.scrollList(this.scroll.getScrollHeight() - this.state.prevScrollHeight);
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        const { typing, messages } = nextProps;
+
+        this.handleTypingProps(typing);
+
+        const {scrollTop, clientHeight, scrollHeight} = this.scroll.getValues();
+        if ((scrollTop + clientHeight === scrollHeight) && // We are at the bottom of scroll list
+            ((messages.get('messageList').size - this.props.messages.get('messageList').size === 1) || // One new message
+                (this.props.messages.get('messageList').size === 0 && // Or chat init
+                messages.get('messageList').size - this.props.messages.get('messageList').size >= 1))) {
+            setTimeout(
+                () => {
+                    this.scrollList(this.scroll.getScrollHeight());
+                },
+                10
+            );
+        }
+    }
+
     formatDate(date) {
         const now = moment();
         const then = moment(date);
@@ -66,6 +82,11 @@ class MessageList extends React.Component {
         } else {
             return then.format('dddd, MMMM Do, YYYY');
         }
+    }
+
+    moreMessages(first_message_id) {
+        this.setState({prevScrollHeight: this.scroll.getScrollHeight()});
+        this.props.actions.moreMessages(first_message_id);
     }
 
     render() {
@@ -87,6 +108,7 @@ class MessageList extends React.Component {
                             autoHide autoHideTimeout={1000}
                             autoHideDuration={200}>
                     <div className='message-list'>
+                        {messages.get('more') ? <button onClick={this.moreMessages.bind(this, messages.get('messageList').get(0).get('id'))}>More</button> : ''}
                         {messages.get('messageList').map((message, index) => {
                             let dateUI = '';
                             if (index === 0 || !moment(message.get('time')).isSame(moment(messages.get('messageList').get(index-1).get('time')), 'day')) {

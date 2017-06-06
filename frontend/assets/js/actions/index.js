@@ -35,3 +35,9 @@ export function initChat(user_id) {
         emit(messageTypes.initChat, {user_id});
     }
 }
+
+export function moreMessages(message_id) {
+    return (dispatch, getState, {emit}) => {
+        emit(messageTypes.moreMessages, {message_id});
+    }
+}

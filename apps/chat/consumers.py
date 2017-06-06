@@ -12,6 +12,8 @@ User = get_user_model()
 class ChatServer(JsonWebsocketConsumer):
     http_user = True
 
+    message_list_limit = 10
+
     def connection_groups(self, **kwargs):
         return [str(self.message.user.id)]
 
@@ -38,6 +40,8 @@ class ChatServer(JsonWebsocketConsumer):
             self.cmd_typing()
         elif content.get('type') == 'userPresence':
             self.cmd_presence()
+        elif content.get('type') == 'moreMessages':
+            self.cmd_more_messages(content.get('payload'))
 
     def cmd_init(self, payload):
         conversation = Conversation.objects\
@@ -53,19 +57,22 @@ class ChatServer(JsonWebsocketConsumer):
         self.message.channel_session['conversation_id'] = conversation.id
 
         query = Message.objects.filter(conversation=conversation)\
-            .order_by('created_at')
+            .order_by('-created_at')[:self.message_list_limit]
         messages = []
-        for message in query:
+        more = conversation.message_set.count() > self.message_list_limit
+        for message in reversed(query):
             messages.append(  # TODO: Refactor message creation
                 {'user': {'name': message.author.email,
                           'photo': message.author.get_photo_url(),
                           'id': message.author.id},
                  'conversation_id': message.conversation.id,
                  'text': message.text,
+                 'id': message.id,
                  'time': message.created_at.isoformat()}
             )
         self.send({'type': 'initChat',
                    'payload': {'conversation_id': conversation.id,
+                               'more': more,
                                'messages': messages}})
 
     def cmd_message(self, payload):
@@ -79,9 +86,11 @@ class ChatServer(JsonWebsocketConsumer):
                                          conversation=conversation)
         response = {'type': 'newMessage',
                     'payload': {'user': {'name': message.author.email,
+                                         'photo': message.author.get_photo_url(),
                                          'id': message.author.id},
                                 'conversation_id': message.conversation.id,
                                 'text': message.text,
+                                'id': message.id,
                                 'time': message.created_at.isoformat()}}
         for user in conversation.users.all():
             self.group_send(str(user.id), response)
@@ -105,6 +114,42 @@ class ChatServer(JsonWebsocketConsumer):
         response = {'type': 'userPresence',
                     'payload': [{'online': user.online()} for user in user_list]}
         return self.send(response)
+
+    def cmd_more_messages(self, payload):
+        try:
+            conversation = Conversation.objects.get(id=self.message.channel_session.get('conversation_id'))
+        except ObjectDoesNotExist:
+            return
+
+        from_time = conversation.message_set\
+            .get(id=payload.get('message_id'))\
+            .created_at
+        query = conversation.message_set\
+            .filter(created_at__lt=from_time)\
+            .order_by('-created_at')
+
+        message_list = [
+            {
+                'user': {'name': message.author.email,
+                         'photo': message.author.get_photo_url(),
+                         'id': message.author.id},
+                'conversation_id': message.conversation.id,
+                'text': message.text,
+                'id': message.id,
+                'time': message.created_at.isoformat()
+            }
+            for message in reversed(query[:self.message_list_limit])
+        ]
+        more = query.count() > self.message_list_limit
+        response = {
+            'type': 'moreMessages',
+            'payload': {
+                'more': more,
+                'conversation_id': conversation.id,
+                'messages': message_list
+            }
+        }
+        self.send(response)
 
     def disconnect(self, message, **kwargs):
         pass

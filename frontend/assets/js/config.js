@@ -6,6 +6,7 @@ const messageTypes = [
     'initUsers',
     'userPresence',
     'newMessage',
+    'moreMessages',
     'userTyping'
 ].reduce((accum, msg) => {
     accum[ msg ] = msg;
