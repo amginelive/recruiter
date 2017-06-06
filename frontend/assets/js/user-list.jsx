@@ -46,6 +46,7 @@ class UserList extends React.Component {
                                     id={user.get('id')}
                                     className={'user-list-item' + (user.get('id') === this.state.activeUser ? ' active-user' : '')}
                                 >
+                                    <img className='user-list-item-photo' src={user.get('photo')} />
                                     <span className={'user-list-item-status' + (user.get('online') === true ? ' user-online' : '')}>●</span>
                                     <span className='user-list-item-name'>{user.get('name')}</span>
                                 </div>

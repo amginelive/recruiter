@@ -12,6 +12,7 @@ from django.contrib.auth.models import (
 from django.core.mail import send_mail
 from django.utils import timezone
 from django.utils.text import slugify
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.utils.translation import ugettext_lazy as _
 
 from django_countries.fields import CountryField
@@ -150,6 +151,15 @@ class User(AbstractBaseUser, PermissionsMixin):
                 return True
         else:
             return False
+
+    def get_photo_url(self):
+        try:
+            if self.account_type == self.ACCOUNT_AGENT:
+                return self.agent.photo.url
+            elif self.account_type == self.ACCOUNT_CANDIDATE:
+                return self.candidate.photo.url
+        except ValueError:
+            return static('img/default_user.jpg')
 
     @property
     def domain(self):

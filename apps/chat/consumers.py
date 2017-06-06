@@ -21,6 +21,7 @@ class ChatServer(JsonWebsocketConsumer):
         self.message.channel_session['user_list'] = user_list
         response = [{'id': user.id,
                      'name': user.email,
+                     'photo': user.get_photo_url(),
                      'online': user.online()}
                     for user in user_list]
         self.send({'type': 'initUsers', 'payload': response})
@@ -57,6 +58,7 @@ class ChatServer(JsonWebsocketConsumer):
         for message in query:
             messages.append(  # TODO: Refactor message creation
                 {'user': {'name': message.author.email,
+                          'photo': message.author.get_photo_url(),
                           'id': message.author.id},
                  'conversation_id': message.conversation.id,
                  'text': message.text,

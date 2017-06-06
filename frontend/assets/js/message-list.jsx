@@ -93,9 +93,9 @@ class MessageList extends React.Component {
                                 dateUI = <div className='message-list-date'>{this.formatDate(message.get('time'))}</div>
                             }
                             return (
-                                <div>
+                                <div key={index}>
                                     {dateUI}
-                                    <Message key={index} user={message.get('user')} text={message.get('text')} time={message.get('time')}/>
+                                    <Message user={message.get('user')} text={message.get('text')} time={message.get('time')}/>
                                 </div>
                             );
                         }).toArray()}
