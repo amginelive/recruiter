@@ -29,6 +29,30 @@
 .user-list-item {
   cursor: pointer;
   padding: 10px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  position: relative;
+}
+
+.user-list-item-status {
+  color: transparent;
+  position: absolute;
+  font-size: 3rem;
+  left: 45px;
+  top: 27px;
+}
+
+.user-list-item-status.user-online {
+  color: lawngreen;
+}
+
+.user-list-item-photo {
+  margin-right: 10px;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  flex: none;
 }
 
 .active-user {
@@ -48,11 +72,24 @@
 
 .message-list-item {
   display: flex;
-  flex-direction: column;
   padding: 10px;
 }
 
-.message-list-item:nth-child(even) {
+.message-list-item-photo {
+  margin-right: 10px;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  flex: none;
+}
+
+.message-list-item-body {
+  display: flex;
+  flex-grow: 2;
+  flex-direction: column;
+}
+
+.message-list > div:nth-child(even) {
     background: whitesmoke;
 }
 
@@ -71,13 +108,10 @@
   font-weight: 700;
 }
 
-.user-list-item-status {
-  color: transparent;
-  margin-right: 1em;
-}
-
-.user-list-item-status.user-online {
-  color: lawngreen;
+.message-list-date {
+  border-top: dotted 1px black;
+  border-bottom: dotted 1px black;
+  text-align: center;
 }
 
 #message-form {

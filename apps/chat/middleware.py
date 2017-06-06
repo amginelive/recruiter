@@ -1,7 +1,3 @@
-from django.core.cache import cache
-from django.conf import settings
-from django.utils import timezone
-
 from .utils import update_user_presence
 
 
