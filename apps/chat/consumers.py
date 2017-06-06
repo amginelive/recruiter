@@ -45,7 +45,6 @@ class ChatServer(JsonWebsocketConsumer):
 
     def cmd_init(self, payload):
         conversation = Conversation.objects\
-            .distinct()\
             .filter(users__id=payload.get('user_id'))\
             .filter(users=self.message.user)\
             .first()
@@ -54,7 +53,7 @@ class ChatServer(JsonWebsocketConsumer):
             conversation.users.add(User.objects.get(id=payload.get('user_id')),
                              self.message.user)
             conversation.save()
-        self.message.channel_session['conversation_id'] = conversation.id
+        self.message.channel_session['conversation'] = conversation
 
         query = Message.objects.filter(conversation=conversation)\
             .order_by('-created_at')[:self.message_list_limit]
@@ -76,10 +75,7 @@ class ChatServer(JsonWebsocketConsumer):
                                'messages': messages}})
 
     def cmd_message(self, payload):
-        try:
-            conversation = Conversation.objects.get(id=self.message.channel_session.get('conversation_id'))
-        except ObjectDoesNotExist:
-            return
+        conversation = self.message.channel_session.get('conversation')
 
         message = Message.objects.create(text=payload,
                                          author=self.message.user,
@@ -96,10 +92,7 @@ class ChatServer(JsonWebsocketConsumer):
             self.group_send(str(user.id), response)
 
     def cmd_typing(self):
-        try:
-            conversation = Conversation.objects.get(id=self.message.channel_session.get('conversation_id'))
-        except ObjectDoesNotExist:
-            return
+        conversation = self.message.channel_session.get('conversation')
 
         response = {'type': 'userTyping',
                     'payload': {'name': self.message.user.email,
@@ -116,10 +109,7 @@ class ChatServer(JsonWebsocketConsumer):
         return self.send(response)
 
     def cmd_more_messages(self, payload):
-        try:
-            conversation = Conversation.objects.get(id=self.message.channel_session.get('conversation_id'))
-        except ObjectDoesNotExist:
-            return
+        conversation = self.message.channel_session.get('conversation')
 
         from_time = conversation.message_set\
             .get(id=payload.get('message_id'))\
