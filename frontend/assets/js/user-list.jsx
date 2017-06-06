@@ -28,6 +28,27 @@ class UserList extends React.Component {
         this.setState({activeUser: id});
     }
 
+    renderUsersGroup(users, group_name) {
+        if (users.size === 0) {
+            return <div className='empty-user-group'>You have no {group_name} connections</div>
+        }
+        return users.map(user => {
+            return (
+                <div
+                    onClick={() => {this.userInit(user.get('id'))}}
+                    key={user.get('id')}
+                    name={user.get('name')}
+                    id={user.get('id')}
+                    className={'user-list-item' + (user.get('id') === this.state.activeUser ? ' active-user' : '')}
+                >
+                    <img className='user-list-item-photo' src={user.get('photo')} />
+                    <span className={'user-list-item-status' + (user.get('online') === true ? ' user-online' : '')}>●</span>
+                    <span className='user-list-item-name'>{user.get('name')}</span>
+                </div>
+            );
+        }).toArray();
+    }
+
     render() {
         const { users } = this.props;
         return (
@@ -37,21 +58,14 @@ class UserList extends React.Component {
                                 autoHide autoHideTimeout={1000}
                                 autoHideDuration={200}>
                     <div className='user-list'>
-                        {users.map(user => {
-                            return (
-                                <div
-                                    onClick={() => {this.userInit(user.get('id'))}}
-                                    key={user.get('id')}
-                                    name={user.get('name')}
-                                    id={user.get('id')}
-                                    className={'user-list-item' + (user.get('id') === this.state.activeUser ? ' active-user' : '')}
-                                >
-                                    <img className='user-list-item-photo' src={user.get('photo')} />
-                                    <span className={'user-list-item-status' + (user.get('online') === true ? ' user-online' : '')}>●</span>
-                                    <span className='user-list-item-name'>{user.get('name')}</span>
-                                </div>
-                            )
-                        }).toArray()}
+                        <div className='user-list-group'>
+                            <div className='user-list-group-header'>My team network</div>
+                            {this.renderUsersGroup(users.get('candidates'), 'team network')}
+                        </div>
+                        <div className='user-list-group'>
+                            <div className='user-list-group-header'>Agents</div>
+                            {this.renderUsersGroup(users.get('agents'), 'agents')}
+                        </div>
                     </div>
                 </Scrollbars>
             </div>

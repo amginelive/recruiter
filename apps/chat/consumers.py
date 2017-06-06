@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
-from django.db.models import ObjectDoesNotExist
+from django.db.models import ObjectDoesNotExist, Q
 
 from channels.generic.websockets import JsonWebsocketConsumer
 
+from recruit.models import Connection
 from .models import Conversation, Message
 from .utils import update_user_presence
 
@@ -19,16 +20,39 @@ class ChatServer(JsonWebsocketConsumer):
 
     def connect(self, message, **kwargs):
         self.send({'accept': True})
-        user_list = User.objects.exclude(id=self.message.user.id)
+
+        connections = Connection.objects\
+            .filter(Q(connecter_id=message.user.id) |
+                    Q(connectee_id=message.user.id))\
+            .filter(connection_type__in=(
+                Connection.CONNECTION_CANDIDATE_TO_AGENT_NETWORK,
+                Connection.CONNECTION_AGENT_TO_AGENT_NETWORK if
+                    self.message.user.account_type == User.ACCOUNT_AGENT else
+                    Connection.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER))
+        user_list = [
+            next(filter(lambda user: user != self.message.user,
+                        connection.users))
+            for connection in connections
+        ]
         self.message.channel_session['user_list'] = user_list
-        response = [{'id': user.id,
-                     'name': user.email,
-                     'photo': user.get_photo_url(),
-                     'online': user.online()}
-                    for user in user_list]
+
+        response = {
+            'agents': [{'id': user.id,
+                        'name': user.email,
+                        'photo': user.get_photo_url(),
+                        'online': user.online()}
+                       for user in user_list if
+                       user.account_type == User.ACCOUNT_AGENT],
+            'candidates': [{'id': user.id,
+                            'name': user.email,
+                            'photo': user.get_photo_url(),
+                            'online': user.online()}
+                           for user in user_list if
+                           user.account_type == User.ACCOUNT_CANDIDATE]
+        }
         self.send({'type': 'initUsers', 'payload': response})
-        if len(response) > 0:
-            self.cmd_init({'user_id': response[0].get('id')})
+        #if len(response) > 0:
+        #    self.cmd_init({'user_id': response[0].get('id')})
 
     def receive(self, content, **kwargs):
         update_user_presence(self.message.user)
@@ -104,8 +128,15 @@ class ChatServer(JsonWebsocketConsumer):
     def cmd_presence(self):
         # It is tied to the order of users sent in connect
         user_list = self.message.channel_session['user_list']
-        response = {'type': 'userPresence',
-                    'payload': [{'online': user.online()} for user in user_list]}
+        response = {
+            'type': 'userPresence',
+            'payload': {
+                'agents': [{'online': user.online()} for user in user_list
+                           if user.account_type == User.ACCOUNT_AGENT],
+                'candidates': [{'online': user.online()} for user in user_list
+                               if user.account_type == User.ACCOUNT_CANDIDATE]
+            }
+        }
         return self.send(response)
 
     def cmd_more_messages(self, payload):
