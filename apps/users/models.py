@@ -213,11 +213,11 @@ class Candidate(ProfileBase):
     """
     Model for Candidate.
     """
-    JOB_TYPE_CONTRACTING = 0
+    JOB_TYPE_CONTRACT = 0
     JOB_TYPE_PERMANENT = 1
 
     JOB_TYPE_CHOICES = (
-        (JOB_TYPE_CONTRACTING, _('Contract')),
+        (JOB_TYPE_CONTRACT, _('Contract')),
         (JOB_TYPE_PERMANENT, _('Permanent')),
     )
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='candidate')
@@ -227,11 +227,13 @@ class Candidate(ProfileBase):
         related_name='candidates',
         verbose_name=_('Skills')
     )
-    job_location = models.CharField(_('Desired job location'),  max_length=200, **optional)
     job_type = models.IntegerField(_('Job type'), choices=JOB_TYPE_CHOICES, **optional)
+    desired_city = models.CharField(_('Desired City'),  max_length=200, **optional)
+    desired_country = CountryField(_('Desired Country'), **optional)
     city = models.CharField(_('City'),  max_length=200)
     country = CountryField(_('Country'))
     experience = models.SmallIntegerField(_('Experience (full years)'), **optional)
+    willing_to_relocate = models.NullBooleanField(_('Willing to relocate?'), **optional)
     cv = models.FileField(_("CV"), upload_to=get_upload_path, max_length=150, editable=True, **optional)
 
     class Meta:
@@ -246,6 +248,21 @@ class Candidate(ProfileBase):
         if self.city and self.country:
             return '{}, {}'.format(self.city, self.country.name)
         return None
+
+    @property
+    def desired_location(self):
+        if self.desired_city and self.desired_country:
+            return '{}, {}'.format(self.desired_city, self.desired_country.name)
+        return None
+
+    @property
+    def willing_to_relocate_text(self):
+        if self.willing_to_relocate == True:
+            return 'Yes'
+        elif self.willing_to_relocate == False:
+            return 'No'
+        else:
+            return None
 
 
 class Agent(ProfileBase):
