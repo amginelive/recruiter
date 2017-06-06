@@ -167,17 +167,16 @@ class JobReferralForm(forms.Form):
         refer_to = self.cleaned_data.get('refer_to')
         job_post = self.cleaned_data.get('job_post')
 
-        referrals = []
-        for candidate in refer_to:
-            referrals.append(
-                JobReferral(
-                    job_post=job_post,
-                    referred_by=self.candidate,
-                    referred_to=candidate,
-                    created_at=timezone.now(),
-                    updated_at=timezone.now()
-                )
+        referrals = [
+            JobReferral(
+                job_post=job_post,
+                referred_by=self.candidate,
+                referred_to=candidate,
+                created_at=timezone.now(),
+                updated_at=timezone.now()
             )
+            for candidate in refer_to
+        ]
         JobReferral.objects.bulk_create(referrals)
 
 
@@ -209,15 +208,14 @@ class UserReferralForm(forms.Form):
         refer_to = self.cleaned_data.get('refer_to')
         referred_user = self.cleaned_data.get('referred_user')
 
-        referrals = []
-        for user in refer_to:
-            referrals.append(
-                UserReferral(
-                    referred_by=self.user,
-                    referred_to=user,
-                    referred_user=referred_user,
-                    created_at=timezone.now(),
-                    updated_at=timezone.now()
-                )
+        referrals = [
+            UserReferral(
+                referred_by=self.user,
+                referred_to=user,
+                referred_user=referred_user,
+                created_at=timezone.now(),
+                updated_at=timezone.now()
             )
+            for user in refer_to
+        ]
         UserReferral.objects.bulk_create(referrals)
