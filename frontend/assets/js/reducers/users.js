@@ -17,7 +17,7 @@ const users = (state = new Immutable.Map().withMutations(ctx => ctx.set('agents'
             list => {
                 return list.update(
                     list.findIndex(item => {return item.get('id') === action.payload.id}),
-                    item => item.set('online', true)
+                    item => {if (item) {return item.set('online', true)}}
                 );
             }
         );
@@ -25,7 +25,7 @@ const users = (state = new Immutable.Map().withMutations(ctx => ctx.set('agents'
             list => {
                 return list.update(
                     list.findIndex(item => {return item.get('id') === action.payload.id}),
-                    item => item.set('online', true)
+                    item => {if (item) {return item.set('online', true)}}
                 );
             }
         );
@@ -35,7 +35,7 @@ const users = (state = new Immutable.Map().withMutations(ctx => ctx.set('agents'
             list => {
                 return list.update(
                     list.findIndex(item => {return item.get('id') === action.payload.user.id}),
-                    item => item.set('online', true)
+                    item => {if (item) {return item.set('online', true)}}
                 );
             }
         );
@@ -43,7 +43,7 @@ const users = (state = new Immutable.Map().withMutations(ctx => ctx.set('agents'
             list => {
                 return list.update(
                     list.findIndex(item => {return item.get('id') === action.payload.user.id}),
-                    item => item.set('online', true)
+                    item => {if (item) {return item.set('online', true)}}
                 );
             }
         );
