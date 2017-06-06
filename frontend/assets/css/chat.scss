@@ -52,7 +52,7 @@
   padding: 10px;
 }
 
-.message-list-item:nth-child(even) {
+.message-list > div:nth-child(even) {
     background: whitesmoke;
 }
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Scrollbars } from 'react-custom-scrollbars';
+import moment from 'moment';
 
 import * as actions from './actions/index.js';
 import Message from './message.jsx';
@@ -53,6 +54,20 @@ class MessageList extends React.Component {
         });
     }
 
+    formatDate(date) {
+        const now = moment();
+        const then = moment(date);
+        if (then.isSame(now, 'day')) {
+            return 'Today';
+        } else if (then.isSame(now.subtract(1, 'days'), 'day')) {
+            return 'Yesterday';
+        } else if (then.isBetween(now.subtract(5, 'days'), now, 'day')) {
+            return then.format('dddd');
+        } else {
+            return then.format('dddd, MMMM Do, YYYY');
+        }
+    }
+
     render() {
         const { messages, typing } = this.props;
         let typingUI = (<div></div>);
@@ -73,7 +88,16 @@ class MessageList extends React.Component {
                             autoHideDuration={200}>
                     <div className='message-list'>
                         {messages.get('messageList').map((message, index) => {
-                            return <Message key={index} user={message.get('user')} text={message.get('text')} time={message.get('time')}/>;
+                            let dateUI = '';
+                            if (index === 0 || !moment(message.get('time')).isSame(moment(messages.get('messageList').get(index-1).get('time')), 'day')) {
+                                dateUI = <div className='message-list-date'>{this.formatDate(message.get('time'))}</div>
+                            }
+                            return (
+                                <div>
+                                    {dateUI}
+                                    <Message key={index} user={message.get('user')} text={message.get('text')} time={message.get('time')}/>
+                                </div>
+                            );
                         }).toArray()}
                     </div>
                 </Scrollbars>
