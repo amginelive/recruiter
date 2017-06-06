@@ -161,12 +161,15 @@ class CandidateSearchView(CandidateRequiredMixin, TemplateView):
         context['candidates'] = candidates
         context['connection_request'] = ConnectionRequest
 
-        connection_requests = ConnectionRequest.objects.filter(connectee__candidate__in=candidates)
-        context['team_member_requests'] = connection_requests\
-            .filter(connection_type=ConnectionRequest.CONNECTION_TEAM_MEMBER)\
+        connection_requests = ConnectionRequest.objects.filter(
+            connectee__candidate__in=candidates,
+            connecter=self.request.user
+        )
+        context['candidate_to_candidate_team_member_requests'] = connection_requests\
+            .filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER)\
             .values_list('connectee__pk', flat=True)
-        context['network_requests'] = connection_requests\
-            .filter(connection_type=ConnectionRequest.CONNECTION_NETWORK)\
+        context['candidate_to_candidate_network_requests'] = connection_requests\
+            .filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK)\
             .values_list('connectee__pk', flat=True)
 
         return context
@@ -174,7 +177,7 @@ class CandidateSearchView(CandidateRequiredMixin, TemplateView):
 candidate_search = CandidateSearchView.as_view()
 
 
-class AgentSearchView(CandidateRequiredMixin, TemplateView):
+class AgentSearchView(LoginRequiredMixin, TemplateView):
     """
     View for candidates to search for agents to add to their network.
     """
@@ -202,10 +205,19 @@ class AgentSearchView(CandidateRequiredMixin, TemplateView):
         context['search'] = search
         context['agents'] = agents
         context['connection_request'] = ConnectionRequest
-        context['agent_requests'] = ConnectionRequest.objects\
-            .filter(connectee__agent__in=agents)\
-            .filter(connection_type=ConnectionRequest.CONNECTION_AGENT)\
-            .values_list('connectee__pk', flat=True)
+
+        connection_requests = ConnectionRequest.objects.filter(
+            connectee__agent__in=agents,
+            connecter=self.request.user
+        )
+        if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
+            context['candidate_to_agent_network_requests'] = connection_requests\
+                .filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_AGENT_NETWORK)\
+                .values_list('connectee__pk', flat=True)
+        elif self.request.user.account_type == User.ACCOUNT_AGENT:
+            context['agent_to_agent_network_requests'] = connection_requests\
+                .filter(connection_type=ConnectionRequest.CONNECTION_AGENT_TO_AGENT_NETWORK)\
+                .values_list('connectee__pk', flat=True)
 
         return context
 

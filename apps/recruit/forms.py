@@ -11,7 +11,9 @@ from .models import (
     ConnectionRequest,
     JobPost,
     JobReferral,
+    UserReferral,
 )
+from core.forms import NumberMultipleSelectField
 from core.utils import send_email
 from users.models import Candidate
 
@@ -118,7 +120,7 @@ class ConnectionInviteForm(forms.ModelForm):
             connection_invite.save()
 
             send_email(
-                _('Candidate Invitation, SquareBalloon'),
+                _('Invitation, SquareBalloon'),
                 [connection_invite.connectee_email,],
                 'recruit/email/connection_invitation',
                 {
@@ -143,7 +145,7 @@ class JobReferralForm(forms.Form):
         self.candidate = initial.get('candidate')
         connections = Connection.objects\
             .filter(Q(connecter=self.candidate.user) | Q(connectee=self.candidate.user))\
-            .filter(connection_type=Connection.CONNECTION_TEAM_MEMBER)
+            .filter(connection_type=Connection.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER)
 
         choices = []
         for connection in connections:
@@ -165,15 +167,55 @@ class JobReferralForm(forms.Form):
         refer_to = self.cleaned_data.get('refer_to')
         job_post = self.cleaned_data.get('job_post')
 
-        referrals = []
-        for candidate in refer_to:
-            referrals.append(
-                JobReferral(
-                    job_post=job_post,
-                    referred_by=self.candidate,
-                    referred_to=candidate,
-                    created_at=timezone.now(),
-                    updated_at=timezone.now(),
-                )
+        referrals = [
+            JobReferral(
+                job_post=job_post,
+                referred_by=self.candidate,
+                referred_to=candidate,
+                created_at=timezone.now(),
+                updated_at=timezone.now()
             )
+            for candidate in refer_to
+        ]
         JobReferral.objects.bulk_create(referrals)
+
+
+class UserReferralForm(forms.Form):
+    """
+    Form for referring a user to another user.
+    """
+    referred_user = forms.IntegerField()
+    refer_to = NumberMultipleSelectField()
+
+    class Meta:
+        model = UserReferral
+        fields = ('referred_by', 'referred_user',)
+
+    def __init__(self, *args, **kwargs):
+        super(UserReferralForm, self).__init__(*args, **kwargs)
+        initial = self.initial
+        self.user = initial.get('user')
+
+    def clean_referred_user(self):
+        referred_user = self.cleaned_data.get('referred_user')
+        return User.objects.get(pk=referred_user)
+
+    def clean_refer_to(self):
+        refer_to = self.cleaned_data.get('refer_to')
+        return User.objects.filter(pk__in=refer_to)
+
+    def save(self, *args, **kwargs):
+        refer_to = self.cleaned_data.get('refer_to')
+        referred_user = self.cleaned_data.get('referred_user')
+
+        referrals = [
+            UserReferral(
+                referred_by=self.user,
+                referred_to=user,
+                referred_user=referred_user,
+                created_at=timezone.now(),
+                updated_at=timezone.now()
+            )
+            for user in refer_to
+        ]
+        UserReferral.objects.bulk_create(referrals)

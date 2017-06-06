@@ -14,6 +14,12 @@
                     <li><a href="{% url 'users:agent_search' %}">Search Agents</a></li>
                     <li><a href="#">My Application</a></li>
                 </ol>
+            {% elif user.account_type == user.ACCOUNT_AGENT %}
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'recruit:dashboard' %}">Activity Feed</a></li>
+                    <li class="active">Search Candidates</li>
+                    <li><a href="{% url 'users:agent_search' %}">Search Agents</a></li>
+                </ol>
             {% endif %}
             <div class="row" style="padding-top:40px;">
                 <div class="col-md-2">
@@ -121,17 +127,17 @@
                                             <div class="search-info connection-buttons">
                                                 {% with user|connections:result.user as connections %}
                                                     {% if connections %}
-                                                        {% if connections.connection_type == connection_request.CONNECTION_AGENT %}
+                                                        {% if connections.connection_type == connection_request.CONNECTION_CANDIDATE_TO_AGENT_NETWORK %}
                                                             <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected as Network</button>
                                                         {% endif %}
                                                     {% else %}
-                                                        {% if result.user.pk in result.user|connection_requests:connection_request.CONNECTION_AGENT %}
+                                                        {% if result.user.pk in result.user|connection_requests:connection_request.CONNECTION_CANDIDATE_TO_AGENT_NETWORK %}
                                                             <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awating Network Approval</button>
                                                         {% else %}
                                                             <form action="{% url 'recruit:connection_request_create' %}" method="POST">
                                                                 {% csrf_token %}
                                                                 <input type="hidden" name="connectee" value="{{ result.user.pk }}">
-                                                                <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_AGENT }}">
+                                                                <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_CANDIDATE_TO_AGENT_NETWORK }}">
 
                                                                 <button class="btn btn-primary btn-xs add-connection">Add to my network</button>
                                                             </form>

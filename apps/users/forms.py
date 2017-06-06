@@ -82,7 +82,6 @@ class CustomSignupForm(forms.Form):
             uuid = request.GET.get('uuid')
             if uuid:
                 connection_invitation = ConnectionInvite.objects.filter(uuid=uuid)
-                import pdb; pdb.set_trace()
                 if connection_invitation.exists():
                     connection_invitation = connection_invitation.first()
                     Connection.objects.create(
