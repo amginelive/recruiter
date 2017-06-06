@@ -5,7 +5,7 @@ You received this email because {{ connection_invite.connecter.get_full_name }} 
 you to join as their {{ connection_invite.get_connection_type_display }} on SquareBalloon.<br>
 <br>
 To accept invitation please signup here:<br>
-{% if connection_invite.connection_type == connection_invite.CONNECTION_AGENT %}
+{% if connection_invite.connection_type == connection_invite.CONNECTION_CANDIDATE_TO_AGENT_NETWORK or connection_invite.connection_type == connection_invite.CONNECTION_AGENT_TO_AGENT_NETWORK  %}
     <a href="http://www.squareballoon.com{% url 'account_signup' %}?account_type={{ user.ACCOUNT_AGENT }}&uuid={{ connection_invite.uuid }}&email={{ connection_invite.connectee_email }}">
         http://www.squareballoon.com{% url 'account_signup' %}?account_type={{ user.ACCOUNT_AGENT }}&uuid={{ connection_invite.uuid }}&email={{ connection_invite.connectee_email }}
     </a>

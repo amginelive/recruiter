@@ -6,6 +6,7 @@ from .models import (
     ConnectionRequest,
     JobPost,
     JobReferral,
+    UserReferral,
     Skill,
 )
 
@@ -15,4 +16,5 @@ admin.site.register(ConnectionInvite)
 admin.site.register(ConnectionRequest)
 admin.site.register(JobPost)
 admin.site.register(JobReferral)
+admin.site.register(UserReferral)
 admin.site.register(Skill)
