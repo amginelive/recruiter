@@ -108,6 +108,14 @@ section#internal-wrap {
     min-height: calc(100vh - 185px);
 }
 
+section#account .core-skill-item{
+    display: block;
+    background-color: #f2f1ec;
+    border-radius: 12px;
+    padding: 5px 12px;
+    margin-top: 5px;
+}
+
 section#account  {
     padding-top: 50px;
 }
@@ -126,7 +134,6 @@ section#account  a {
 }
 section#account h4 a {
     font-family: PangramLight;
-    font-size: 14px;
     font-weight: 400;
     color: #f9690e;
 }
@@ -1407,4 +1414,42 @@ section#cart .code_error span {
     border:1px
     solid #dfdfdf;
     padding:15px;
+}
+
+section#account .profile-detail-section {
+    border: solid 1px #f2f1ec;
+    padding: 5px 30px 30px 30px;
+}
+
+section#account .status-section {
+    padding-top: 10px;
+    padding-bottom: 20px;
+}
+
+section#account .location-section {
+    padding-top: 10px;
+    padding-bottom: 20px;
+    border-left: solid 1px #f2f1ec;
+}
+
+section#account .tracking-section {
+    margin-left: 20px;
+    border: solid 1px #f2f1ec;
+    padding: 5px 30px 30px 30px;
+}
+
+section#account .tracking-section .row {
+    padding: 5px 10px 50px 10px;
+}
+
+section#account .tracking-section .tracking-item {
+    margin-top: 10px;
+}
+
+section#account .profile-navigation {
+    padding-bottom: 15px;
+}
+
+.orange-text {
+    color: #f9690e !important;
 }

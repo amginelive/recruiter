@@ -4,6 +4,7 @@ from django.contrib.postgres.search import (
     SearchVector,
 )
 
+from django.db.models import Q
 from django.shortcuts import render
 from django.views.generic import (
     DetailView,
@@ -25,6 +26,7 @@ from .models import (
     Candidate,
 )
 from .utils import get_profile_completeness
+from chat.models import Message
 from companies.models import CompanyRequestInvitation
 from recruit.models import ConnectionRequest
 
@@ -120,6 +122,15 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
             context['photo_form'] = CandidatePhotoUploadForm
             context['completeness'] = get_profile_completeness(profile)
             context['candidate_form'] = CandidateUpdateForm(instance=profile)
+            if self.request.user.account_type == User.ACCOUNT_AGENT:
+                messages_sent = Message.objects.filter(author=self.request.user).order_by('created_at')
+                context['first_contact_sent'] = messages_sent.first()
+                context['last_message_sent'] = messages_sent.last()
+                context['last_message_received'] = Message.objects\
+                    .filter(conversation__users=self.request.user)\
+                    .exclude(author=self.request.user)\
+                    .order_by('created_at')\
+                    .last()
 
         elif profile.user.account_type == User.ACCOUNT_AGENT:
             company = profile.company
