@@ -150,10 +150,10 @@ class ChatServer(JsonWebsocketConsumer):
     def cmd_more_messages(self, payload):
         conversation = self.message.channel_session.get('conversation')
 
-        from_time = conversation.message_set\
+        from_time = conversation.messages\
             .get(id=payload.get('message_id'))\
             .created_at
-        query = conversation.message_set\
+        query = conversation.messages\
             .filter(created_at__lt=from_time)\
             .order_by('-created_at')
 
