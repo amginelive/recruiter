@@ -52,7 +52,7 @@ class MessageForm extends React.Component {
                        onKeyDown={this.checkInput.bind(this)}
                        value={this.state.message}
                 />
-                <button className='send-button' type='submit' disabled={submitDisabled}>
+                <button className='chat-button send-button' type='submit' disabled={submitDisabled}>
                     Send
                 </button>
             </form>

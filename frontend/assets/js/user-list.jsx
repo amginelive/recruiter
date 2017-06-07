@@ -13,6 +13,7 @@ class UserList extends React.Component {
         this.state = {
             activeUser: 0,
             userPresencePollingInterval: 10,
+            selectedUsersGroup: 0
         };
         setInterval(() => this.props.actions.userPresence(), this.state.userPresencePollingInterval*1000);
     }
@@ -49,6 +50,10 @@ class UserList extends React.Component {
         }).toArray();
     }
 
+    handleUserGroupSelect(group) {
+        this.setState({selectedUsersGroup: group});
+    }
+
     render() {
         const { users } = this.props;
         return (
@@ -58,13 +63,14 @@ class UserList extends React.Component {
                                 autoHide autoHideTimeout={1000}
                                 autoHideDuration={200}>
                     <div className='user-list'>
-                        <div className='user-list-group'>
-                            <div className='user-list-group-header'>My team network</div>
-                            {this.renderUsersGroup(users.get('candidates'), 'team network')}
+                        <div className='user-list-header'>
+                            <button className={'chat-button user-list-button button-candidates' + (this.state.selectedUsersGroup === 0 ? ' active' : '')} onClick={this.handleUserGroupSelect.bind(this, 0)}>Candidates</button>
+                            <button className={'chat-button user-list-button button-agents' + (this.state.selectedUsersGroup === 1 ? ' active' : '')} onClick={this.handleUserGroupSelect.bind(this, 1)}>Agents</button>
                         </div>
                         <div className='user-list-group'>
-                            <div className='user-list-group-header'>Agents</div>
-                            {this.renderUsersGroup(users.get('agents'), 'agents')}
+                            {this.state.selectedUsersGroup === 0 ?
+                                this.renderUsersGroup(users.get('candidates'), 'team network') :
+                                this.renderUsersGroup(users.get('agents'), 'agents')}
                         </div>
                     </div>
                 </Scrollbars>
