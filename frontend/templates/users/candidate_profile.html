@@ -13,7 +13,7 @@
         <div class="container">
             <div class="col-md-8 text-center profile-navigation">
                 <div class="col-md-4">
-                    <span>Last online: 05/06/17</span>
+                    <span>Last online: {{ profile.user.last_seen|date:"m/d/y" }}</span>
                 </div>
                 {% if user != profile.user %}
                     <div class="col-md-4">
@@ -89,17 +89,17 @@
                 </div>
             </div>
             {% if user.account_type == user.ACCOUNT_AGENT %}
-                <div class="col-md-4 tracking-section">
+                <div class="col-md-3 tracking-section">
                     <div class="row">
                         <h4 class="text-center orange-text"><strong>Auto Tracking</strong></h4>
                         <div class="tracking-item">
-                            <span class="orange-text">First contact sent: </span>10/04/14
+                            <span class="orange-text">First contact sent: </span>{{ first_contact_sent.created_at|date:"m/d/y" }}
                         </div>
                         <div class="tracking-item">
-                            <span class="orange-text">Last message sent: </span>05/05/17
+                            <span class="orange-text">Last message sent: </span>{{ last_message_sent.created_at|date:"m/d/y" }}
                         </div>
                         <div class="tracking-item">
-                            <span class="orange-text">Last message received: </span>06/05/17
+                            <span class="orange-text">Last message received: </span>{{ last_message_received.created_at|date:"m/d/y" }}
                         </div>
                     </div>
                     <div class="row">

@@ -90,7 +90,7 @@ class ChatServer(JsonWebsocketConsumer):
         query = Message.objects.filter(conversation=conversation)\
             .order_by('-created_at')[:self.message_list_limit]
         messages = []
-        more = conversation.message_set.count() > self.message_list_limit
+        more = conversation.messages.count() > self.message_list_limit
         for message in reversed(query):
             messages.append(  # TODO: Refactor message creation
                 {'user': {'name': message.author.email,

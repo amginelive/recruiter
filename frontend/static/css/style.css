@@ -1433,6 +1433,7 @@ section#account .location-section {
 }
 
 section#account .tracking-section {
+    margin-left: 20px;
     border: solid 1px #f2f1ec;
     padding: 5px 30px 30px 30px;
 }
