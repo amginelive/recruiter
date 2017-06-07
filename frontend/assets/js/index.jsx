@@ -7,13 +7,14 @@ import thunkMiddleware from 'redux-thunk';
 import { AppContainer } from 'react-hot-loader';
 
 import App from './chat.jsx';
+import IdleMonitor from './idle-monitor.jsx';
 import rootReducer from './reducers/index.js';
 import { init as websocketInit, emit } from './actions/websocket.js';
 
 
 const initialState = new Immutable.Map();
 
-function startUp () {
+(function startUp () {
     const thunk = thunkMiddleware.default ? thunkMiddleware.default : thunkMiddleware;
     const middleware = [thunk.withExtraArgument({emit})];
 
@@ -30,16 +31,13 @@ function startUp () {
         });
     }
 
-    return store;
-}
+    window.storeRoot = store;
+}());
 
-
-const container = document.getElementById('app');
-
-const render = (Component) => {
+const render = (Component, container) => {
     ReactDOM.render(
         <AppContainer>
-            <Provider store={startUp()}>
+            <Provider store={window.storeRoot}>
                 <Component />
             </Provider>
         </AppContainer>,
@@ -47,11 +45,24 @@ const render = (Component) => {
     );
 };
 
-render(App);
+if (window.location.pathname === '/chat/') {
+    render(App, document.getElementById('app'));
+}
+
+const div = document.createElement('div');
+div.id = 'idle-monitor';
+document.getElementsByTagName('body')[0].appendChild(div);
+render(IdleMonitor, div);
 
 if (module.hot) {
-    module.hot.accept('./chat.jsx', () => {
-        ReactDOM.unmountComponentAtNode(container);
-        render(App);
+    if (window.location.pathname === '/chat') {
+        module.hot.accept('./chat.jsx', () => {
+            ReactDOM.unmountComponentAtNode(document.getElementById('app'));
+            render(App, document.getElementById('app'));
+        });
+    }
+    module.hot.accept('./idle-monitor.jsx', () => {
+        ReactDOM.unmountComponentAtNode(div);
+        render(IdleMonitor, div);
     });
 }

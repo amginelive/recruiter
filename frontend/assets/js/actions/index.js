@@ -41,3 +41,15 @@ export function moreMessages(message_id) {
         emit(messageTypes.moreMessages, {message_id});
     }
 }
+
+export function userIdle() {
+    return (dispatch, getState, {emit}) => {
+        emit(messageTypes.userIdle, {});
+    }
+}
+
+export function userActive() {
+    return (dispatch, getState, {emit}) => {
+        emit(messageTypes.userActive, {});
+    }
+}

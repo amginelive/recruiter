@@ -79,6 +79,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         (ACCOUNT_AGENT, _('Agent')),
     )
 
+    STATUS_OFFLINE = 0
+    STATUS_AWAY = 1
+    STATUS_ONLINE = 2
+
     email = models.EmailField(_('Email Address'), max_length=254, unique=True)
     first_name = models.CharField(_('First Name'), max_length=30)
     last_name = models.CharField(_('Last Name'), max_length=30)
@@ -142,15 +146,18 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def online(self):
         last_seen = self.last_seen()
+        idle = cache.get(f'idle_{self.email}')
+        if idle:
+            return self.STATUS_AWAY
         if last_seen:
             now = timezone.now()
             if now > last_seen + timezone.timedelta(
                     seconds=settings.USER_ONLINE_TIMEOUT):
-                return False
+                return self.STATUS_OFFLINE
             else:
-                return True
+                return self.STATUS_ONLINE
         else:
-            return False
+            return self.STATUS_OFFLINE
 
     def get_photo_url(self):
         try:

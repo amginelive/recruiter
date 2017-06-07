@@ -1,8 +1,12 @@
 from django.core.cache import cache
-from django.conf import settings
 from django.utils import timezone
 
 
-def update_user_presence(user):
+def update_user_presence(user, idle=False):
     now = timezone.now()
-    cache.set(f'seen_{user.email}', now, settings.USER_ONLINE_TIMEOUT)
+    if not idle:
+        cache.set(f'seen_{user.email}', now, None)
+
+
+def update_user_idle(user, idle):
+    cache.set(f'idle_{user.email}', idle, None)

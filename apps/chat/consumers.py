@@ -5,7 +5,7 @@ from channels.generic.websockets import JsonWebsocketConsumer
 
 from recruit.models import Connection
 from .models import Conversation, Message
-from .utils import update_user_presence
+from .utils import update_user_idle, update_user_presence
 
 User = get_user_model()
 
@@ -63,7 +63,9 @@ class ChatServer(JsonWebsocketConsumer):
         #    self.cmd_init({'user_id': response[0].get('id')})
 
     def receive(self, content, **kwargs):
-        update_user_presence(self.message.user)
+        if content.get('type') != 'userIdle' and content.get('type') != 'userPresence':
+            update_user_presence(self.message.user)
+
         if content.get('type') == 'initChat':
             self.cmd_init(content.get('payload'))
         elif content.get('type') == 'newMessage':
@@ -74,6 +76,10 @@ class ChatServer(JsonWebsocketConsumer):
             self.cmd_presence()
         elif content.get('type') == 'moreMessages':
             self.cmd_more_messages(content.get('payload'))
+        elif content.get('type') == 'userIdle':
+            self.cmd_idle(True)
+        elif content.get('type') == 'userActive':
+            self.cmd_idle(False)
 
     def cmd_init(self, payload):
         conversation = Conversation.objects\
@@ -180,5 +186,8 @@ class ChatServer(JsonWebsocketConsumer):
         }
         self.send(response)
 
+    def cmd_idle(self, idle):
+        update_user_idle(self.message.user, idle)
+
     def disconnect(self, message, **kwargs):
-        pass
+        self.cmd_idle(False)
