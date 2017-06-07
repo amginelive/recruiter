@@ -19,7 +19,11 @@ class ChatServer(JsonWebsocketConsumer):
         return [str(self.message.user.id)]
 
     def connect(self, message, **kwargs):
-        self.send({'accept': True})
+        if message.user.is_authenticated():
+            self.send({'accept': True})
+        else:
+            self.send({'accept': False})
+            return
 
         connections = Connection.objects\
             .filter(Q(connecter=message.user) |
@@ -190,4 +194,6 @@ class ChatServer(JsonWebsocketConsumer):
         update_user_idle(self.message.user, idle)
 
     def disconnect(self, message, **kwargs):
+        if not message.user.is_authenticated():
+            return
         self.cmd_idle(False)
