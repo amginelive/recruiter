@@ -31,17 +31,10 @@ class MessageList extends React.Component {
     componentWillReceiveProps(nextProps) {
         const { messages } = nextProps;
 
-        const {scrollTop, clientHeight, scrollHeight} = this.scroll.getValues();
-        if ((scrollTop + clientHeight === scrollHeight) && // We are at the bottom of scroll list
-            ((messages.get('messageList').size - this.props.messages.get('messageList').size === 1) || // One new message
-                (this.props.messages.get('messageList').size === 0 && // Or chat init
-                messages.get('messageList').size - this.props.messages.get('messageList').size >= 1))) {
-            setTimeout(
-                () => {
-                    this.scrollList(this.scroll.getScrollHeight());
-                },
-                10
-            );
+        if ((messages.get('more') === this.props.messages.get('more') && messages.get('messageList').size - this.props.messages.get('messageList').size === 1) || // One new message came
+            this.props.messages.get('activeChat') !== messages.get('activeChat')) // OR Chat init happened
+        {
+            setTimeout(() => this.scrollList(this.scroll.getScrollHeight()), 10);
         }
     }
 
