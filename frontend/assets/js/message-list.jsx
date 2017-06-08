@@ -14,35 +14,12 @@ class MessageList extends React.Component {
 
         this.scrollList = this.scrollList.bind(this);
         this.state = {
-            userTypingExpireTime: 3,
             prevScrollHeight: 0,
         };
     }
 
     scrollList(value) {
         this.scroll.scrollTop(value);
-    }
-
-    handleTypingProps(typing) {
-        if (typing.size === 0) {
-            return;
-        }
-        typing.get('typingMap').entrySeq().forEach(entry => {
-            if (entry[1].get('timer_id') === 0) {
-                const timer_id = setTimeout(() => {
-                    this.props.actions.typeTimerExpire({
-                        user_id: entry[0],
-                        user_name: entry[1].get('user_name'),
-                        timer_id
-                    });
-                }, this.state.userTypingExpireTime*1000);
-                this.props.actions.typeTimerStart({
-                    user_id: entry[0],
-                    user_name: entry[1].get('user_name'),
-                    timer_id
-                });
-            }
-        });
     }
 
     componentDidUpdate(prevProps, prevState) { // This is keeping scroll in place on requesting more messages.
@@ -52,9 +29,7 @@ class MessageList extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const { typing, messages } = nextProps;
-
-        this.handleTypingProps(typing);
+        const { messages } = nextProps;
 
         const {scrollTop, clientHeight, scrollHeight} = this.scroll.getValues();
         if ((scrollTop + clientHeight === scrollHeight) && // We are at the bottom of scroll list
@@ -90,17 +65,8 @@ class MessageList extends React.Component {
     }
 
     render() {
-        const { messages, typing } = this.props;
-        let typingUI = (<div></div>);
-        if (typing.size > 0) {
-            typingUI = (
-                <div className='user-type-list'>
-                    {typing.get('typingMap').map((user, index) => {
-                        return <div key={index} className='user-type-list-item'>{user.get('user_name') + ' is typing...'}</div>
-                    }).toArray()}
-                </div>
-            );
-        }
+        const { messages } = this.props;
+
         return (
             <div className='message-list-container'>
                 <Scrollbars ref={(scroll) => {this.scroll = scroll;}}
@@ -123,7 +89,6 @@ class MessageList extends React.Component {
                         }).toArray()}
                     </div>
                 </Scrollbars>
-                {typingUI}
             </div>
         );
     }
@@ -131,8 +96,7 @@ class MessageList extends React.Component {
 
 function mapStateToProps (state) {
     return {
-        messages: state.get('messages'),
-        typing: state.get('typing')
+        messages: state.get('messages')
     };
 }
 

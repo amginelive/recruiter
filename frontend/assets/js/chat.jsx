@@ -6,6 +6,7 @@ import * as actions from './actions/index.js';
 import UserList from './user-list.jsx';
 import MessageList from './message-list.jsx';
 import MessageForm from './message-send-form.jsx';
+import TypingList from './typing-list.jsx';
 
 import '../css/chat.scss';
 
@@ -22,6 +23,7 @@ class App extends React.Component {
                     <UserList />
                     <MessageList />
                 </div>
+                <TypingList />
                 <MessageForm />
             </div>
         );

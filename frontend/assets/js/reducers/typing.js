@@ -6,7 +6,7 @@ import * as actionTypes from '../actions/action-types.js';
 
 const { messageTypes } = config;
 
-const typing = (state = new Immutable.Map(), action) => {
+const typing = (state = new Immutable.Map().withMutations(ctx => ctx.set('activeChat', 0).set('typingMap', new Immutable.Map())), action) => {
     if (action.type === messageTypes.userTyping && action.payload['conversation_id'] === state.get('activeChat')) {
         return state.setIn(
             ['typingMap', action.payload.id],
