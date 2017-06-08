@@ -9,6 +9,7 @@ from .models import (
     Connection,
     ConnectionInvite,
     ConnectionRequest,
+    JobApplication,
     JobPost,
     JobReferral,
     UserReferral,
@@ -219,3 +220,26 @@ class UserReferralForm(forms.Form):
             for user in refer_to
         ]
         UserReferral.objects.bulk_create(referrals)
+
+
+class JobApplicationForm(forms.ModelForm):
+    """
+    Form for candidates applying to a job post.
+    """
+
+    class Meta:
+        model = JobApplication
+        fields = ('candidate',)
+
+    def __init__(self, *args, **kwargs):
+        super(JobApplicationForm, self).__init__(*args, **kwargs)
+        initial = self.initial
+        self.job_post = initial.get('job_post')
+
+    def save(self, *args, **kwargs):
+        job_application = super(JobApplicationForm, self).save(commit=False)
+        job_application.job_post = self.job_post
+        job_application.candidate = self.cleaned_data.get('candidate')
+        job_application.save()
+
+        return job_application

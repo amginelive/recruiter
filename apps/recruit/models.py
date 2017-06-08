@@ -36,6 +36,12 @@ class JobPost(AbstractTimeStampedModel):
         verbose_name=_('Skills')
     )
     uuid = models.SlugField(_('UUID'), default=uuid.uuid4, editable=False)
+    applications = models.ManyToManyField(
+        'users.Candidate',
+        related_name='applications',
+        through='JobApplication',
+        verbose_name=_('Application')
+    )
 
     class Meta:
         verbose_name = _('Job Post')
@@ -43,6 +49,10 @@ class JobPost(AbstractTimeStampedModel):
 
     def __str__(self):
         return self.title
+
+    @property
+    def applicants(self):
+        return [job_application.candidate for job_application in self.candidate_applications.all()]
 
 
 class Skill(AbstractTimeStampedModel):
@@ -176,3 +186,19 @@ class UserReferral(AbstractTimeStampedModel):
 
     def __str__(self):
         return self.referred_to.get_full_name()
+
+
+class JobApplication(AbstractTimeStampedModel):
+    """
+    Model for Job Application.
+    """
+    job_post = models.ForeignKey('recruit.JobPost', related_name='candidate_applications', verbose_name=_('Job Post'))
+    candidate = models.ForeignKey('users.Candidate', related_name='job_applications', verbose_name=_('Candidate'))
+    is_viewed = models.BooleanField(_('Is Viewed?'), default=False)
+
+    class Meta:
+        verbose_name = _('Job Application')
+        verbose_name_plural = _('Job Applications')
+
+    def __str__(self):
+        return self.candidate.user.get_full_name()
