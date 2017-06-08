@@ -39,9 +39,48 @@ class Conversation(AbstractTimeStampedModel):
         verbose_name=_('Conversation participants')
     )
 
+    users_new = models.ManyToManyField(
+        'users.User',
+        through='chat.Participant',
+        related_name='conversations_new',
+        verbose_name=_('Conversation participants')
+    )
+
     class Meta:
         verbose_name = _('Conversation')
         verbose_name_plural = _('Conversations')
 
     def __str__(self):
         return ', '.join([user.get_full_name() for user in self.users.all()])
+
+
+class Participant(AbstractTimeStampedModel):
+    last_read_message = models.ForeignKey(
+        'chat.Message',
+        null=True,
+        on_delete=models.CASCADE,
+        related_name='+',
+        verbose_name='Last read message'
+    )
+    user = models.ForeignKey(
+        'users.User',
+        on_delete=models.CASCADE,
+        related_name='participations',
+        verbose_name='User'
+    )
+    conversation = models.ForeignKey(
+        'chat.Conversation',
+        on_delete=models.CASCADE,
+        related_name='participants',
+        verbose_name='Conversation'
+    )
+
+    class Meta:
+        verbose_name = _('Participant')
+        verbose_name_plural = _('Participants')
+        unique_together = [
+            ['user', 'conversation']
+        ]
+
+    def __str__(self):
+        return self.user.get_full_name()
