@@ -54,6 +54,10 @@ class JobPost(AbstractTimeStampedModel):
     def applicants(self):
         return [job_application.candidate for job_application in self.candidate_applications.all()]
 
+    @property
+    def new_applications(self):
+        return self.candidate_applications.filter(is_viewed=False)
+
 
 class Skill(AbstractTimeStampedModel):
     """

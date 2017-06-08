@@ -23,7 +23,7 @@
                     <a href="{% url 'recruit:job_post_create' %}" class="btn btn-lg btn-primary margin-top-10">Post a New Job</a>
                 </div>
                 <div class="col-md-3 text-left">
-                    <a href="#" class="btn btn-lg btn-primary margin-top-10">Rehire a Freelancer</a>
+                    <a href="#" class="btn btn-lg btn-primary margin-top-10">Rehire a Candidate</a>
                 </div>
             </div>
             <div class="job-posts-table">
@@ -51,9 +51,16 @@
                                             <a href="{% url 'users:profile_detail' job_post.posted_by.user.slug %}">{{ job_post.posted_by }}</a>
                                         {% endif %}
                                     </span>
-                                    <span class="block"><a href="#">View Suggesed Freelancers</a></span>
+                                    <span class="block"><a href="#">View Suggested Candidates</a></span>
                                 </td>
-                                <td>41</td>
+                                <td>
+                                    <a href="{% url 'recruit:job_application_list' job_post.uuid %}">
+                                        {{ job_post.candidate_applications.count }}
+                                        {% if job_post.new_applications %}
+                                            ({{ job_post.new_applications.count }} new)
+                                        {% endif %}
+                                    </a>
+                                </td>
                                 <td>2</td>
                                 <td>1</td>
                                 <td>Public</td>
@@ -63,9 +70,9 @@
                                             <i class="glyphicon glyphicon-option-horizontal"></i>
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                            <li><a href="#">View Proposals</a></li>
+                                            <li><a href="{% url 'recruit:job_application_list' job_post.uuid %}">View Proposals</a></li>
                                             <li><a href="#">Make Private</a></li>
-                                            <li><a href="#">View Job Posting</a></li>
+                                            <li><a href="{% url 'recruit:job_post_detail' job_post.uuid %}">View Job Posting</a></li>
                                             <li><a href="{% url 'recruit:job_post_update' job_post.uuid %}">Edit Posting</a></li>
                                             <li><a href="#">Duplicate Posting</a></li>
                                             <li><a href="{% url 'recruit:job_post_delete' job_post.uuid %}">Remove Posting</a></li>

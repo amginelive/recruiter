@@ -34,6 +34,7 @@ from .models import (
     Connection,
     ConnectionInvite,
     ConnectionRequest,
+    JobApplication,
     JobReferral,
     UserReferral,
 )
@@ -307,3 +308,19 @@ class ConnectionInviteCreateView(LoginRequiredMixin, CreateView, JSONResponseMix
         return context
 
 connection_invite_create = ConnectionInviteCreateView.as_view()
+
+
+class JobApplicantListView(AgentRequiredMixin, ListView):
+    """
+    View for showing the list of applicants in the job post.
+    """
+    model = JobApplication
+    context_object_name = 'job_applications'
+    template_name = 'recruit/job_application_list.html'
+
+    def get_queryset(self):
+        job_applications = JobApplication.objects.filter(job_post__uuid=self.kwargs.get('uuid'))
+        job_applications.update(is_viewed=True)
+        return job_applications
+
+job_application_list = JobApplicantListView.as_view()

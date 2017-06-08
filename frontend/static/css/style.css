@@ -1512,3 +1512,8 @@ section#job-posts .job-posts-table {
     -moz-border-radius:6px 0 6px 6px;
     border-radius:6px 0 6px 6px;
 }
+
+.card-item {
+    border:1px solid #dfdfdf;
+    padding:15px;
+}
