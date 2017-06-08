@@ -45,10 +45,6 @@
                                 <li><i class="glyphicon glyphicon-paperclip"></i><b>15</b> Posted</li>
                                 <li><i class="glyphicon glyphicon-tasks"></i><b>12</b> Remaining</li>
                             </ul>
-                            {% if user == profile.user %}
-                                <a href="{% url 'recruit:search' %}" class="btn action-btn" style="width:80%; margin-top:20px;"><i class="glyphicon glyphicon-search"></i>Find candidates</a>
-                                <a href="{% url 'recruit:job_post_list' %}" class="btn action-btn" style="width:80%; margin-top:20px;">Job Posts</a>
-                            {% endif %}
                         </div>
                     </div>
                 </div>

@@ -536,8 +536,6 @@ section#about p{
 }
 
 section#footer{
-    z-index: 1000;
-    /*margin-top: 70px;*/
     background-color: #45404e;
     padding: 30px;
     height: 188px;
@@ -1452,4 +1450,23 @@ section#account .profile-navigation {
 
 .orange-text {
     color: #f9690e !important;
+}
+
+.margin-top-10 {
+    margin-top: 10px
+}
+
+section#job-posts .job-post-title {
+    font-size: 24px;
+    display: block;
+}
+
+section#job-posts .job-posts-table {
+    margin-top: 20px;
+    border: 1px solid #f2f1ec;
+    padding: 30px;
+}
+
+.block {
+    display: block;
 }
