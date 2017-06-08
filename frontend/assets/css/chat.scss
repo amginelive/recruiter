@@ -71,9 +71,16 @@
   padding: 10px;
   display: flex;
   flex-wrap: nowrap;
+  flex: none;
   align-items: center;
   position: relative;
   border-bottom: 1px solid #999;
+}
+
+.user-list-item-name {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .user-list-item-status {
