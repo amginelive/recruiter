@@ -35,14 +35,8 @@ class Conversation(AbstractTimeStampedModel):
     """
     users = models.ManyToManyField(
         'users.User',
-        related_name='conversations',
-        verbose_name=_('Conversation participants')
-    )
-
-    users_new = models.ManyToManyField(
-        'users.User',
         through='chat.Participant',
-        related_name='conversations_new',
+        related_name='conversations',
         verbose_name=_('Conversation participants')
     )
 

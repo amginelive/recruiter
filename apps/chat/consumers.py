@@ -4,7 +4,7 @@ from django.db.models import ObjectDoesNotExist, Q
 from channels.generic.websockets import JsonWebsocketConsumer
 
 from recruit.models import Connection
-from .models import Conversation, Message
+from .models import Conversation, Message, Participant
 from .utils import update_user_idle, update_user_presence
 
 User = get_user_model()
@@ -92,8 +92,14 @@ class ChatServer(JsonWebsocketConsumer):
             .first()
         if not conversation:
             conversation = Conversation.objects.create()
-            conversation.users.add(User.objects.get(id=payload.get('user_id')),
-                             self.message.user)
+            participant_connecter = Participant.objects.create(
+                user=self.message.user,
+                conversation=conversation
+            )
+            participant_connectee = Participant.objects.create(
+                user=User.objects.get(id=payload.get('user_id')),
+                conversation=conversation
+            )
             conversation.save()
         self.message.channel_session['conversation'] = conversation
 
