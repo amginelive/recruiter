@@ -12,9 +12,7 @@ import rootReducer from './reducers/index.js';
 import { init as websocketInit, emit } from './actions/websocket.js';
 
 
-const initialState = new Immutable.Map();
-
-(function startUp () {
+(function startUp() {
     const thunk = thunkMiddleware.default ? thunkMiddleware.default : thunkMiddleware;
     const middleware = [thunk.withExtraArgument({emit})];
 
