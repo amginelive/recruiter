@@ -86,6 +86,20 @@ class ChatServer(JsonWebsocketConsumer):
             conversation.save()
         return conversation
 
+    @staticmethod
+    def _create_message_data_dict(message):
+        return {
+            'user': {
+                'name': message.author.email,
+                'photo': message.author.get_photo_url(),
+                'id': message.author.id
+            },
+            'conversation_id': message.conversation.id,
+            'text': message.text,
+            'id': message.id,
+            'time': message.created_at.isoformat()
+        }
+
     def receive(self, content, **kwargs):
         if content.get('type') not in ['userIdle', 'userPresence']:
             update_user_presence(self.message.user)
@@ -116,15 +130,7 @@ class ChatServer(JsonWebsocketConsumer):
         messages = []
         more = conversation.messages.count() > self.message_list_limit
         for message in reversed(query):
-            messages.append(  # TODO: Refactor message creation
-                {'user': {'name': message.author.email,
-                          'photo': message.author.get_photo_url(),
-                          'id': message.author.id},
-                 'conversation_id': message.conversation.id,
-                 'text': message.text,
-                 'id': message.id,
-                 'time': message.created_at.isoformat()}
-            )
+            messages.append(self._create_message_data_dict(message))
         self.send({'type': 'initChat',
                    'payload': {'conversation_id': conversation.id,
                                'more': more,
@@ -137,13 +143,7 @@ class ChatServer(JsonWebsocketConsumer):
                                          author=self.message.user,
                                          conversation=conversation)
         response = {'type': 'newMessage',
-                    'payload': {'user': {'name': message.author.email,
-                                         'photo': message.author.get_photo_url(),
-                                         'id': message.author.id},
-                                'conversation_id': message.conversation.id,
-                                'text': message.text,
-                                'id': message.id,
-                                'time': message.created_at.isoformat()}}
+                    'payload': self._create_message_data_dict(message)}
         for user in conversation.users.all():
             self.group_send(str(user.id), response)
 
@@ -182,15 +182,7 @@ class ChatServer(JsonWebsocketConsumer):
             .order_by('-created_at')
 
         message_list = [
-            {
-                'user': {'name': message.author.email,
-                         'photo': message.author.get_photo_url(),
-                         'id': message.author.id},
-                'conversation_id': message.conversation.id,
-                'text': message.text,
-                'id': message.id,
-                'time': message.created_at.isoformat()
-            }
+            self._create_message_data_dict(message)
             for message in reversed(query[:self.message_list_limit])
         ]
         more = query.count() > self.message_list_limit
