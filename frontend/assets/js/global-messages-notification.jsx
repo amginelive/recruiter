@@ -12,7 +12,19 @@ class GlobalMessagesNotification extends React.Component {
         const unread_agents = this.props.users.get('agents').reduce((result, user) => result + user.get('unread'), 0);
         if (unread_candidates + unread_agents > 0) {
             return (
-                <span style={{position: 'absolute', top: 30, right: -10, zIndex: 10}}>
+                <span style={{
+                    position: 'absolute',
+                    top: 30,
+                    right: -10,
+                    zIndex: 10,
+                    borderRadius: '50%',
+                    width: 24,
+                    height: 24,
+                    padding: 1,
+                    border: '1px solid #999',
+                    backgroundColor: '#ffc211',
+                    textAlign: 'center'
+                }}>
                     {unread_candidates + unread_agents}
                 </span>
             );
