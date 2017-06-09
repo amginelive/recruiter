@@ -8,6 +8,7 @@ import { AppContainer } from 'react-hot-loader';
 
 import App from './chat.jsx';
 import IdleMonitor from './idle-monitor.jsx';
+import GlobalMessagesNotification from './global-messages-notification.jsx';
 import rootReducer from './reducers/index.js';
 import { init as websocketInit, emit } from './actions/websocket.js';
 
@@ -47,10 +48,12 @@ if (window.location.pathname === '/chat/') {
     render(App, document.getElementById('app'));
 }
 
-const div = document.createElement('div');
-div.id = 'idle-monitor';
-document.getElementsByTagName('body')[0].appendChild(div);
-render(IdleMonitor, div);
+const divIdle = document.createElement('div');
+divIdle.id = 'idle-monitor';
+document.getElementsByTagName('body')[0].appendChild(divIdle);
+render(IdleMonitor, divIdle);
+
+render(GlobalMessagesNotification, document.getElementById('global-messages-notification'));
 
 if (module.hot) {
     if (window.location.pathname === '/chat') {
@@ -60,7 +63,11 @@ if (module.hot) {
         });
     }
     module.hot.accept('./idle-monitor.jsx', () => {
-        ReactDOM.unmountComponentAtNode(div);
-        render(IdleMonitor, div);
+        ReactDOM.unmountComponentAtNode(divIdle);
+        render(IdleMonitor, divIdle);
+    });
+    module.hot.accept('./global-messages-notification.jsx', () => {
+        ReactDOM.unmountComponentAtNode(document.getElementById('global-messages-notification'));
+        render(GlobalMessagesNotification, document.getElementById('global-messages-notification'));
     });
 }
