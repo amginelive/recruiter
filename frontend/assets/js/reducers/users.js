@@ -16,15 +16,8 @@ const users = (state = new Immutable.Map().withMutations(ctx => ctx.set('agents'
         state = state.updateIn(['agents'],
             list => {
                 const index = list.findIndex(item => {return item.get('id') === action.payload.id});
-                if (index > 0) {
-                    return list.update(
-                        index,
-                        item => {
-                            if (item) {
-                                return item.set('online', true)
-                            }
-                        }
-                    );
+                if (index >= 0) {
+                    return list.update(index, item => item.set('online', 2));
                 } else {
                     return list;
                 }
@@ -33,15 +26,8 @@ const users = (state = new Immutable.Map().withMutations(ctx => ctx.set('agents'
         return state.updateIn(['candidates'],
             list => {
                 const index = list.findIndex(item => {return item.get('id') === action.payload.id});
-                if (index > 0) {
-                    return list.update(
-                        index,
-                        item => {
-                            if (item) {
-                                return item.set('online', true)
-                            }
-                        }
-                    );
+                if (index >= 0) {
+                    return list.update(index, item => item.set('online', 2));
                 } else {
                     return list;
                 }
@@ -52,15 +38,8 @@ const users = (state = new Immutable.Map().withMutations(ctx => ctx.set('agents'
         state = state.updateIn(['agents'],
             list => {
                 const index = list.findIndex(item => {return item.get('id') === action.payload.user.id});
-                if (index > 0) {
-                    return list.update(
-                        index,
-                        item => {
-                            if (item) {
-                                return item.set('online', true)
-                            }
-                        }
-                    );
+                if (index >= 0) {
+                    return list.update(index, item => item.set('online', 2));
                 } else {
                     return list;
                 }
@@ -69,15 +48,8 @@ const users = (state = new Immutable.Map().withMutations(ctx => ctx.set('agents'
         return state.updateIn(['candidates'],
             list => {
                 const index = list.findIndex(item => {return item.get('id') === action.payload.user.id});
-                if (index > 0) {
-                    return list.update(
-                        index,
-                        item => {
-                            if (item) {
-                                return item.set('online', true)
-                            }
-                        }
-                    );
+                if (index >= 0) {
+                    return list.update(index, item => item.set('online', 2));
                 } else {
                     return list;
                 }

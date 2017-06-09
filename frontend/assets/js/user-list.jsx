@@ -12,9 +12,10 @@ class UserList extends React.Component {
 
         this.state = {
             activeUser: 0,
-            userPresencePollingIterval: 10
+            userPresencePollingInterval: 10,
+            selectedUsersGroup: 0
         };
-        setInterval(() => this.props.actions.userPresence(), this.state.userPresencePollingIterval*1000);
+        setInterval(() => this.props.actions.userPresence(), this.state.userPresencePollingInterval*1000);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -39,14 +40,18 @@ class UserList extends React.Component {
                     key={user.get('id')}
                     name={user.get('name')}
                     id={user.get('id')}
-                    className={'user-list-item' + (user.get('id') === this.state.activeUser ? ' active-user' : '')}
+                    className={'user-list-item' + (user.get('id') === this.state.activeUser ? ' active' : '')}
                 >
                     <img className='user-list-item-photo' src={user.get('photo')} />
-                    <span className={'user-list-item-status' + (user.get('online') === true ? ' user-online' : '')}>●</span>
+                    <span className={'user-list-item-status' + (user.get('online') === 2 ? ' user-online' : (user.get('online') === 1 ? ' user-away': ''))}>●</span>
                     <span className='user-list-item-name'>{user.get('name')}</span>
                 </div>
             );
         }).toArray();
+    }
+
+    handleUserGroupSelect(group) {
+        this.setState({selectedUsersGroup: group});
     }
 
     render() {
@@ -58,13 +63,14 @@ class UserList extends React.Component {
                                 autoHide autoHideTimeout={1000}
                                 autoHideDuration={200}>
                     <div className='user-list'>
-                        <div className='user-list-group'>
-                            <div className='user-list-group-header'>My team network</div>
-                            {this.renderUsersGroup(users.get('candidates'), 'team network')}
+                        <div className='user-list-header'>
+                            <button className={'chat-button user-list-button button-candidates' + (this.state.selectedUsersGroup === 0 ? ' active' : '')} onClick={this.handleUserGroupSelect.bind(this, 0)}>Candidates</button>
+                            <button className={'chat-button user-list-button button-agents' + (this.state.selectedUsersGroup === 1 ? ' active' : '')} onClick={this.handleUserGroupSelect.bind(this, 1)}>Agents</button>
                         </div>
                         <div className='user-list-group'>
-                            <div className='user-list-group-header'>Agents</div>
-                            {this.renderUsersGroup(users.get('agents'), 'agents')}
+                            {this.state.selectedUsersGroup === 0 ?
+                                this.renderUsersGroup(users.get('candidates'), 'team network') :
+                                this.renderUsersGroup(users.get('agents'), 'agents')}
                         </div>
                     </div>
                 </Scrollbars>

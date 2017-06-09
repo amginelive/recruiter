@@ -14,35 +14,12 @@ class MessageList extends React.Component {
 
         this.scrollList = this.scrollList.bind(this);
         this.state = {
-            userTypingExpireTime: 3,
             prevScrollHeight: 0,
         };
     }
 
     scrollList(value) {
         this.scroll.scrollTop(value);
-    }
-
-    handleTypingProps(typing) {
-        if (typing.size === 0) {
-            return;
-        }
-        typing.get('typingMap').entrySeq().forEach(entry => {
-            if (entry[1].get('timer_id') === 0) {
-                const timer_id = setTimeout(() => {
-                    this.props.actions.typeTimerExpire({
-                        user_id: entry[0],
-                        user_name: entry[1].get('user_name'),
-                        timer_id
-                    });
-                }, this.state.userTypingExpireTime*1000);
-                this.props.actions.typeTimerStart({
-                    user_id: entry[0],
-                    user_name: entry[1].get('user_name'),
-                    timer_id
-                });
-            }
-        });
     }
 
     componentDidUpdate(prevProps, prevState) { // This is keeping scroll in place on requesting more messages.
@@ -52,21 +29,12 @@ class MessageList extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const { typing, messages } = nextProps;
+        const { messages } = nextProps;
 
-        this.handleTypingProps(typing);
-
-        const {scrollTop, clientHeight, scrollHeight} = this.scroll.getValues();
-        if ((scrollTop + clientHeight === scrollHeight) && // We are at the bottom of scroll list
-            ((messages.get('messageList').size - this.props.messages.get('messageList').size === 1) || // One new message
-                (this.props.messages.get('messageList').size === 0 && // Or chat init
-                messages.get('messageList').size - this.props.messages.get('messageList').size >= 1))) {
-            setTimeout(
-                () => {
-                    this.scrollList(this.scroll.getScrollHeight());
-                },
-                10
-            );
+        if ((messages.get('more') === this.props.messages.get('more') && messages.get('messageList').size - this.props.messages.get('messageList').size === 1) || // One new message came
+            this.props.messages.get('activeChat') !== messages.get('activeChat')) // OR Chat init happened
+        {
+            setTimeout(() => this.scrollList(this.scroll.getScrollHeight()), 10);
         }
     }
 
@@ -90,17 +58,8 @@ class MessageList extends React.Component {
     }
 
     render() {
-        const { messages, typing } = this.props;
-        let typingUI = (<div></div>);
-        if (typing.size > 0) {
-            typingUI = (
-                <div className='user-type-list'>
-                    {typing.get('typingMap').map((user, index) => {
-                        return <div key={index} className='user-type-list-item'>{user.get('user_name') + ' is typing...'}</div>
-                    }).toArray()}
-                </div>
-            );
-        }
+        const { messages } = this.props;
+
         return (
             <div className='message-list-container'>
                 <Scrollbars ref={(scroll) => {this.scroll = scroll;}}
@@ -123,7 +82,6 @@ class MessageList extends React.Component {
                         }).toArray()}
                     </div>
                 </Scrollbars>
-                {typingUI}
             </div>
         );
     }
@@ -131,8 +89,7 @@ class MessageList extends React.Component {
 
 function mapStateToProps (state) {
     return {
-        messages: state.get('messages'),
-        typing: state.get('typing')
+        messages: state.get('messages')
     };
 }
 

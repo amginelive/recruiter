@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED=1 \
     DJANGO_SETTINGS_MODULE=conf.settings.prod \
     NGINX_VERSION=1.11.13-1~jessie \
     NPM_CONFIG_LOGLEVEL=info \
-    NODE_VERSION=7.10.0
+    NODE_VERSION=8.0.0
 
 EXPOSE 80
 
@@ -39,13 +39,13 @@ RUN set -ex \
     C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
     56730D5401028683275BD23C23EFEFE93C4CFFFE \
   ; do \
-    gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key" || \
     gpg --keyserver pgp.mit.edu --recv-keys "$key" || \
-    gpg --keyserver keyserver.pgp.com --recv-keys "$key" ; \
+    gpg --keyserver keyserver.pgp.com --recv-keys "$key" || \
+    gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key" ; \
   done
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
-  && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
+  && curl -SLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
   && gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \
   && grep " node-v$NODE_VERSION-linux-x64.tar.xz\$" SHASUMS256.txt | sha256sum -c - \
   && tar -xJf "node-v$NODE_VERSION-linux-x64.tar.xz" -C /usr/local --strip-components=1 \

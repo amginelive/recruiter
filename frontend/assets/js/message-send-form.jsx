@@ -29,7 +29,7 @@ class MessageForm extends React.Component {
     }
 
     checkInput(event) {
-        if (this.state.lastInput === null || (moment().unix() - this.state.lastInput >= this.state.typingThrottleTime)) {
+        if ((this.state.lastInput === null || (moment().unix() - this.state.lastInput >= this.state.typingThrottleTime)) && this.props.typing.get('activeChat') !== 0) {
             this.setState({lastInput: moment().unix()});
             this.props.actions.userTyping();
         }
@@ -52,7 +52,7 @@ class MessageForm extends React.Component {
                        onKeyDown={this.checkInput.bind(this)}
                        value={this.state.message}
                 />
-                <button className='send-button' type='submit' disabled={submitDisabled}>
+                <button className='chat-button send-button' type='submit' disabled={submitDisabled}>
                     Send
                 </button>
             </form>
@@ -61,7 +61,9 @@ class MessageForm extends React.Component {
 }
 
 function mapStateToProps (state) {
-    return {};
+    return {
+        typing: state.get('typing')
+    };
 }
 
 function mapDispatchToProps (dispatch) {
