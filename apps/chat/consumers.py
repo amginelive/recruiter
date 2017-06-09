@@ -56,6 +56,7 @@ class ChatServer(JsonWebsocketConsumer):
             }
 
         response = {
+            'activeChat': 0,
             'agents': {},
             'candidates': {}
         }
@@ -135,6 +136,8 @@ class ChatServer(JsonWebsocketConsumer):
                    'payload': {'conversation_id': conversation.id,
                                'more': more,
                                'messages': messages}})
+        if len(messages) > 0:
+            self.cmd_read_message(messages[-1]['id'])
 
     def cmd_message(self, payload):
         conversation = self.message.channel_session.get('conversation')
@@ -210,6 +213,11 @@ class ChatServer(JsonWebsocketConsumer):
         participant = conversation.participants.get(user=self.message.user)
         participant.last_read_message = Message.objects.get(id=payload)
         participant.save()
+        self.send({
+            'type': 'readMessage',
+            'payload': conversation.participants
+                    .exclude(id=participant.id).first().user.id
+        })
 
     def disconnect(self, message, **kwargs):
         if not message.user.is_authenticated():
