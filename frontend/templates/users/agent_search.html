@@ -11,6 +11,7 @@
                 <li><a href="{% url 'recruit:dashboard' %}">Activity Feed</a></li>
                 <li><a href="{% url 'recruit:search' %}">Search Candidates</a></li>
                 <li class="active">Search Agents</li>
+                <li><a href="{% url 'recruit:job_post_list' %}">Job Postings</a></li>
             </ol>
         {% elif user.account_type == user.ACCOUNT_CANDIDATE %}
             <ol class="breadcrumb">

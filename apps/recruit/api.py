@@ -2,18 +2,22 @@ from django.views.generic import (
     CreateView,
     DeleteView,
     FormView,
+    UpdateView,
 )
 
 from braces.views import LoginRequiredMixin, JSONResponseMixin
 
 from .forms import (
     ConnectionRequestForm,
+    JobApplicationForm,
     JobReferralForm,
     UserReferralForm,
 )
 from .models import (
     Connection,
     ConnectionRequest,
+    JobApplication,
+    JobPost,
     JobReferral,
     UserReferral,
 )
@@ -118,3 +122,30 @@ class UserReferralCreateView(CandidateRequiredMixin, FormView, JSONResponseMixin
         })
 
 user_referral_create = UserReferralCreateView.as_view()
+
+
+class JobApplicationView(CandidateRequiredMixin, CreateView, JSONResponseMixin):
+    """
+    View for candidates applying to a job post.
+    """
+    model = JobApplication
+    form_class = JobApplicationForm
+
+    def get_initial(self):
+        return {
+            'job_post': JobPost.objects.get(uuid=self.kwargs.get('uuid'))
+        }
+
+    def form_valid(self, form):
+        form.save()
+        return self.render_json_response({
+            'success': True,
+        })
+
+    def form_invalid(self, form):
+        return self.render_json_response({
+            'success': False,
+            'errors': form.errors,
+        })
+
+job_application = JobApplicationView.as_view()

@@ -41,40 +41,50 @@
                     </button>
                     <a href="{% url 'recruit:home' %}"><img class="logo" src="{% static 'img/logo.png' %}" alt="{% trans 'SquareBalloon Logo' %}"/></a>
                 </div>
-
-                <div id="navbar" class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav navbar-right">
-                        {% if user.is_anonymous %}
-                            <li><a href="{% url 'account_signup' %}?account_type=1"><i class="glyphicon glyphicon-user"></i> Register CV</a></li>
-                            <li><a href="{% url 'account_signup' %}?account_type=2"><i class="glyphicon glyphicon-briefcase"></i> Recruiter registration</a></li>
-                            <li>
-                                <a href="{% url 'account_login' %}"><i class="glyphicon glyphicon-log-in"></i> {% trans "Login" %}</a>
-                            </li>
-                        {% else %}
-                            <li>
-                                <a href="{% url 'users:profile_detail' user.slug %}">{% trans "My Profile" %}</a>
-                            </li>
-                            <li>
-                                <a href="{% url 'recruit:dashboard' %}">{% trans "My Dashboard" %}</a>
-                            </li>
-                            <li>
-                                <a href="{% url 'chat:chat' %}">{% trans "Messages" %}</a>
-                            </li>
-                            <li class="dropdown">
-                                <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="account" aria-expanded="true">
-                                    {% trans "My Account" %} <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="account">
-                                    <li><a href="{% url 'users:profile_update' %}">{% trans "Edit Profile" %}</a></li>
-                                    <li><a href="{% url 'account_change_password' %}">{% trans "Change Password" %}</a></li>
-                                    <li class="divider"></li>
+                <div class="navbar navbar-fixed-top" role="navigation">
+                    <div class="container">
+                        <div class="collapse navbar-collapse navbar-ex1-collapse">
+                            <ul class="nav navbar-nav navbar-right">
+                                {% if user.is_anonymous %}
+                                    <li><a href="{% url 'account_signup' %}?account_type=1"><i class="glyphicon glyphicon-user"></i> Register CV</a></li>
+                                    <li><a href="{% url 'account_signup' %}?account_type=2"><i class="glyphicon glyphicon-briefcase"></i> Recruiter registration</a></li>
                                     <li>
-                                        <a href="{% url 'account_logout' %}">{% trans "Logout" %}</a>
+                                        <a href="{% url 'account_login' %}"><i class="glyphicon glyphicon-log-in"></i> {% trans "Login" %}</a>
                                     </li>
-                                </ul>
-                            </li>
-                       {% endif %}
-                    </ul>
+                                {% else %}
+                                    <li>
+                                        <a href="{% url 'users:profile_detail' user.slug %}">{% trans "My Profile" %}</a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'recruit:dashboard' %}">{% trans "My Dashboard" %}</a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'chat:chat' %}">{% trans "Messages" %}</a>
+                                    </li>
+                                    <li class="menu-item dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Hi" %} {{ user.get_full_name }} <b class="caret"></b></a>
+                                        <ul class="dropdown-menu">
+                                            <li class="menu-item dropdown dropdown-submenu">
+                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Accounts" %}</a>
+                                                <ul class="dropdown-menu">
+                                                    <li class="menu-item">
+                                                        <a href="{% url 'users:profile_update' %}">{{ user.email }}</a>
+                                                    </li>
+                                                    <li class="menu-item">
+                                                        <a href="{% url 'account_change_password' %}">{% trans "Change Password" %}</a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="divider"></li>
+                                            <li>
+                                                <a href="{% url 'account_logout' %}">{% trans "Logout" %}</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>

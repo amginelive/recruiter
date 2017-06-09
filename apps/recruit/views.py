@@ -34,6 +34,7 @@ from .models import (
     Connection,
     ConnectionInvite,
     ConnectionRequest,
+    JobApplication,
     JobReferral,
     UserReferral,
 )
@@ -201,7 +202,7 @@ class JobPostListView(AgentRequiredMixin, ListView):
     """
     model = JobPost
     context_object_name = 'job_posts'
-    template_name = 'recruit/job_posts/list.html'
+    template_name = 'recruit/job_post_list.html'
 
     def get_queryset(self):
         return JobPost.objects.filter(posted_by=self.request.user.agent).order_by('-updated_at')
@@ -215,7 +216,7 @@ class JobPostDetailView(LoginRequiredMixin, DetailView):
     """
     model = JobPost
     context_object_name = 'job_post'
-    template_name = 'recruit/job_posts/detail.html'
+    template_name = 'recruit/job_post_detail.html'
 
     def get_object(self):
         return JobPost.objects.get(uuid=self.kwargs.get('uuid'))
@@ -229,7 +230,7 @@ class JobPostCreateView(AgentRequiredMixin, CreateView):
     """
     model = JobPost
     form_class = JobPostForm
-    template_name = 'recruit/job_posts/create_update.html'
+    template_name = 'recruit/job_post_create_update.html'
     success_url = reverse_lazy('recruit:job_post_list')
 
     def get_initial(self):
@@ -245,7 +246,7 @@ class JobPostUpdateView(AgentRequiredMixin, UpdateView):
     model = JobPost
     context_object_name = 'job_post'
     form_class = JobPostForm
-    template_name = 'recruit/job_posts/create_update.html'
+    template_name = 'recruit/job_post_create_update.html'
     success_url = reverse_lazy('recruit:job_post_list')
 
     def get_object(self):
@@ -260,7 +261,7 @@ class JobPostDeleteView(AgentRequiredMixin, DeleteView):
     """
     model = JobPost
     context_object_name = 'job_post'
-    template_name = 'recruit/job_posts/delete.html'
+    template_name = 'recruit/job_post_delete.html'
     success_url = reverse_lazy('recruit:job_post_list')
 
     def get_object(self):
@@ -307,3 +308,19 @@ class ConnectionInviteCreateView(LoginRequiredMixin, CreateView, JSONResponseMix
         return context
 
 connection_invite_create = ConnectionInviteCreateView.as_view()
+
+
+class JobApplicantListView(AgentRequiredMixin, ListView):
+    """
+    View for showing the list of applicants in the job post.
+    """
+    model = JobApplication
+    context_object_name = 'job_applications'
+    template_name = 'recruit/job_application_list.html'
+
+    def get_queryset(self):
+        job_applications = JobApplication.objects.filter(job_post__uuid=self.kwargs.get('uuid'))
+        job_applications.update(is_viewed=True)
+        return job_applications
+
+job_application_list = JobApplicantListView.as_view()
