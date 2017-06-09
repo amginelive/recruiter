@@ -40,31 +40,51 @@ class ChatServer(JsonWebsocketConsumer):
         ]
         self.message.channel_session['user_list'] = user_list
 
+        def create_user_data_dict(user):
+            conversation = self._get_or_create_conversation(user)
+            last_read_message = self.message.user.participations.get(
+                conversation=conversation).last_read_message
+            unread = conversation.messages\
+                .filter(created_at__gt=last_read_message.created_at)\
+                .count() if last_read_message else conversation.messages.all().count()
+            return {
+                'id': user.id,
+                'name': user.email,
+                'photo': user.get_photo_url(),
+                'online': user.online(),
+                'unread': unread
+            }
+
         response = {
-            'agents': [
-                {
-                    'id': user.id,
-                    'name': user.email,
-                    'photo': user.get_photo_url(),
-                    'online': user.online()
-                }
-                for user in user_list if
-                user.account_type == User.ACCOUNT_AGENT
-            ],
-            'candidates': [
-                {
-                    'id': user.id,
-                    'name': user.email,
-                    'photo': user.get_photo_url(),
-                    'online': user.online()
-                }
-                for user in user_list if
-                user.account_type == User.ACCOUNT_CANDIDATE
-            ]
+            'agents': [],
+            'candidates': []
         }
+        for user in user_list:
+            if user.account_type == User.ACCOUNT_AGENT:
+                response['agents'].append(create_user_data_dict(user))
+            if user.account_type == User.ACCOUNT_CANDIDATE:
+                response['candidates'].append(create_user_data_dict(user))
         self.send({'type': 'initUsers', 'payload': response})
         #if len(response) > 0:
         #    self.cmd_init({'user_id': response[0].get('id')})
+
+    def _get_or_create_conversation(self, user):
+        conversation = Conversation.objects \
+            .filter(users=user) \
+            .filter(users=self.message.user) \
+            .first()
+        if not conversation:
+            conversation = Conversation.objects.create()
+            participant_connecter = Participant.objects.create(
+                user=self.message.user,
+                conversation=conversation
+            )
+            participant_connectee = Participant.objects.create(
+                user=user,
+                conversation=conversation
+            )
+            conversation.save()
+        return conversation
 
     def receive(self, content, **kwargs):
         if content.get('type') not in ['userIdle', 'userPresence']:
@@ -84,23 +104,11 @@ class ChatServer(JsonWebsocketConsumer):
             self.cmd_idle(True)
         elif content.get('type') == 'userActive':
             self.cmd_idle(False)
+        elif content.get('type') == 'readMessage':
+            self.cmd_read_message(content.get('payload'))
 
     def cmd_init(self, payload):
-        conversation = Conversation.objects\
-            .filter(users__id=payload.get('user_id'))\
-            .filter(users=self.message.user)\
-            .first()
-        if not conversation:
-            conversation = Conversation.objects.create()
-            participant_connecter = Participant.objects.create(
-                user=self.message.user,
-                conversation=conversation
-            )
-            participant_connectee = Participant.objects.create(
-                user=User.objects.get(id=payload.get('user_id')),
-                conversation=conversation
-            )
-            conversation.save()
+        conversation = self._get_or_create_conversation(payload.get('user_id'))
         self.message.channel_session['conversation'] = conversation
 
         query = Message.objects.filter(conversation=conversation)\
@@ -198,6 +206,13 @@ class ChatServer(JsonWebsocketConsumer):
 
     def cmd_idle(self, idle):
         update_user_idle(self.message.user, idle)
+
+    def cmd_read_message(self, payload):
+        conversation = self.message.channel_session.get('conversation')
+
+        participant = conversation.participants.get(user=self.message.user)
+        participant.last_read_message = Message.objects.get(id=payload)
+        participant.save()
 
     def disconnect(self, message, **kwargs):
         if not message.user.is_authenticated():

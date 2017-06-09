@@ -38,13 +38,12 @@ class UserList extends React.Component {
                 <div
                     onClick={() => {this.userInit(user.get('id'))}}
                     key={user.get('id')}
-                    name={user.get('name')}
-                    id={user.get('id')}
                     className={'user-list-item' + (user.get('id') === this.state.activeUser ? ' active' : '')}
                 >
                     <img className='user-list-item-photo' src={user.get('photo')} />
                     <span className={'user-list-item-status' + (user.get('online') === 2 ? ' user-online' : (user.get('online') === 1 ? ' user-away': ''))}>●</span>
                     <span className='user-list-item-name'>{user.get('name')}</span>
+                    {user.get('unread') > 0 ? <div className='user-list-item-unread'><span>{user.get('unread')}</span></div> : ''}
                 </div>
             );
         }).toArray();

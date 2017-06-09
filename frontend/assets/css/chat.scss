@@ -16,7 +16,7 @@
 .user-list-container {
   border: 1px solid black;
   border-radius: 2px;
-  width: 200px;
+  width: 250px;
   margin-right: 10px;
 }
 
@@ -105,6 +105,22 @@
   width: 50px;
   height: 50px;
   flex: none;
+}
+
+.user-list-item-unread {
+  display: flex;
+  flex-direction: row-reverse;
+  flex-grow: 1;
+}
+
+.user-list-item-unread > span {
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    padding: 1px;
+    border: 1px solid #999;
+    background-color: #ffc211;
+    text-align: center;
 }
 
 .user-list-item.active {
