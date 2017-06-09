@@ -46,9 +46,9 @@ class ChatServer(JsonWebsocketConsumer):
                 conversation=conversation).last_read_message
             unread = conversation.messages\
                 .filter(created_at__gt=last_read_message.created_at)\
-                .count() if last_read_message else conversation.messages.all().count()
+                .count() if last_read_message\
+                else conversation.messages.all().count()
             return {
-                'id': user.id,
                 'name': user.email,
                 'photo': user.get_photo_url(),
                 'online': user.online(),
@@ -56,14 +56,14 @@ class ChatServer(JsonWebsocketConsumer):
             }
 
         response = {
-            'agents': [],
-            'candidates': []
+            'agents': {},
+            'candidates': {}
         }
         for user in user_list:
             if user.account_type == User.ACCOUNT_AGENT:
-                response['agents'].append(create_user_data_dict(user))
+                response['agents'][str(user.id)] = create_user_data_dict(user)
             if user.account_type == User.ACCOUNT_CANDIDATE:
-                response['candidates'].append(create_user_data_dict(user))
+                response['candidates'][str(user.id)] = create_user_data_dict(user)
         self.send({'type': 'initUsers', 'payload': response})
         #if len(response) > 0:
         #    self.cmd_init({'user_id': response[0].get('id')})
@@ -158,15 +158,20 @@ class ChatServer(JsonWebsocketConsumer):
             self.group_send(str(user.id), response)
 
     def cmd_presence(self):
-        # It is tied to the order of users sent in connect
         user_list = self.message.channel_session['user_list']
         response = {
             'type': 'userPresence',
             'payload': {
-                'agents': [{'online': user.online()} for user in user_list
-                           if user.account_type == User.ACCOUNT_AGENT],
-                'candidates': [{'online': user.online()} for user in user_list
-                               if user.account_type == User.ACCOUNT_CANDIDATE]
+                'agents': {
+                    str(user.id): {'online': user.online()}
+                    for user in user_list
+                    if user.account_type == User.ACCOUNT_AGENT
+                },
+                'candidates': {
+                    str(user.id): {'online': user.online()}
+                    for user in user_list
+                    if user.account_type == User.ACCOUNT_CANDIDATE
+                }
             }
         }
         return self.send(response)

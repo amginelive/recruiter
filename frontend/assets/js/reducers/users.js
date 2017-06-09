@@ -5,7 +5,7 @@ import * as config from '../config.js';
 
 const { messageTypes } = config;
 
-const users = (state = new Immutable.Map().withMutations(ctx => ctx.set('agents', new Immutable.List()).set('candidates', new Immutable.List())), action) => {
+const users = (state = new Immutable.Map().withMutations(ctx => ctx.set('agents', new Immutable.Map()).set('candidates', new Immutable.Map())), action) => {
     if (action.type === messageTypes.initUsers) {
         return Immutable.fromJS(action.payload);
     }
@@ -13,48 +13,18 @@ const users = (state = new Immutable.Map().withMutations(ctx => ctx.set('agents'
         return state.mergeDeep(action.payload)
     }
     if (action.type === messageTypes.userTyping) {
-        state = state.updateIn(['agents'],
-            list => {
-                const index = list.findIndex(item => {return item.get('id') === action.payload.id});
-                if (index >= 0) {
-                    return list.update(index, item => item.set('online', 2));
-                } else {
-                    return list;
-                }
-            }
-        );
-        return state.updateIn(['candidates'],
-            list => {
-                const index = list.findIndex(item => {return item.get('id') === action.payload.id});
-                if (index >= 0) {
-                    return list.update(index, item => item.set('online', 2));
-                } else {
-                    return list;
-                }
-            }
-        );
+        if (state.get('agents').has(action.payload.id)) {
+            return state.mergeIn(['agents', action.payload.id], {online: 2});
+        } else {
+            return state.mergeIn(['candidates', action.payload.id], {online: 2});
+        }
     }
     if (action.type === messageTypes.newMessage) {
-        state = state.updateIn(['agents'],
-            list => {
-                const index = list.findIndex(item => {return item.get('id') === action.payload.user.id});
-                if (index >= 0) {
-                    return list.update(index, item => item.set('online', 2));
-                } else {
-                    return list;
-                }
-            }
-        );
-        return state.updateIn(['candidates'],
-            list => {
-                const index = list.findIndex(item => {return item.get('id') === action.payload.user.id});
-                if (index >= 0) {
-                    return list.update(index, item => item.set('online', 2));
-                } else {
-                    return list;
-                }
-            }
-        );
+        if (state.get('agents').has(action.payload.user.id)) {
+            return state.mergeIn(['agents', action.payload.user.id], {online: 2});
+        } else {
+            return state.mergeIn(['candidates', action.payload.user.id], {online: 2});
+        }
     }
     return state;
 };

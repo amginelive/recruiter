@@ -33,17 +33,17 @@ class UserList extends React.Component {
         if (users.size === 0) {
             return <div className='empty-user-group'>You have no {group_name} connections</div>
         }
-        return users.map(user => {
+        return users.entrySeq().map(entry => {
             return (
                 <div
-                    onClick={() => {this.userInit(user.get('id'))}}
-                    key={user.get('id')}
-                    className={'user-list-item' + (user.get('id') === this.state.activeUser ? ' active' : '')}
+                    onClick={() => {this.userInit(entry[0])}}
+                    key={entry[0]}
+                    className={'user-list-item' + (entry[0] === this.state.activeUser ? ' active' : '')}
                 >
-                    <img className='user-list-item-photo' src={user.get('photo')} />
-                    <span className={'user-list-item-status' + (user.get('online') === 2 ? ' user-online' : (user.get('online') === 1 ? ' user-away': ''))}>●</span>
-                    <span className='user-list-item-name'>{user.get('name')}</span>
-                    {user.get('unread') > 0 ? <div className='user-list-item-unread'><span>{user.get('unread')}</span></div> : ''}
+                    <img className='user-list-item-photo' src={entry[1].get('photo')} />
+                    <span className={'user-list-item-status' + (entry[1].get('online') === 2 ? ' user-online' : (entry[1].get('online') === 1 ? ' user-away': ''))}>●</span>
+                    <span className='user-list-item-name'>{entry[1].get('name')}</span>
+                    {entry[1].get('unread') > 0 ? <div className='user-list-item-unread'><span>{entry[1].get('unread')}</span></div> : ''}
                 </div>
             );
         }).toArray();
