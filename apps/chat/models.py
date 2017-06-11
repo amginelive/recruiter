@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from core.models import AbstractTimeStampedModel
+from core.models import AbstractTimeStampedModel, optional
 
 
 class Message(AbstractTimeStampedModel):
@@ -51,10 +51,10 @@ class Conversation(AbstractTimeStampedModel):
 class Participant(AbstractTimeStampedModel):
     last_read_message = models.ForeignKey(
         'chat.Message',
-        null=True,
         on_delete=models.CASCADE,
         related_name='+',
-        verbose_name='Last read message'
+        verbose_name='Last read message',
+        **optional
     )
     user = models.ForeignKey(
         'users.User',
