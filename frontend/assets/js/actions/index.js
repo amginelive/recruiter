@@ -53,3 +53,9 @@ export function userActive() {
         emit(messageTypes.userActive, {});
     }
 }
+
+export function readMessage(message_id) {
+    return (dispatch, getState, {emit}) => {
+        emit(messageTypes.readMessage, message_id); // TODO: refactor other actions like this.
+    }
+}

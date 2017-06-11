@@ -30,7 +30,13 @@ module.exports = {
         rules: [
         {
             test: /\.jsx?$/,
-            use: 'babel-loader',
+            use: {
+                loader: 'babel-loader',
+                options: {
+                    presets: [['env', {modules: false}], 'react'],
+                    plugins: ['transform-object-rest-spread', 'babel-plugin-syntax-dynamic-import']
+                }
+            },
             exclude: [/node_modules/]
         },
         {

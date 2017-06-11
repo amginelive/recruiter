@@ -31,9 +31,11 @@ class MessageList extends React.Component {
     componentWillReceiveProps(nextProps) {
         const { messages } = nextProps;
 
-        if ((messages.get('more') === this.props.messages.get('more') && messages.get('messageList').size - this.props.messages.get('messageList').size === 1) || // One new message came
-            this.props.messages.get('activeChat') !== messages.get('activeChat')) // OR Chat init happened
-        {
+        if (messages.get('more') === this.props.messages.get('more') && messages.get('messageList').size - this.props.messages.get('messageList').size === 1) { // One new message came
+            this.props.actions.readMessage(messages.get('messageList').last().get('id'));
+            setTimeout(() => this.scrollList(this.scroll.getScrollHeight()), 10);
+        }
+        if (this.props.messages.get('activeChat') !== messages.get('activeChat')) { // Chat init happened
             setTimeout(() => this.scrollList(this.scroll.getScrollHeight()), 10);
         }
     }
