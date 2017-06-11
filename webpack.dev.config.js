@@ -24,4 +24,6 @@ config.plugins = config.plugins.concat([
     new webpack.NoEmitOnErrorsPlugin()
 ]);
 
+config.module.rules[0].use.options.plugins = ['transform-object-rest-spread', 'babel-plugin-syntax-dynamic-import', 'react-hot-loader/babel'];
+
 module.exports = config;
