@@ -8,8 +8,7 @@ from django.utils import timezone
 
 def make_many_participants(apps, schema_editor):
     """
-        Adds the Author object in Book.author to the
-        many-to-many relationship in Book.authors
+        Populates new relationship from old one.
     """
     Conversation = apps.get_model('chat', 'Conversation')
     Participant = apps.get_model('chat', 'Participant')
