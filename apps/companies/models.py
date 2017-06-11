@@ -10,15 +10,9 @@ from django.utils.translation import ugettext_lazy as _
 
 from django_countries.fields import CountryField
 
-from core.models import AbstractTimeStampedModel
+from core.models import AbstractTimeStampedModel, optional
 from core.utils import get_upload_path
 from libs.tools import random_string_gen
-
-
-optional = {
-    'blank': True,
-    'null': True,
-}
 
 
 class Company(AbstractTimeStampedModel):

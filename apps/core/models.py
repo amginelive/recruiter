@@ -5,6 +5,12 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 
+optional = {
+    'blank': True,
+    'null': True,
+}
+
+
 class AbstractTimeStampedModel(models.Model):
     """
     Base for time-stamped models.

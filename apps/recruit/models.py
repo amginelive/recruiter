@@ -4,14 +4,8 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 
-from core.models import AbstractTimeStampedModel
+from core.models import AbstractTimeStampedModel, optional
 from django_countries.fields import CountryField
-
-
-optional = {
-    'blank': True,
-    'null': True,
-}
 
 
 class JobPost(AbstractTimeStampedModel):
