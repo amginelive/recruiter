@@ -44,10 +44,12 @@ class ChatServer(JsonWebsocketConsumer):
             conversation = self._get_or_create_conversation(user)
             last_read_message = self.message.user.participations.get(
                 conversation=conversation).last_read_message
-            unread = conversation.messages\
-                .filter(created_at__gt=last_read_message.created_at)\
-                .count() if last_read_message\
-                else conversation.messages.all().count()
+            if last_read_message:
+                unread = conversation.messages\
+                    .filter(created_at__gt=last_read_message.created_at)\
+                    .count()
+            else:
+                unread = conversation.messages.all().count()
             return {
                 'name': user.email,
                 'photo': user.get_photo_url(),
