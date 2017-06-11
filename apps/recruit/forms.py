@@ -150,9 +150,9 @@ class JobReferralForm(forms.Form):
 
         choices = []
         for connection in connections:
-            if connection.connecter == self.candidate.user:
+            if connection.connecter == self.candidate.user and connection.connectee.account_type == User.ACCOUNT_CANDIDATE:
                 choices.append((connection.connectee.candidate.pk, connection.connectee.get_full_name()))
-            elif connection.connectee == self.candidate.user:
+            elif connection.connectee == self.candidate.user and connection.connecter.account_type == User.ACCOUNT_CANDIDATE:
                 choices.append((connection.connecter.candidate.pk, connection.connecter.get_full_name()))
         self.fields['refer_to'].choices = choices
 
