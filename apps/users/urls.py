@@ -11,6 +11,7 @@ urlpatterns = (
     url(r'^candidate/search/$', views.candidate_search, name='candidate_search'),
     url(r'^agent/search/$', views.agent_search, name='agent_search'),
 
-    url(r'^photo/upload/$', api.profile_photo_upload, name='profile_photo_upload'),
-    url(r'^cv/upload/$', api.profile_cv_upload, name='profile_cv_upload'),
+    url(r'^photo/upload/api/$', api.profile_photo_upload, name='profile_photo_upload'),
+    url(r'^cv/upload/api/$', api.profile_cv_upload, name='profile_cv_upload'),
+    url(r'^profile/:pk/update/api/$', api.profile_candidate_update, name='profile_candidate_update'),
 )

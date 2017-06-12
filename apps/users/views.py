@@ -4,7 +4,6 @@ from django.contrib.postgres.search import (
     SearchVector,
 )
 
-from django.db.models import Q
 from django.shortcuts import render
 from django.views.generic import (
     DetailView,
@@ -19,6 +18,7 @@ from .forms import (
     AgentUpdateForm,
     CandidatePhotoUploadForm,
     CandidateUpdateForm,
+    CandidateProfileUpdateForm,
 )
 from .mixins import CandidateRequiredMixin
 from .models import (
@@ -131,6 +131,8 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
                     .exclude(author=self.request.user)\
                     .order_by('created_at')\
                     .last()
+            if self.request.user == profile.user:
+                context['profile_candidate_form'] = CandidateProfileUpdateForm(instance=self.request.user.candidate)
 
         elif profile.user.account_type == User.ACCOUNT_AGENT:
             company = profile.company

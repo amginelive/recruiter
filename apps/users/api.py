@@ -1,17 +1,24 @@
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.views.generic import (
+    UpdateView,
     View,
 )
 
-from braces.views import LoginRequiredMixin
+from braces.views import (
+    JSONResponseMixin,
+    LoginRequiredMixin,
+)
 
 from .forms import (
     AgentPhotoUploadForm,
     CandidateCVUploadForm,
     CandidatePhotoUploadForm,
+    CandidateProfileUpdateForm,
 )
 from .mixins import CandidateRequiredMixin
+from .models import Candidate
+
 
 User = get_user_model()
 
@@ -61,3 +68,28 @@ class ProfileCVUploadAPIView(CandidateRequiredMixin, View):
             return JsonResponse({'success': True, 'cv': candidate.cv.url})
 
 profile_cv_upload = ProfileCVUploadAPIView.as_view()
+
+
+class ProfileCandidateUpdateAPIView(CandidateRequiredMixin, UpdateView, JSONResponseMixin):
+    """
+    View for updating the candidate's profile through the profile page.
+    """
+    model = Candidate
+    form_class = CandidateProfileUpdateForm
+
+    def get_object(self):
+        return Candidate.objects.get(pk=self.kwargs.get('pk'))
+
+    def form_valid(self, form):
+        form.save()
+        return self.render_json_response({
+            'success': True,
+        })
+
+    def form_invalid(self, form):
+        return self.render_json_response({
+            'success': False,
+            'errors': form.errors,
+        })
+
+profile_candidate_update = ProfileCandidateUpdateAPIView.as_view()
