@@ -56,18 +56,20 @@
                             </form>
                         {% endif %}
                         <div class="profile-details">
-                            <div>Years of experience: {{ profile.experience }} year{{ profile.experience|pluralize }}</div>
+                            <div>Years of experience: <span class="experience-text">{{ profile.experience }} year{{ profile.experience|pluralize }}</span></div>
                             <h5><u>CORE SKILLS</u></h5>
-                            {% for skill in profile.skills.all %}
-                                <span class="core-skill-item">{{ skill.name }}</span>
-                            {% endfor %}
+                            <div class="core-skills">
+                                {% for skill in profile.skills.all %}
+                                    <span class="core-skill-item">{{ skill.name }}</span>
+                                {% endfor %}
+                            </div>
                         </div>
-                        <form action="{% url 'users:profile_candidate_update' profile.pk %}" method="POST" class="profile-edit-form hidden">
+                        <form action="{% url 'users:candidate_profile_detail_update' profile.pk %}" method="POST" class="profile-edit-details-form hidden">
                             {% csrf_token %}
                             <div class="form-group">
                                 <label class="control-label" for="id_experience">{{ profile_candidate_form.experience.label }}</label>
                                 <div class=" ">
-                                    <input type="number" name="experience" value="13" class=" form-control" id="id_experience" value="{{ profile_candidate_form.experience.value }}">
+                                    <input type="number" name="experience" value="{{ profile_candidate_form.experience.value }}" class=" form-control" id="id_experience" value="{{ profile_candidate_form.experience.value }}">
                                 </div>
                                 <div class="experience_error orange-text"></div>
                             </div>
@@ -83,39 +85,132 @@
                                 </div>
                                 <div class="skills_error orange-text"></div>
                             </div>
-                        </form>
                     </div>
                 </div>
                 <div class="row">
                     <hr class="col-md-4 col-md-offset-1"/>
-                    <hr class="col-md-4  col-md-offset-1"/>
+                    <hr class="col-md-4 col-md-offset-1"/>
                 </div>
                 <div class="row">
+                    <div class="row">
+
                     <div class="col-md-6 text-left status-section">
-                        <h5>STATUS</h5>
-                        <div>In a contract</div>
-                        <br />
-                        <div>I am open to new positions</div>
+                        <div class="status-details">
+                            <h5>STATUS</h5>
+                            <div>{{ profile.get_status_display }}</div>
+                            <br />
+                            {% if profile.status == profile.STATUS_IN_CONTRACT %}
+                                <div>{{ profile.get_in_contract_status_display }}</div>
+                            {% elif profile.status == profile.STATUS_OUT_OF_CONTRACT %}
+                                <div>{{ profile.get_out_contract_status_display }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="status-form hidden">
+                            <div class="form-group">
+                                <label class="control-label" for="id_status">{{ profile_candidate_form.status.label }}</label>
+                                <div class=" ">
+                                    <select name="status" class=" form-control" id="id_status">
+                                        {% for key, value in profile_candidate_form.status.field.choices %}
+                                            <option value="{{ key }}" {% if key == profile_candidate_form.status.value %}selected="selected"{% endif %}>{{ value }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group in-contract-status-field {% if profile.status != profile.STATUS_IN_CONTRACT %}hidden{% endif %}">
+                                <label class="control-label" for="id_in_contract_status">{{ profile_candidate_form.in_contract_status.label }}</label>
+                                <div class=" ">
+                                    <select name="in_contract_status" class=" form-control" id="id_in_contract_status">
+                                        {% for key, value in profile_candidate_form.in_contract_status.field.choices %}
+                                            <option value="{{ key }}" {% if key == profile_candidate_form.in_contract_status.value %}selected="selected"{% endif %}>{{ value }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group out-contract-status-field {% if profile.status != profile.STATUS_OUT_OF_CONTRACT %}hidden{% endif %}">
+                                <label class="control-label" for="id_out_contract_status">{{ profile_candidate_form.out_contract_status.label }}</label>
+                                <div class=" ">
+                                    <select name="out_contract_status" class=" form-control" id="id_out_contract_status">
+                                        {% for key, value in profile_candidate_form.out_contract_status.field.choices %}
+                                            <option value="{{ key }}" {% if key == profile_candidate_form.out_contract_status.value %}selected="selected"{% endif %}>{{ value }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6 text-left location-section">
-                        <h5>LOCATION</h5>
-                        <div>
-                            <div>Current</div>
-                            <span>{{ profile.location }}</span>
-                        </div>
-                        <br />
-                        {% if profile.desired_location %}
+                        <div class="location-details">
+                            <h5>LOCATION</h5>
                             <div>
-                                <div>Desired</div>
-                                <span>{{ profile.desired_location }}</span>
+                                <div>Current</div>
+                                <span>{{ profile.location }}</span>
                             </div>
                             <br />
-                        {% endif %}
-                        {% if profile.willing_to_relocate %}
-                            <div>Willing to relocate? {{ profile.willing_to_relocate_text }}</div>
-                        {% endif %}
+                            {% if profile.desired_location %}
+                                <div>
+                                    <div>Desired</div>
+                                    <span>{{ profile.desired_location }}</span>
+                                </div>
+                                <br />
+                            {% endif %}
+                            {% if profile.willing_to_relocate != None %}
+                                <div>Willing to relocate? {{ profile.willing_to_relocate_text }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="location-form hidden">
+                            <div class="form-group">
+                                <label class="control-label" for="id_city">{{ profile_candidate_form.city.label }}</label>
+                                <div class=" ">
+                                    <input type="text" name="city" value="{{ profile_candidate_form.city.value }}" maxlength="200" class=" form-control" required="" id="id_city">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label" for="id_country">{{ profile_candidate_form.country.label }}</label>
+                                <div class=" ">
+                                    <select name="country" class=" form-control" required="" id="id_country">
+                                        {% for key, value in profile_candidate_form.country.field.choices %}
+                                            <option value="{{ key }}" {% if key == profile_candidate_form.country.value %}selected="selected"{% endif %}>{{ value }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label" for="id_desired_city">{{ profile_candidate_form.desired_city.label }}</label>
+                                <div class=" ">
+                                    <input type="text" name="desired_city" value="{{ profile_candidate_form.desired_city.value }}" maxlength="200" class=" form-control" id="id_desired_city">
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="control-label" for="id_desired_country">{{ profile_candidate_form.desired_country.label }}</label>
+                                <div class=" ">
+                                    <select name="desired_country" class=" form-control" id="id_desired_country">
+                                        {% for key, value in profile_candidate_form.desired_country.field.choices %}
+                                            <option value="{{ key }}" {% if key == profile_candidate_form.desired_country.value %}selected="selected"{% endif %}>{{ value }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label" for="id_willing_to_relocate">{{ profile_candidate_form.willing_to_relocate.label }}</label>
+                                <div class=" ">
+                                    <select name="willing_to_relocate" class=" form-control" id="id_willing_to_relocate">
+                                      <option value="1">---------</option>
+                                      <option value="2" {% if profile_candidate_form.willing_to_relocate.value %}selected="selected"{% endif %}>Yes</option>
+                                      <option value="3" {% if not profile_candidate_form.willing_to_relocate.value %}selected="selected"{% endif %}>No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                        </form>
             </div>
             {% if user.account_type == user.ACCOUNT_AGENT %}
                 <div class="col-md-3 tracking-section">
@@ -212,31 +307,57 @@
         $("#cv_upload_form").ajaxSubmit({success:updateCandidateCV});
     });
 
+    $('#id_status').on('change', function() {
+        $('.in-contract-status-field').removeClass('hidden');
+        $('.out-contract-status-field').removeClass('hidden');
+        $('#id_in_contract_status').val('');
+        $('#id_out_contract_status').val('');
+
+        if ($(this).val() == 1) {
+            $('.in-contract-status-field').addClass('hidden');
+            $('.out-contract-status-field').addClass('hidden');
+        }
+        else if ($(this).val() == 2) {
+            $('.in-contract-status-field').removeClass('hidden');
+            $('.out-contract-status-field').addClass('hidden');
+        }
+        else if ($(this).val() == 3) {
+            $('.in-contract-status-field').addClass('hidden');
+            $('.out-contract-status-field').removeClass('hidden');
+        }
+    });
+
     $('.btn-edit-profile').on('click', function() {
         $(this).addClass('hidden');
         $('.btn-save-profile').removeClass('hidden');
         $('#photo_upload_btn').removeClass('hidden');
         $('#cv_upload_btn').removeClass('hidden');
         $('#cv_upload_btn').removeClass('hidden');
-        $('.profile-details').addClass('hidden');
         $('.current_cv').addClass('hidden');
         $('#current_cv').addClass('hidden');
-        $('.profile-edit-form').removeClass('hidden');
+        $('.profile-details').addClass('hidden');
+        $('.profile-edit-details-form').removeClass('hidden');
+        $('.location-details').addClass('hidden');
+        $('.location-form').removeClass('hidden');
+        $('.status-details').addClass('hidden');
+        $('.status-form').removeClass('hidden');
     });
 
     $('.btn-save-profile').on('click', function() {
-        $(".profile-edit-form").ajaxSubmit({
+        $(".profile-edit-details-form").ajaxSubmit({
             success: function (response) {
-                if (response.success)
+                if (response.success) {
                     location.reload();
-                else
+                }
+                else {
                     $.each(response.errors, function(key, value){
                         var form_error = key + '_error';
                         $('.' + form_error).html(value);
                     });
+                }
             }
         });
-    })
+    });
 
     /* SCRIPTS TO HANDLE THE CROPPER BOX */
     var $image = $("#image");

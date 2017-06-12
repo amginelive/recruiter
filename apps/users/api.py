@@ -14,7 +14,7 @@ from .forms import (
     AgentPhotoUploadForm,
     CandidateCVUploadForm,
     CandidatePhotoUploadForm,
-    CandidateProfileUpdateForm,
+    CandidateProfileDetailUpdateForm,
 )
 from .mixins import CandidateRequiredMixin
 from .models import Candidate
@@ -70,12 +70,12 @@ class ProfileCVUploadAPIView(CandidateRequiredMixin, View):
 profile_cv_upload = ProfileCVUploadAPIView.as_view()
 
 
-class ProfileCandidateUpdateAPIView(CandidateRequiredMixin, UpdateView, JSONResponseMixin):
+class CandidateProfileDetailUpdateAPIView(CandidateRequiredMixin, UpdateView, JSONResponseMixin):
     """
     View for updating the candidate's profile through the profile page.
     """
     model = Candidate
-    form_class = CandidateProfileUpdateForm
+    form_class = CandidateProfileDetailUpdateForm
 
     def get_object(self):
         return Candidate.objects.get(pk=self.kwargs.get('pk'))
@@ -92,4 +92,4 @@ class ProfileCandidateUpdateAPIView(CandidateRequiredMixin, UpdateView, JSONResp
             'errors': form.errors,
         })
 
-profile_candidate_update = ProfileCandidateUpdateAPIView.as_view()
+candidate_profile_detail_update = CandidateProfileDetailUpdateAPIView.as_view()

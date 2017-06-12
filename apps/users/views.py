@@ -18,7 +18,7 @@ from .forms import (
     AgentUpdateForm,
     CandidatePhotoUploadForm,
     CandidateUpdateForm,
-    CandidateProfileUpdateForm,
+    CandidateProfileDetailUpdateForm,
 )
 from .mixins import CandidateRequiredMixin
 from .models import (
@@ -132,7 +132,7 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
                     .order_by('created_at')\
                     .last()
             if self.request.user == profile.user:
-                context['profile_candidate_form'] = CandidateProfileUpdateForm(instance=self.request.user.candidate)
+                context['profile_candidate_form'] = CandidateProfileDetailUpdateForm(instance=profile)
 
         elif profile.user.account_type == User.ACCOUNT_AGENT:
             company = profile.company

@@ -223,6 +223,33 @@ class Candidate(ProfileBase):
         (JOB_TYPE_CONTRACT, _('Contract')),
         (JOB_TYPE_PERMANENT, _('Permanent')),
     )
+
+    STATUS_LOOKING_FOR_CONTRACT = 1
+    STATUS_IN_CONTRACT = 2
+    STATUS_OUT_OF_CONTRACT = 3
+
+    STATUS_CHOICES = (
+        (STATUS_LOOKING_FOR_CONTRACT, _('Currently Looking for a new contract')),
+        (STATUS_IN_CONTRACT, _('Currently in Contract')),
+        (STATUS_OUT_OF_CONTRACT, _('Currently out of contract')),
+    )
+
+    IN_CONTRACT_STATUS_OPEN = 1
+    IN_CONTRACT_STATUS_LOOKING = 2
+
+    IN_CONTRACT_STATUS_CHOICES = (
+        (IN_CONTRACT_STATUS_OPEN, _('Open to new opportunities')),
+        (IN_CONTRACT_STATUS_LOOKING, _('Actively looking for new opportunities')),
+    )
+
+    OUT_CONTRACT_STATUS_LOOKING = 1
+    OUT_CONTRACT_STATUS_NOT_LOOKING = 2
+
+    OUT_CONTRACT_STATUS_CHOICES = (
+        (OUT_CONTRACT_STATUS_LOOKING, _('Currently looking for new opportunities')),
+        (OUT_CONTRACT_STATUS_NOT_LOOKING, _('Not looking for new opportunities')),
+    )
+
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='candidate')
     title = models.CharField(_('Job title'), max_length=200, **optional)
     skills = models.ManyToManyField(
@@ -238,6 +265,9 @@ class Candidate(ProfileBase):
     experience = models.SmallIntegerField(_('Experience (full years)'), **optional)
     willing_to_relocate = models.NullBooleanField(_('Willing to relocate?'), **optional)
     cv = models.FileField(_("CV"), upload_to=get_upload_path, max_length=150, editable=True, **optional)
+    status = models.IntegerField(_('Status'), choices=STATUS_CHOICES, default=STATUS_LOOKING_FOR_CONTRACT)
+    in_contract_status = models.IntegerField(_('In Contract Status'), choices=IN_CONTRACT_STATUS_CHOICES, **optional)
+    out_contract_status = models.IntegerField(_('Out of Contract Status'), choices=OUT_CONTRACT_STATUS_CHOICES, **optional)
 
     class Meta:
         verbose_name = _('Candidate')

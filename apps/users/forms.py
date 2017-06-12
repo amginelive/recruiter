@@ -96,14 +96,16 @@ class CandidateUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Candidate
-        exclude = ('user', 'date_updated', 'status', 'photo', 'cv', 'connections')
+        exclude = ('user', 'date_updated', 'photo', 'cv', 'connections')
 
 
-class CandidateProfileUpdateForm(forms.ModelForm):
+class CandidateProfileDetailUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Candidate
-        fields = ('experience', 'skills',)
+        fields = ('experience', 'skills', 'city', 'country',
+                  'desired_city', 'desired_country', 'willing_to_relocate',
+                  'status', 'in_contract_status', 'out_contract_status',)
 
 
 class AgentUpdateForm(forms.ModelForm):
