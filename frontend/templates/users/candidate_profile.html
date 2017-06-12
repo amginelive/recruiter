@@ -115,9 +115,10 @@
                                         {% endfor %}
                                     </select>
                                 </div>
+                                <div class="status_error orange-text"></div>
                             </div>
 
-                            <div class="form-group in-contract-status-field {% if profile.status != profile.STATUS_IN_CONTRACT %}hidden{% endif %}">
+                            <div class="form-group in-contract-status-field {% if profile_candidate_form.in_contract_status.value != profile.STATUS_IN_CONTRACT %}hidden{% endif %}">
                                 <label class="control-label" for="id_in_contract_status">{{ profile_candidate_form.in_contract_status.label }}</label>
                                 <div class=" ">
                                     <select name="in_contract_status" class=" form-control" id="id_in_contract_status">
@@ -126,9 +127,10 @@
                                         {% endfor %}
                                     </select>
                                 </div>
+                                <div class="in_contract_status_error orange-text"></div>
                             </div>
 
-                            <div class="form-group out-contract-status-field {% if profile.status != profile.STATUS_OUT_OF_CONTRACT %}hidden{% endif %}">
+                            <div class="form-group out-contract-status-field {% if profile_candidate_form.out_contract_status != profile.STATUS_OUT_OF_CONTRACT %}hidden{% endif %}">
                                 <label class="control-label" for="id_out_contract_status">{{ profile_candidate_form.out_contract_status.label }}</label>
                                 <div class=" ">
                                     <select name="out_contract_status" class=" form-control" id="id_out_contract_status">
@@ -137,6 +139,7 @@
                                         {% endfor %}
                                     </select>
                                 </div>
+                                <div class="out_contract_status_error orange-text"></div>
                             </div>
                         </div>
                     </div>
@@ -165,6 +168,7 @@
                                 <div class=" ">
                                     <input type="text" name="city" value="{{ profile_candidate_form.city.value }}" maxlength="200" class=" form-control" required="" id="id_city">
                                 </div>
+                                <div class="city_error orange-text"></div>
                             </div>
 
                             <div class="form-group">
@@ -176,6 +180,7 @@
                                         {% endfor %}
                                     </select>
                                 </div>
+                                <div class="country_error orange-text"></div>
                             </div>
 
                             <div class="form-group">
@@ -183,8 +188,8 @@
                                 <div class=" ">
                                     <input type="text" name="desired_city" value="{{ profile_candidate_form.desired_city.value }}" maxlength="200" class=" form-control" id="id_desired_city">
                                 </div>
+                                <div class="desired_city_error orange-text"></div>
                             </div>
-
 
                             <div class="form-group">
                                 <label class="control-label" for="id_desired_country">{{ profile_candidate_form.desired_country.label }}</label>
@@ -195,6 +200,7 @@
                                         {% endfor %}
                                     </select>
                                 </div>
+                                <div class="desired_country_error orange-text"></div>
                             </div>
 
                             <div class="form-group">
@@ -206,6 +212,7 @@
                                       <option value="3" {% if not profile_candidate_form.willing_to_relocate.value %}selected="selected"{% endif %}>No</option>
                                     </select>
                                 </div>
+                                <div class="willing_to_relocate_error orange-text"></div>
                             </div>
                         </div>
                     </div>

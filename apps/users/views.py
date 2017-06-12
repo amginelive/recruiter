@@ -3,7 +3,8 @@ from django.contrib.postgres.search import (
     SearchQuery,
     SearchVector,
 )
-
+from django.core.urlresolvers import reverse_lazy
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import (
     DetailView,
@@ -66,14 +67,15 @@ class ProfileUpdateView(LoginRequiredMixin, View):
         completeness = {}
         form_values = request.POST.copy()
         form_values['user'] = request.user.id
+        valid = False
 
         if request.user.account_type == User.ACCOUNT_CANDIDATE:
             self.template_name = 'users/candidate_update.html'
             form = CandidateUpdateForm(form_values, request.FILES, instance=request.user.candidate)
             completeness = get_profile_completeness(request.user.candidate)
-
             if form.is_valid():
                 form.save(commit=True)
+                valid = True
 
         # show agent dashboard
         elif request.user.account_type == User.ACCOUNT_AGENT:
@@ -82,7 +84,10 @@ class ProfileUpdateView(LoginRequiredMixin, View):
 
             if form.is_valid():
                 form.save(commit=True)
+                valid = True
 
+        if valid:
+            return HttpResponseRedirect(reverse_lazy('users:profile_update'))
         return render(request, self.template_name, {
             'form': form,
             'completeness': completeness
