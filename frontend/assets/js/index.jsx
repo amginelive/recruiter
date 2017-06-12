@@ -56,7 +56,7 @@ render(IdleMonitor, divIdle);
 render(GlobalMessagesNotification, document.getElementById('global-messages-notification'));
 
 if (module.hot) {
-    if (window.location.pathname === '/chat') {
+    if (window.location.pathname === '/chat/') {
         module.hot.accept('./chat.jsx', () => {
             ReactDOM.unmountComponentAtNode(document.getElementById('app'));
             render(App, document.getElementById('app'));
