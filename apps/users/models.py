@@ -317,3 +317,29 @@ class Agent(ProfileBase):
 
     def __str__(self):
         return self.user.get_full_name()
+
+
+class UserNote(AbstractTimeStampedModel):
+    """
+    Model for User Note.
+    """
+    TYPE_TEXT = 1
+    TYPE_CALL = 2
+    TYPE_MAIL = 3
+
+    TYPE_CHOICES = (
+        (TYPE_TEXT, _('Text')),
+        (TYPE_CALL, _('Call')),
+        (TYPE_MAIL, _('Mail')),
+    )
+    note_by = models.ForeignKey('users.User', related_name='notes_written', verbose_name=_('Note by'))
+    note_to = models.ForeignKey('users.User', related_name='notes_given', verbose_name=_('Note To'))
+    text = models.TextField(_('Text'))
+    type = models.IntegerField(_('Type'), choices=TYPE_CHOICES)
+
+    class Meta:
+        verbose_name = _('User Note')
+        verbose_name_plural = _('User Notes')
+
+    def __str__(self):
+        return self.user.get_full_name()
