@@ -25,6 +25,7 @@ from .mixins import CandidateRequiredMixin
 from .models import (
     Agent,
     Candidate,
+    UserNote,
 )
 from .utils import get_profile_completeness
 from chat.models import Message
@@ -127,6 +128,8 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
             context['photo_form'] = CandidatePhotoUploadForm
             context['completeness'] = get_profile_completeness(profile)
             context['candidate_form'] = CandidateUpdateForm(instance=profile)
+            context['user_note'] = UserNote
+            context['user_notes'] = UserNote.objects.filter(note_by=self.request.user, note_to=profile.user)
             if self.request.user.account_type == User.ACCOUNT_AGENT:
                 messages_sent = Message.objects.filter(author=self.request.user).order_by('created_at')
                 context['first_contact_sent'] = messages_sent.first()

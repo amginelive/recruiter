@@ -1436,10 +1436,6 @@ section#account .tracking-section {
     padding: 5px 30px 30px 30px;
 }
 
-section#account .tracking-section .row {
-    padding: 5px 10px 50px 10px;
-}
-
 section#account .tracking-section .tracking-item {
     margin-top: 10px;
 }
@@ -1516,4 +1512,48 @@ section#job-posts .job-posts-table {
 .card-item {
     border:1px solid #dfdfdf;
     padding:15px;
+}
+
+.tracking-button.active {
+    background-color: #f9690e;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.note-type {
+    cursor: pointer;
+}
+
+.note-type.active {
+    color: #f9690e;
+}
+
+.create-note-form {
+    margin-bottom: 100px;
+}
+
+.btn-create-note {
+    min-width: inherit !important;
+    height: inherit !important;
+    margin: 0px !important;
+}
+
+.note-history-item {
+    border-top: 1px solid #f2f1ec;
+    margin-left: 5px;
+    margin-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 15px;
+}
+
+.note-item-text {
+    margin-top: 10px;
+}
+
+.note-history-timestamp {
+    font-size: 12px;
+}
+
+.btn-action-note-history {
+    cursor: pointer;
 }

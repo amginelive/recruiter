@@ -1,6 +1,6 @@
 {% extends 'users/index.html' %}
 
-{% load staticfiles i18n bootstrap %}
+{% load staticfiles i18n bootstrap humanize %}
 
 {% block extra_css %}
 <link href="{% static 'css/cropper.min.css' %}" rel="stylesheet">
@@ -11,7 +11,7 @@
     <!-- internal block -->
     <section id="account">
         <div class="container">
-            <div class="col-md-8 text-center profile-navigation">
+            <div class="col-md-7 text-center profile-navigation">
                 <div class="col-md-4">
                     <span>Last online: {{ profile.user.last_seen|date:"d/m/y" }}</span>
                 </div>
@@ -29,7 +29,7 @@
                     </div>
                 {% endif %}
             </div>
-            <div class="col-md-8 profile-detail-section">
+            <div class="{% if user == profile.user %}col-md-12{% else %}col-md-7{% endif %} profile-detail-section">
                 <div class="row">
                     <div class="col-md-6 text-center">
                         <h3>{{ profile.user.get_full_name }}</h3>
@@ -218,9 +218,12 @@
                         </form>
             </div>
             {% if user.account_type == user.ACCOUNT_AGENT %}
-                <div class="col-md-3 tracking-section">
-                    <div class="row">
-                        <h4 class="text-center orange-text"><strong>Auto Tracking</strong></h4>
+                <div class="col-md-4 tracking-section">
+                    <div class="row text-center tracking-button-switcher">
+                        <button class="btn btn-secondary tracking-button btn-auto-tracking active">Auto Tracking</button>
+                        <button class="btn btn-secondary tracking-button btn-manual-tracking">Manual Tracking</button>
+                    </div>
+                    <div class="row auto-tracking-section">
                         <div class="tracking-item">
                             <span class="orange-text">First contact sent: </span>{{ first_contact_sent.created_at|date:"d/m/y" }}
                         </div>
@@ -231,20 +234,61 @@
                             <span class="orange-text">Last message received: </span>{{ last_message_received.created_at|date:"d/m/y" }}
                         </div>
                     </div>
-                    <div class="row">
-                        <h4 class="text-center orange-text">
-                            <strong>Manual Tracking</strong>
-                            <a href="#" class="pull-right"><i class="glyphicon glyphicon-plus-sign"></i></a>
-                        </h4>
-                        <div class="tracking-item">
-                            <span class="orange-text">Successful placement - </span>Bank of Tokyo - 10/04/14
-                        </div>
-                        <div class="tracking-item">
-                            <span class="orange-text">Unsuccessful interview - </span> Betfair - 05/05/17
-                        </div>
-                        <div class="tracking-item">
-                            <span class="orange-text">Unsuccessful interview - </span> Visa Europe - 06/05/17
-                        </div>
+                    <div class="row manual-tracking-section hidden">
+                        <form action="" method="POST" class="create-note-form">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label class="control-label" for="id_text">Notes:</label>
+                                <div class=" ">
+                                    <textarea type="text" name="text" class="form-control" required="" id="id_text"></textarea>
+                                </div>
+                                <div class="text_error orange-text"></div>
+                            </div>
+                            <div class="note-type-field">
+                                <div class="col-md-6">
+                                    <input type="hidden" name="type" id="id_type">
+                                    <label class="control-label" for="id_type">Insert:</label> &nbsp;
+                                    <i class="glyphicon glyphicon-earphone note-type" data-type="{{ user_note.TYPE_CALL }}"></i> &nbsp;
+                                    <i class="glyphicon glyphicon-phone note-type" data-type="{{ user_note.TYPE_TEXT }}"></i> &nbsp;
+                                    <i class="glyphicon glyphicon-envelope note-type" data-type="{{ user_note.TYPE_MAIL }}"></i>
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    <button class="btn btn-primary btn-create-note">Save</button>
+                                </div>
+                            </div>
+                        </form>
+                        <h5>History</h5>
+                        {% for user_note in user_notes %}
+                            <div class="row note-history-item">
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <span class="note-history-timestamp">{{ user_note.created_at|date:"D, F d, o P" }} <strong>{{ user_note.created_at|naturaltime }}</strong></span>
+                                    </div>
+                                    <div class="col-md-3 text-right">
+                                        <span class="note-history-timestamp">
+                                            <i class="glyphicon glyphicon-pencil btn-action-note-history"></i>
+                                            <i class="glyphicon glyphicon-remove btn-action-note-history orange-text"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row note-item-text">
+                                    <div class="col-md-1">
+                                        {% if user_note.type == user_note.TYPE_CALL %}
+                                            <i class="glyphicon glyphicon-earphone"></i>
+                                        {% elif user_note.type == user_note.TYPE_TEXT %}
+                                            <i class="glyphicon glyphicon-phone"></i>
+                                        {% elif user_note.type == user_note.TYPE_MAIL %}
+                                            <i class="glyphicon glyphicon-envelope"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-11">
+                                        {{ user_note.text }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            No history yet.
+                        {% endfor %}
                     </div>
                 </div>
             {% endif %}
@@ -288,6 +332,31 @@
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script src="{% static 'js/cropper.min.js' %}" type="text/javascript"></script>
 <script>
+    $('.note-type').on('click', function() {
+        var note_type_field = $(this).closest('.note-type-field');
+        $.each(note_type_field.find('.note-type'), function(key, value){
+            $(this).removeClass('active');
+        });
+        $(this).addClass('active');
+
+        var type = $(this).attr('data-type');
+        note_type_field.find('#id_type').val(type);
+    });
+
+    $('.btn-auto-tracking').on('click', function() {
+        $(this).addClass('active');
+        $('.btn-manual-tracking').removeClass('active');
+        $('.auto-tracking-section').removeClass('hidden');
+        $('.manual-tracking-section').addClass('hidden');
+    });
+
+    $('.btn-manual-tracking').on('click', function() {
+        $(this).addClass('active');
+        $('.btn-auto-tracking').removeClass('active');
+        $('.auto-tracking-section').addClass('hidden');
+        $('.manual-tracking-section').removeClass('hidden');
+    });
+
     $("#id_skills").select2({
         tags: true,
     });

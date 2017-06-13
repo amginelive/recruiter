@@ -342,4 +342,4 @@ class UserNote(AbstractTimeStampedModel):
         verbose_name_plural = _('User Notes')
 
     def __str__(self):
-        return self.user.get_full_name()
+        return self.note_to.get_full_name()
