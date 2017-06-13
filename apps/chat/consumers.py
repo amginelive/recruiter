@@ -63,10 +63,8 @@ class ChatServer(JsonWebsocketConsumer):
             'candidates': {}
         }
         for user in user_list:
-            if user.account_type == User.ACCOUNT_AGENT:
-                response['agents'][str(user.id)] = create_user_data_dict(user)
-            if user.account_type == User.ACCOUNT_CANDIDATE:
-                response['candidates'][str(user.id)] = create_user_data_dict(user)
+            account_type = f'{user.get_account_type_display().lower()}s'
+            response[account_type][str(user.id)] = create_user_data_dict(user)
         self.send({'type': 'initUsers', 'payload': response})
         #if len(response) > 0:
         #    self.cmd_init({'user_id': response[0].get('id')})
