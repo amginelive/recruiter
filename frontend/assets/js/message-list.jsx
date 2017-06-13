@@ -60,12 +60,12 @@ class MessageList extends React.Component {
     }
 
     render() {
-        const { messages } = this.props;
+        const { messages, users } = this.props;
 
         return (
             <div className='message-list-container'>
                 <Scrollbars ref={(scroll) => {this.scroll = scroll;}}
-                            style={{height: 500 + 'px'}}
+                            style={{height: '100%'}}
                             autoHide autoHideTimeout={1000}
                             autoHideDuration={200}>
                     <div className='message-list'>
@@ -78,7 +78,7 @@ class MessageList extends React.Component {
                             return (
                                 <div key={index}>
                                     {dateUI}
-                                    <Message user={message.get('user')} text={message.get('text')} time={message.get('time')}/>
+                                    <Message user={message.get('user').get('id') === 0 ? message.get('user').set('online', 2) : users.get(message.get('user').get('type')).get(message.get('user').get('id').toString())} text={message.get('text')} time={message.get('time')}/>
                                 </div>
                             );
                         }).toArray()}
@@ -91,7 +91,8 @@ class MessageList extends React.Component {
 
 function mapStateToProps (state) {
     return {
-        messages: state.get('messages')
+        messages: state.get('messages'),
+        users: state.get('users')
     };
 }
 

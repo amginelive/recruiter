@@ -89,13 +89,17 @@ class ChatServer(JsonWebsocketConsumer):
             conversation.save()
         return conversation
 
-    @staticmethod
-    def _create_message_data_dict(message):
+    def _create_message_data_dict(self, message):
+        if message.author.account_type == User.ACCOUNT_CANDIDATE:
+            user_type = 'candidates'
+        else:
+            user_type = 'agents'
         return {
             'user': {
                 'name': message.author.email,
                 'photo': message.author.get_photo_url(),
-                'id': message.author.id
+                'id': message.author.id if self.message.user != message.author else 0,
+                'type': user_type
             },
             'conversation_id': message.conversation.id,
             'text': message.text,

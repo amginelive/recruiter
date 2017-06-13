@@ -4,7 +4,9 @@ import moment from 'moment';
 const Message = props => {
     return (
         <div className='message-list-item'>
-            <img className='message-list-item-photo' src={props.user.get('photo')} />
+            <div className={'user-avatar' + (props.user.get('online') === 2 ? ' user-online' : (props.user.get('online') === 1 ? ' user-away': ''))}>
+                <img src={props.user.get('photo')} />
+            </div>
             <div className='message-list-item-body'>
                 <div className='message-list-item-header'>
                     <span className='message-list-item-name'>{props.user.get('name')}</span>

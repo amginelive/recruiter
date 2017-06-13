@@ -19,12 +19,15 @@ class App extends React.Component {
     render() {
         return (
             <div className='app-container'>
-                <div className='app-inner-row'>
-                    <UserList />
-                    <MessageList />
+                <div className ='chat-container'>
+                    <div className='app-inner-row'>
+                        <UserList />
+                        <MessageList />
+                    </div>
+                    <TypingList />
+                    <MessageForm />
                 </div>
-                <TypingList />
-                <MessageForm />
+                <div className='placeholder'></div>
             </div>
         );
     }
