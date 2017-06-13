@@ -98,6 +98,24 @@ class CandidateUpdateForm(forms.ModelForm):
         model = Candidate
         exclude = ('user', 'date_updated', 'photo', 'cv', 'connections')
 
+    def clean_in_contract_status(self):
+        status = self.cleaned_data.get('status')
+        in_contract_status = self.cleaned_data.get('in_contract_status')
+
+        if status == Candidate.STATUS_IN_CONTRACT and not in_contract_status:
+            raise forms.ValidationError(_('This field is required'), code='field-required')
+
+        return in_contract_status
+
+    def clean_out_contract_status(self):
+        status = self.cleaned_data.get('status')
+        out_contract_status = self.cleaned_data.get('out_contract_status')
+
+        if status == Candidate.STATUS_OUT_OF_CONTRACT and not out_contract_status:
+            raise forms.ValidationError(_('This field is required'), code='field-required')
+
+        return out_contract_status
+
 
 class CandidateProfileDetailUpdateForm(forms.ModelForm):
 
@@ -106,6 +124,24 @@ class CandidateProfileDetailUpdateForm(forms.ModelForm):
         fields = ('experience', 'skills', 'city', 'country',
                   'desired_city', 'desired_country', 'willing_to_relocate',
                   'status', 'in_contract_status', 'out_contract_status',)
+
+    def clean_in_contract_status(self):
+        status = self.cleaned_data.get('status')
+        in_contract_status = self.cleaned_data.get('in_contract_status')
+
+        if status == Candidate.STATUS_IN_CONTRACT and not in_contract_status:
+            raise forms.ValidationError(_('This field is required'), code='field-required')
+
+        return in_contract_status
+
+    def clean_out_contract_status(self):
+        status = self.cleaned_data.get('status')
+        out_contract_status = self.cleaned_data.get('out_contract_status')
+
+        if status == Candidate.STATUS_OUT_OF_CONTRACT and not out_contract_status:
+            raise forms.ValidationError(_('This field is required'), code='field-required')
+
+        return out_contract_status
 
 
 class AgentUpdateForm(forms.ModelForm):
