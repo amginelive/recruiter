@@ -78,7 +78,7 @@ class MessageList extends React.Component {
                             return (
                                 <div key={index}>
                                     {dateUI}
-                                    <Message user={message.get('user').get('id') === 0 ? message.get('user').set('online', 2) : users.get(message.get('user').get('type')).get(message.get('user').get('id').toString())} text={message.get('text')} time={message.get('time')}/>
+                                    <Message user={message.get('user').get('id') === users.get('self') ? message.get('user').set('online', 2) : users.get(message.get('user').get('type')).get(message.get('user').get('id').toString())} text={message.get('text')} time={message.get('time')}/>
                                 </div>
                             );
                         }).toArray()}

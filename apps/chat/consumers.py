@@ -1,5 +1,7 @@
+from datetime import datetime
+
 from django.contrib.auth import get_user_model
-from django.db.models import ObjectDoesNotExist, Q
+from django.db.models import Q
 
 from channels.generic.websockets import JsonWebsocketConsumer
 
@@ -50,14 +52,31 @@ class ChatServer(JsonWebsocketConsumer):
                     .count()
             else:
                 unread = conversation.messages.all().count()
+            last_message = conversation.messages\
+                .all()\
+                .order_by('created_at')\
+                .last()
+            if last_message:
+                if self.message.user == last_message.author:
+                    last_message_text = 'You: '
+                else:
+                    last_message_text = f'{user.get_full_name()}: '
+                    last_message_text += last_message.text
+                last_message_time = last_message.created_at.isoformat()
+            else:
+                last_message_text = ''
+                last_message_time = datetime.fromtimestamp(0).isoformat()
             return {
                 'name': user.email,
                 'photo': user.get_photo_url(),
                 'online': user.online(),
-                'unread': unread
+                'unread': unread,
+                'last_message_time': last_message_time,
+                'last_message_string': last_message_text
             }
 
         response = {
+            'self': self.message.user.id,
             'activeChat': 0,
             'agents': {},
             'candidates': {}
@@ -96,7 +115,7 @@ class ChatServer(JsonWebsocketConsumer):
             'user': {
                 'name': message.author.email,
                 'photo': message.author.get_photo_url(),
-                'id': message.author.id if self.message.user != message.author else 0,
+                'id': message.author.id,
                 'type': user_type
             },
             'conversation_id': message.conversation.id,
