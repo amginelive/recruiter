@@ -1,6 +1,9 @@
 from django.contrib.auth import get_user_model
+from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.http import JsonResponse
+from django.template.defaultfilters import date
 from django.views.generic import (
+    CreateView,
     UpdateView,
     View,
 )
@@ -15,9 +18,13 @@ from .forms import (
     CandidateCVUploadForm,
     CandidatePhotoUploadForm,
     CandidateProfileDetailUpdateForm,
+    UserNoteForm,
 )
 from .mixins import CandidateRequiredMixin
-from .models import Candidate
+from .models import (
+    Candidate,
+    UserNote,
+)
 
 
 User = get_user_model()
@@ -93,3 +100,37 @@ class CandidateProfileDetailUpdateAPIView(CandidateRequiredMixin, UpdateView, JS
         })
 
 candidate_profile_detail_update = CandidateProfileDetailUpdateAPIView.as_view()
+
+
+class UserNoteCreateAPIView(LoginRequiredMixin, CreateView, JSONResponseMixin):
+    """
+    View for adding a note on a user
+    """
+    model = UserNote
+    form_class = UserNoteForm
+
+    def get_initial(self):
+        return {'user': self.request.user}
+
+    def form_valid(self, form):
+        user_note = form.save()
+        return self.render_json_response({
+            'success': True,
+            'data': {
+                'pk': user_note.pk,
+                'type': user_note.type,
+                'text': user_note.text,
+                'created_at': {
+                    'proper': date(user_note.created_at, 'D, F d, o P'),
+                    'timeago': naturaltime(user_note.created_at),
+                },
+            }
+        })
+
+    def form_invalid(self, form):
+        return self.render_json_response({
+            'success': False,
+            'errors': form.errors,
+        })
+
+user_note_create = UserNoteCreateAPIView.as_view()

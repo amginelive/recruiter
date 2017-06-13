@@ -7,7 +7,11 @@ from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.formfields import PhoneNumberField
 from PIL import Image
 
-from .models import Candidate, Agent
+from .models import (
+    Agent,
+    Candidate,
+    UserNote,
+)
 from recruit.models import (
     Connection,
     ConnectionInvite,
@@ -212,3 +216,27 @@ class AgentPhotoUploadForm(forms.ModelForm):
         resized_image.save(agent.photo.path)
 
         return agent
+
+
+class UserNoteForm(forms.ModelForm):
+    """
+    Form for UserNote.
+    """
+    class Meta:
+        model = UserNote
+        fields = ('note_to', 'text', 'type',)
+
+    def __init__(self, *args, **kargs):
+        super(UserNoteForm, self).__init__(*args, **kargs)
+        if not self.instance.pk:
+            initial = self.initial
+            self.user = initial.get('user')
+
+    def save(self, *args, **kargs):
+        user_note = super(UserNoteForm, self).save(commit=False)
+
+        if not self.instance.pk:
+            user_note.note_by = self.user
+        user_note.save()
+
+        return user_note
