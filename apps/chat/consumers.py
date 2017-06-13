@@ -63,10 +63,8 @@ class ChatServer(JsonWebsocketConsumer):
             'candidates': {}
         }
         for user in user_list:
-            if user.account_type == User.ACCOUNT_AGENT:
-                response['agents'][str(user.id)] = create_user_data_dict(user)
-            if user.account_type == User.ACCOUNT_CANDIDATE:
-                response['candidates'][str(user.id)] = create_user_data_dict(user)
+            account_type = f'{user.get_account_type_display().lower()}s'
+            response[account_type][str(user.id)] = create_user_data_dict(user)
         self.send({'type': 'initUsers', 'payload': response})
         #if len(response) > 0:
         #    self.cmd_init({'user_id': response[0].get('id')})
@@ -89,13 +87,17 @@ class ChatServer(JsonWebsocketConsumer):
             conversation.save()
         return conversation
 
-    @staticmethod
-    def _create_message_data_dict(message):
+    def _create_message_data_dict(self, message):
+        if message.author.account_type == User.ACCOUNT_CANDIDATE:
+            user_type = 'candidates'
+        else:
+            user_type = 'agents'
         return {
             'user': {
                 'name': message.author.email,
                 'photo': message.author.get_photo_url(),
-                'id': message.author.id
+                'id': message.author.id if self.message.user != message.author else 0,
+                'type': user_type
             },
             'conversation_id': message.conversation.id,
             'text': message.text,

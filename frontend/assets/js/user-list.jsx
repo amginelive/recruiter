@@ -40,8 +40,9 @@ class UserList extends React.Component {
                     key={entry[0]}
                     className={'user-list-item' + (entry[0] === this.state.activeUser ? ' active' : '')}
                 >
-                    <img className='user-list-item-photo' src={entry[1].get('photo')} />
-                    <span className={'user-list-item-status' + (entry[1].get('online') === 2 ? ' user-online' : (entry[1].get('online') === 1 ? ' user-away': ''))}>●</span>
+                    <div className={'user-avatar' + (entry[1].get('online') === 2 ? ' user-online' : (entry[1].get('online') === 1 ? ' user-away': ''))}>
+                        <img src={entry[1].get('photo')} />
+                    </div>
                     <span className='user-list-item-name'>{entry[1].get('name')}</span>
                     {entry[1].get('unread') > 0 ? <div className='user-list-item-unread'><span>{entry[1].get('unread')}</span></div> : ''}
                 </div>
@@ -58,7 +59,7 @@ class UserList extends React.Component {
         return (
             <div className='user-list-container'>
                 <Scrollbars ref={(scroll) => {this.scroll = scroll;}}
-                                style={{height: 500 + 'px'}}
+                                style={{height: '100%'}}
                                 autoHide autoHideTimeout={1000}
                                 autoHideDuration={200}>
                     <div className='user-list'>
