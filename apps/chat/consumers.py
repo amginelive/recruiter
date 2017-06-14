@@ -239,6 +239,4 @@ class ChatServer(JsonWebsocketConsumer):
         })
 
     def disconnect(self, message, **kwargs):
-        if not message.user.is_authenticated():
-            return
         self.cmd_idle(False)
