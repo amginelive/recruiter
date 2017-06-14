@@ -67,7 +67,7 @@ class ChatServer(JsonWebsocketConsumer):
                 last_message_text = ''
                 last_message_time = datetime.fromtimestamp(0).isoformat()
             return {
-                'name': user.email,
+                'name': user.get_full_name(),
                 'photo': user.get_photo_url(),
                 'online': user.online(),
                 'unread': unread,
@@ -107,16 +107,12 @@ class ChatServer(JsonWebsocketConsumer):
         return conversation
 
     def _create_message_data_dict(self, message):
-        if message.author.account_type == User.ACCOUNT_CANDIDATE:
-            user_type = 'candidates'
-        else:
-            user_type = 'agents'
         return {
             'user': {
-                'name': message.author.email,
+                'name': message.author.get_full_name(),
                 'photo': message.author.get_photo_url(),
                 'id': message.author.id,
-                'type': user_type
+                'type': f'{message.author.get_account_type_display().lower()}s'
             },
             'conversation_id': message.conversation.id,
             'text': message.text,
@@ -177,7 +173,7 @@ class ChatServer(JsonWebsocketConsumer):
         conversation = self.message.channel_session.get('conversation')
 
         response = {'type': 'userTyping',
-                    'payload': {'name': self.message.user.email,
+                    'payload': {'name': self.message.user.get_full_name(),
                                 'id': self.message.user.id,
                                 'conversation_id': conversation.id}}
         for user in conversation.users.exclude(id=self.message.user.id):
