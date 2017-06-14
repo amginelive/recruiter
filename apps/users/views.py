@@ -3,8 +3,8 @@ from django.contrib.postgres.search import (
     SearchQuery,
     SearchVector,
 )
-
-from django.db.models import Q
+from django.core.urlresolvers import reverse_lazy
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import (
     DetailView,
@@ -19,11 +19,13 @@ from .forms import (
     AgentUpdateForm,
     CandidatePhotoUploadForm,
     CandidateUpdateForm,
+    CandidateProfileDetailUpdateForm,
 )
 from .mixins import CandidateRequiredMixin
 from .models import (
     Agent,
     Candidate,
+    UserNote,
 )
 from .utils import get_profile_completeness
 from chat.models import Message
@@ -66,14 +68,15 @@ class ProfileUpdateView(LoginRequiredMixin, View):
         completeness = {}
         form_values = request.POST.copy()
         form_values['user'] = request.user.id
+        valid = False
 
         if request.user.account_type == User.ACCOUNT_CANDIDATE:
             self.template_name = 'users/candidate_update.html'
             form = CandidateUpdateForm(form_values, request.FILES, instance=request.user.candidate)
             completeness = get_profile_completeness(request.user.candidate)
-
             if form.is_valid():
                 form.save(commit=True)
+                valid = True
 
         # show agent dashboard
         elif request.user.account_type == User.ACCOUNT_AGENT:
@@ -82,7 +85,10 @@ class ProfileUpdateView(LoginRequiredMixin, View):
 
             if form.is_valid():
                 form.save(commit=True)
+                valid = True
 
+        if valid:
+            return HttpResponseRedirect(reverse_lazy('users:profile_update'))
         return render(request, self.template_name, {
             'form': form,
             'completeness': completeness
@@ -122,6 +128,10 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
             context['photo_form'] = CandidatePhotoUploadForm
             context['completeness'] = get_profile_completeness(profile)
             context['candidate_form'] = CandidateUpdateForm(instance=profile)
+            context['user_note'] = UserNote
+            context['user_notes'] = UserNote.objects\
+                .filter(note_by=self.request.user, note_to=profile.user)\
+                .order_by('-created_at')
             if self.request.user.account_type == User.ACCOUNT_AGENT:
                 messages_sent = Message.objects.filter(author=self.request.user).order_by('created_at')
                 context['first_contact_sent'] = messages_sent.first()
@@ -131,6 +141,8 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
                     .exclude(author=self.request.user)\
                     .order_by('created_at')\
                     .last()
+            if self.request.user == profile.user:
+                context['profile_candidate_form'] = CandidateProfileDetailUpdateForm(instance=profile)
 
         elif profile.user.account_type == User.ACCOUNT_AGENT:
             company = profile.company

@@ -17,26 +17,136 @@
                             <a class="btn" href="{% url 'users:profile_detail' user.slug %}"><i class="glyphicon glyphicon-eye-open"></i> My profile</a>
                         </div>
                     </div>
-<!--                    <div class="row">
-                        <div class="col-md-4 text-center">
-                            <h5>Photo</h5>
-                            <img id="profile_photo" src="{% if profile.photo %}{{ profile.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}">
-                            <form action="{% url 'users:profile_photo_upload' %}" id="photo_upload_form" method="post" role="form" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <input type="file" name="photo" id="photo_upload" style="display:none"/>
-                                <button type="button" class="btn" id="photo_upload_btn" OnClick="javascript:void(0)">{% trans "Update Photo" %}</button>
-                            </form>
-                        </div>
-                        <div class="col-md-8">
-
-                        </div>
-                    </div> -->
                     <div class="row">
                         <div class="col-md-12 profile-update">
                             <h5 style="margin:20px 0px;">{% trans 'Profile update' %}</h5>
                             <form action="{% url 'users:profile_update' %}" method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
-                                {{ form|bootstrap }}
+                                <div class="orange-text">{{ form.non_field_errors }}</div>
+                                <div class="form-group">
+                                    <label class="control-label" for="id_phone">{{ form.phone.label }}</label>
+                                    <div class=" ">
+                                        <input type="text" name="phone" value="{{ form.phone.value }}" maxlength="200" class=" form-control" required="" id="id_phone">
+                                    </div>
+                                    <div class="orange-text">{{ form.phone.errors }}</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="id_job_title">{{ form.title.label }}</label>
+                                    <div class=" ">
+                                        <input type="text" name="title" value="{{ form.title.value }}" maxlength="200" class=" form-control" required="" id="title">
+                                    </div>
+                                    <div class="orange-text">{{ form.title.errors }}</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="id_skills">Skills</label>
+                                    <div class=" ">
+                                        <select name="skills" class=" form-control" required="" id="id_skills" multiple="multiple">
+                                            {% for key, value in form.skills.field.choices %}
+                                                <option value="{{ key }}" {% if key in form.skills.value %}selected="selected"{% endif %}>{{ value }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="orange-text">{{ form.skills.errors }}</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="id_job_type">{{ form.job_type.label }}</label>
+                                    <div class=" ">
+                                        <select name="job_type" class=" form-control" required="" id="id_job_type">
+                                            {% for key, value in form.job_type.field.choices %}
+                                                <option value="{{ key }}" {% if key == form.job_type.value %}selected="selected"{% endif %}>{{ value }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="orange-text">{{ form.job_type.errors }}</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="id_experience">{{ form.experience.label }}</label>
+                                    <div class=" ">
+                                        <input type="number" name="experience" value="{{ form.experience.value }}" class=" form-control" id="id_experience" value="{{ form.experience.value }}">
+                                    </div>
+                                    <div class="orange-text">{{ form.experience.errors }}</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="id_city">{{ form.city.label }}</label>
+                                    <div class=" ">
+                                        <input type="text" name="city" value="{{ form.city.value }}" maxlength="200" class=" form-control" required="" id="id_city">
+                                    </div>
+                                    <div class="orange-text">{{ form.city.errors }}</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="id_country">{{ form.country.label }}</label>
+                                    <div class=" ">
+                                        <select name="country" class=" form-control" required="" id="id_country">
+                                            {% for key, value in form.country.field.choices %}
+                                                <option value="{{ key }}" {% if key == form.country.value %}selected="selected"{% endif %}>{{ value }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="orange-text">{{ form.country.errors }}</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="id_desired_city">{{ form.desired_city.label }}</label>
+                                    <div class=" ">
+                                        <input type="text" name="desired_city" value="{{ form.desired_city.value }}" maxlength="200" class=" form-control" id="id_desired_city">
+                                    </div>
+                                    <div class="orange-text">{{ form.desired_city.errors }}</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="id_desired_country">{{ form.desired_country.label }}</label>
+                                    <div class=" ">
+                                        <select name="desired_country" class=" form-control" id="id_desired_country">
+                                            {% for key, value in form.desired_country.field.choices %}
+                                                <option value="{{ key }}" {% if key == form.desired_country.value %}selected="selected"{% endif %}>{{ value }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="orange-text">{{ form.desired_country.errors }}</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="id_willing_to_relocate">{{ form.willing_to_relocate.label }}</label>
+                                    <div class=" ">
+                                        <select name="willing_to_relocate" class=" form-control" id="id_willing_to_relocate">
+                                          <option value="1">---------</option>
+                                          <option value="2" {% if form.willing_to_relocate.value %}selected="selected"{% endif %}>Yes</option>
+                                          <option value="3" {% if not form.willing_to_relocate.value %}selected="selected"{% endif %}>No</option>
+                                        </select>
+                                    </div>
+                                    <div class="orange-text">{{ form.willing_to_relocate.errors }}</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="id_status">{{ form.status.label }}</label>
+                                    <div class=" ">
+                                        <select name="status" class=" form-control" id="id_status">
+                                            {% for key, value in form.status.field.choices %}
+                                                <option value="{{ key }}" {% if key == form.status.value %}selected="selected"{% endif %}>{{ value }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="orange-text">{{ form.status.errors }}</div>
+                                </div>
+                                <div class="form-group in-contract-status-field {% if form.in_contract_status.value != user.candidate.STATUS_IN_CONTRACT %}hidden{% endif %}">
+                                    <label class="control-label" for="id_in_contract_status">{{ form.in_contract_status.label }}</label>
+                                    <div class=" ">
+                                        <select name="in_contract_status" class=" form-control" id="id_in_contract_status">
+                                            {% for key, value in form.in_contract_status.field.choices %}
+                                                <option value="{{ key }}" {% if key == form.in_contract_status.value %}selected="selected"{% endif %}>{{ value }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="orange-text">{{ form.in_contract_status.errors }}</div>
+                                </div>
+                                <div class="form-group out-contract-status-field {% if form.out_contract_status.value != user.candidate.STATUS_OUT_OF_CONTRACT %}hidden{% endif %}">
+                                    <label class="control-label" for="id_out_contract_status">{{ form.out_contract_status.label }}</label>
+                                    <div class=" ">
+                                        <select name="out_contract_status" class=" form-control" id="id_out_contract_status">
+                                            {% for key, value in form.out_contract_status.field.choices %}
+                                                <option value="{{ key }}" {% if key == form.out_contract_status.value %}selected="selected"{% endif %}>{{ value }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="orange-text">{{ form.out_contract_status.errors }}</div>
+                                </div>
+
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-primary btn-lg">{% trans 'Save' %}</button>
                                 </div>
@@ -57,39 +167,6 @@
                       <li><i class="glyphicon glyphicon-{% if completeness.is_complete %}check{% else %}remove-sign{% endif %}"></i> Complete profile</li>
                       <li><i class="glyphicon glyphicon-{% if completeness.cv %}check{% else %}remove-sign{% endif %}"></i> CV uploaded</li>
                     </ul>
-                    <!-- <form action="{% url 'users:profile_cv_upload' %}" id="cv_upload_form" method="post" role="form" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <input type="file" name="cv" id="cv_upload" style="display:none"/>
-                        <button type="button" class="btn" id="cv_upload_btn" OnClick="javascript:void(0)">{% trans "Update CV" %}</button>
-                        <div id="cv_updated" class="label label-success cv_updated">{% trans 'CV updated' %}</div>
-                        <a href="{{ profile.cv.url }}" id="current_cv" {% if not profile.cv %}class="hidden"{% endif %}><i class="glyphicon glyphicon-download"></i> Download current CV</a>
-                    </form>
-
-                </div>
-                <!-- lists / placeholders -->
-<!--                <div class="col-md-7 col-md-offset-1 bottom-blocks-left">
-                    <div class="row">
-                        <div class="col-md-12 my-applications">
-                            <h4>My applications</h4>
-                            <div class="inner">
-                                You haven't applied for any jobs
-                            </div>
-                        </div>
-                        <div class="col-md-12 job-alerts">
-                            <h4>Job Alerts</h4>
-                            <div class="inner">
-                                Job alerts
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 suggested-jobs">
-                    <h4>Suggested Jobs</h4>
-                    <div class="inner">
-                        Start by setting up a job alert
-                    </div>
-                </div>-->
-                <!-- end lists -->
             </div>
         </div>
     </section>
@@ -104,6 +181,26 @@
     $("#id_skills").select2({
         tags: true,
     })
+
+    $('#id_status').on('change', function() {
+        $('.in-contract-status-field').removeClass('hidden');
+        $('.out-contract-status-field').removeClass('hidden');
+        $('#id_in_contract_status').val('');
+        $('#id_out_contract_status').val('');
+
+        if ($(this).val() == 1) {
+            $('.in-contract-status-field').addClass('hidden');
+            $('.out-contract-status-field').addClass('hidden');
+        }
+        else if ($(this).val() == 2) {
+            $('.in-contract-status-field').removeClass('hidden');
+            $('.out-contract-status-field').addClass('hidden');
+        }
+        else if ($(this).val() == 3) {
+            $('.in-contract-status-field').addClass('hidden');
+            $('.out-contract-status-field').removeClass('hidden');
+        }
+    });
 
     function updateProfilePhoto(responseText, statusText, xhr, $form){
         if(responseText['success'] == true){

@@ -2,6 +2,7 @@ import itertools
 import logging
 
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import (
@@ -223,6 +224,33 @@ class Candidate(ProfileBase):
         (JOB_TYPE_CONTRACT, _('Contract')),
         (JOB_TYPE_PERMANENT, _('Permanent')),
     )
+
+    STATUS_LOOKING_FOR_CONTRACT = 1
+    STATUS_IN_CONTRACT = 2
+    STATUS_OUT_OF_CONTRACT = 3
+
+    STATUS_CHOICES = (
+        (STATUS_LOOKING_FOR_CONTRACT, _('Currently Looking for a new contract')),
+        (STATUS_IN_CONTRACT, _('Currently in Contract')),
+        (STATUS_OUT_OF_CONTRACT, _('Currently out of contract')),
+    )
+
+    IN_CONTRACT_STATUS_OPEN = 1
+    IN_CONTRACT_STATUS_LOOKING = 2
+
+    IN_CONTRACT_STATUS_CHOICES = (
+        (IN_CONTRACT_STATUS_OPEN, _('Open to new opportunities')),
+        (IN_CONTRACT_STATUS_LOOKING, _('Actively looking for new opportunities')),
+    )
+
+    OUT_CONTRACT_STATUS_LOOKING = 1
+    OUT_CONTRACT_STATUS_NOT_LOOKING = 2
+
+    OUT_CONTRACT_STATUS_CHOICES = (
+        (OUT_CONTRACT_STATUS_LOOKING, _('Currently looking for new opportunities')),
+        (OUT_CONTRACT_STATUS_NOT_LOOKING, _('Not looking for new opportunities')),
+    )
+
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='candidate')
     title = models.CharField(_('Job title'), max_length=200, **optional)
     skills = models.ManyToManyField(
@@ -231,13 +259,16 @@ class Candidate(ProfileBase):
         verbose_name=_('Skills')
     )
     job_type = models.IntegerField(_('Job type'), choices=JOB_TYPE_CHOICES, **optional)
-    desired_city = models.CharField(_('Desired City'),  max_length=200, **optional)
-    desired_country = CountryField(_('Desired Country'), **optional)
+    experience = models.SmallIntegerField(_('Experience (full years)'), **optional)
     city = models.CharField(_('City'),  max_length=200)
     country = CountryField(_('Country'))
-    experience = models.SmallIntegerField(_('Experience (full years)'), **optional)
+    desired_city = models.CharField(_('Desired City'),  max_length=200, **optional)
+    desired_country = CountryField(_('Desired Country'), **optional)
     willing_to_relocate = models.NullBooleanField(_('Willing to relocate?'), **optional)
     cv = models.FileField(_("CV"), upload_to=get_upload_path, max_length=150, editable=True, **optional)
+    status = models.IntegerField(_('Status'), choices=STATUS_CHOICES, default=STATUS_LOOKING_FOR_CONTRACT)
+    in_contract_status = models.IntegerField(_('In Contract Status'), choices=IN_CONTRACT_STATUS_CHOICES, **optional)
+    out_contract_status = models.IntegerField(_('Out of Contract Status'), choices=OUT_CONTRACT_STATUS_CHOICES, **optional)
 
     class Meta:
         verbose_name = _('Candidate')
@@ -245,6 +276,18 @@ class Candidate(ProfileBase):
 
     def __str__(self):
         return self.user.get_full_name()
+
+    def clean(self):
+        validations = {}
+
+        if self.status == self.STATUS_IN_CONTRACT and not self.in_contract_status:
+            validations['in_contract_status'] = _('This field is required.')
+
+        if self.status == self.STATUS_OUT_OF_CONTRACT and not self.out_contract_status:
+            validations['out_contract_status'] = _('This field is required.')
+
+        if validations:
+            raise ValidationError(validations)
 
     @property
     def location(self):
@@ -287,3 +330,29 @@ class Agent(ProfileBase):
 
     def __str__(self):
         return self.user.get_full_name()
+
+
+class UserNote(AbstractTimeStampedModel):
+    """
+    Model for User Note.
+    """
+    TYPE_TEXT = 1
+    TYPE_CALL = 2
+    TYPE_MAIL = 3
+
+    TYPE_CHOICES = (
+        (TYPE_TEXT, _('Text')),
+        (TYPE_CALL, _('Call')),
+        (TYPE_MAIL, _('Mail')),
+    )
+    note_by = models.ForeignKey('users.User', related_name='notes_written', verbose_name=_('Note by'))
+    note_to = models.ForeignKey('users.User', related_name='notes_given', verbose_name=_('Note To'))
+    text = models.TextField(_('Text'))
+    type = models.IntegerField(_('Type'), choices=TYPE_CHOICES)
+
+    class Meta:
+        verbose_name = _('User Note')
+        verbose_name_plural = _('User Notes')
+
+    def __str__(self):
+        return self.note_to.get_full_name()

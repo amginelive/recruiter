@@ -7,7 +7,11 @@ from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.formfields import PhoneNumberField
 from PIL import Image
 
-from .models import Candidate, Agent
+from .models import (
+    Agent,
+    Candidate,
+    UserNote,
+)
 from recruit.models import (
     Connection,
     ConnectionInvite,
@@ -96,7 +100,16 @@ class CandidateUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Candidate
-        exclude = ('user', 'date_updated', 'status', 'photo', 'cv', 'connections')
+        exclude = ('user', 'date_updated', 'photo', 'cv', 'connections')
+
+
+class CandidateProfileDetailUpdateForm(forms.ModelForm):
+
+    class Meta:
+        model = Candidate
+        fields = ('experience', 'skills', 'city', 'country',
+                  'desired_city', 'desired_country', 'willing_to_relocate',
+                  'status', 'in_contract_status', 'out_contract_status',)
 
 
 class AgentUpdateForm(forms.ModelForm):
@@ -167,3 +180,27 @@ class AgentPhotoUploadForm(forms.ModelForm):
         resized_image.save(agent.photo.path)
 
         return agent
+
+
+class UserNoteForm(forms.ModelForm):
+    """
+    Form for UserNote.
+    """
+    class Meta:
+        model = UserNote
+        fields = ('note_to', 'text', 'type',)
+
+    def __init__(self, *args, **kargs):
+        super(UserNoteForm, self).__init__(*args, **kargs)
+        if not self.instance.pk:
+            initial = self.initial
+            self.user = initial.get('user')
+
+    def save(self, *args, **kargs):
+        user_note = super(UserNoteForm, self).save(commit=False)
+
+        if not self.instance.pk:
+            user_note.note_by = self.user
+        user_note.save()
+
+        return user_note

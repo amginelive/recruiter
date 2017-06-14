@@ -8,8 +8,9 @@ from .forms import (
     UserCreationForm
 )
 from .models import (
-    Candidate,
     Agent,
+    Candidate,
+    UserNote
 )
 
 User = get_user_model()
@@ -43,3 +44,4 @@ class UserAdmin(UserAdmin):
 admin.site.register(Agent)
 admin.site.register(Candidate)
 admin.site.register(User, UserAdmin)
+admin.site.register(UserNote)
