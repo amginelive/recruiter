@@ -61,7 +61,7 @@ class ChatServer(JsonWebsocketConsumer):
                     last_message_text = 'You: '
                 else:
                     last_message_text = f'{user.get_full_name()}: '
-                    last_message_text += last_message.text
+                last_message_text += last_message.text
                 last_message_time = last_message.created_at.isoformat()
             else:
                 last_message_text = ''
@@ -72,7 +72,8 @@ class ChatServer(JsonWebsocketConsumer):
                 'online': user.online(),
                 'unread': unread,
                 'last_message_time': last_message_time,
-                'last_message_string': last_message_text
+                'last_message_text': last_message_text,
+                'conversation_id': conversation.id
             }
 
         response = {

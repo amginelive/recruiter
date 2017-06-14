@@ -45,17 +45,33 @@ const users = (state = new Immutable.OrderedMap().withMutations(ctx => ctx.set('
                 }
             });
         }
+
         ['candidates', 'agents'].forEach(group => {
             if (state.get(group).has(action.payload.user.id.toString())) {
                 state = sortUsersMap(state.mergeIn(
                     [group, action.payload.user.id.toString()],
                     {
-                        last_message_text: action.payload.user.id === state.get('self') ? 'You: ' : `${action.payload.user.name}: ` + action.payload.text,
+                        last_message_text: (action.payload.user.id === state.get('self') ? 'You: ' : `${action.payload.user.name}: `) + action.payload.text,
                         last_message_time: action.payload.time
                     }
                 ));
             }
         });
+        if (state.get('self') === action.payload.user.id) {
+            ['candidates', 'agents'].forEach(group => {
+                const result = state.get(group).findEntry(value => value.get('conversation_id') === action.payload.conversation_id);
+                if (result) {
+                    state = sortUsersMap(state.mergeIn(
+                        [group, result[0]],
+                        {
+                            last_message_text: `You: ${action.payload.text}`,
+                            last_message_time: action.payload.time
+                        }
+                    ));
+                }
+            });
+        }
+
         if (state.get('agents').has(action.payload.user.id.toString())) {
             return state.mergeIn(['agents', action.payload.user.id.toString()], {online: 2});
         } else if (state.get('candidates').has(action.payload.user.id.toString())) {
