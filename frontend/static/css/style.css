@@ -1557,3 +1557,9 @@ section#job-posts .job-posts-table {
 .btn-action-note-history {
     cursor: pointer;
 }
+
+.btn-save-edit-note {
+    min-width: inherit !important;
+    height: inherit !important;
+    margin: 0px !important;
+}

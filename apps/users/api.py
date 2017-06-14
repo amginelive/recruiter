@@ -104,7 +104,7 @@ candidate_profile_detail_update = CandidateProfileDetailUpdateAPIView.as_view()
 
 class UserNoteCreateAPIView(LoginRequiredMixin, CreateView, JSONResponseMixin):
     """
-    View for adding a note on a user
+    View for adding a note on a user.
     """
     model = UserNote
     form_class = UserNoteForm
@@ -134,3 +134,37 @@ class UserNoteCreateAPIView(LoginRequiredMixin, CreateView, JSONResponseMixin):
         })
 
 user_note_create = UserNoteCreateAPIView.as_view()
+
+
+class UserNoteUpdateAPIView(LoginRequiredMixin, UpdateView, JSONResponseMixin):
+    """
+    View for updating a note on a user.
+    """
+    model = UserNote
+    form_class = UserNoteForm
+
+    def get_object(self):
+        return UserNote.objects.get(pk=self.kwargs.get('pk'))
+
+    def form_valid(self, form):
+        user_note = form.save()
+        return self.render_json_response({
+            'success': True,
+            'data': {
+                'pk': user_note.pk,
+                'type': user_note.type,
+                'text': user_note.text,
+                'created_at': {
+                    'proper': date(user_note.created_at, 'D, F d, o P'),
+                    'timeago': naturaltime(user_note.created_at),
+                },
+            }
+        })
+
+    def form_invalid(self, form):
+        return self.render_json_response({
+            'success': False,
+            'errors': form.errors,
+        })
+
+user_note_update = UserNoteUpdateAPIView.as_view()

@@ -15,4 +15,5 @@ urlpatterns = (
     url(r'^cv/upload/api/$', api.profile_cv_upload, name='profile_cv_upload'),
     url(r'^profile/details/:pk/update/api/$', api.candidate_profile_detail_update, name='candidate_profile_detail_update'),
     url(r'^user-note/create/api/$', api.user_note_create, name='user_note_create'),
+    url(r'^user-note/:pk/update/api/$', api.user_note_update, name='user_note_update'),
 )
