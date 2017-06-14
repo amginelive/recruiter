@@ -207,12 +207,12 @@ section#account .container form button, .btn.action-btn {
 
 /* start Illya K. */
 section#account h5 {font-family:PangramRegular; font-size:18px;}
-section#account .profile-left {border:1px solid #f8f8f8; padding-top:15px;}
+section#account .profile-left {border:1px solid #f8f8f8; padding-top:15px; padding-bottom:25px;}
 section#account .account-actions a {padding-left:0px; padding-top:14px; font-family:PangramRegular;}
 section#account .account-actions a:hover {color:#ff5005}
 section#account .account-actions a i {margin-right:5px;}
 
-section#account .profile-right {padding-top:15px; min-height:341px}
+section#account .profile-right {padding-top:10px; padding-bottom:10px;}
 section#account .profile-right h4 {padding-bottom:0;}
 section#account .profile-right .progress {width:100%; background-color:#f8f8f8; border:1px solid #ccc; line-height:30px; min-height:30px;}
 section#account .profile-right .progress-bar {width:0%; min-height:30px; margin:0; padding:0; color:#fff; line-height:30px; vertical-align:middle;}
@@ -1562,4 +1562,9 @@ section#job-posts .job-posts-table {
     min-width: inherit !important;
     height: inherit !important;
     margin: 0px !important;
+}
+
+.job-stats {
+    margin-left: 20px;
+    border: solid 1px #f2f1ec;
 }
