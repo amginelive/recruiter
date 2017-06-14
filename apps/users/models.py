@@ -2,6 +2,7 @@ import itertools
 import logging
 
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import (
@@ -275,6 +276,18 @@ class Candidate(ProfileBase):
 
     def __str__(self):
         return self.user.get_full_name()
+
+    def clean(self):
+        validations = {}
+
+        if self.status == self.STATUS_IN_CONTRACT and not self.in_contract_status:
+            validations['in_contract_status'] = _('This field is required.')
+
+        if self.status == self.STATUS_OUT_OF_CONTRACT and not self.out_contract_status:
+            validations['out_contract_status'] = _('This field is required.')
+
+        if validations:
+            raise ValidationError(validations)
 
     @property
     def location(self):
