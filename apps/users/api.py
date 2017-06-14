@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.http import JsonResponse
-from django.template.defaultfilters import date
 from django.middleware.csrf import get_token
+from django.template.defaultfilters import date
 from django.views.generic import (
     CreateView,
     DeleteView,
