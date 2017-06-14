@@ -5,18 +5,26 @@ import { connect } from 'react-redux';
 class GlobalMessagesNotification extends React.Component {
     constructor(props) {
         super(props);
+
+        this.state = {
+            originalTitle: document.title
+        }
     }
 
     render() {
         const unread_candidates = this.props.users.get('candidates').reduce((result, user) => result + user.get('unread'), 0);
         const unread_agents = this.props.users.get('agents').reduce((result, user) => result + user.get('unread'), 0);
         if (unread_candidates + unread_agents > 0) {
+            document.title = `[${unread_candidates + unread_agents}] ${this.state.originalTitle}`;
             return (
                 <span>
                     {unread_candidates + unread_agents}
                 </span>
             );
-        } else return <div />;
+        } else {
+            document.title = this.state.originalTitle;
+            return <div />;
+        }
     }
 }
 
