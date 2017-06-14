@@ -84,6 +84,8 @@ class UserList extends React.Component {
 
     render() {
         const { users } = this.props;
+        const unread_candidates = this.props.users.get('candidates').reduce((result, user) => result + user.get('unread'), 0);
+        const unread_agents = this.props.users.get('agents').reduce((result, user) => result + user.get('unread'), 0);
         return (
             <div className='user-list-container'>
                 <Scrollbars ref={(scroll) => {this.scroll = scroll;}}
@@ -92,8 +94,22 @@ class UserList extends React.Component {
                                 autoHideDuration={200}>
                     <div className='user-list'>
                         <div className='user-list-header'>
-                            <button className={'chat-button user-list-button button-candidates' + (this.state.selectedUsersGroup === 0 ? ' active' : '')} onClick={this.handleUserGroupSelect.bind(this, 0)}>Candidates</button>
-                            <button className={'chat-button user-list-button button-agents' + (this.state.selectedUsersGroup === 1 ? ' active' : '')} onClick={this.handleUserGroupSelect.bind(this, 1)}>Agents</button>
+                            <button className={'chat-button user-list-button button-candidates' + (this.state.selectedUsersGroup === 0 ? ' active' : '')} onClick={this.handleUserGroupSelect.bind(this, 0)}>
+                                Candidates
+                                {
+                                    this.state.selectedUsersGroup !== 0 && unread_candidates !== 0 ?
+                                    <span>{unread_candidates}</span> :
+                                    ''
+                                }
+                            </button>
+                            <button className={'chat-button user-list-button button-agents' + (this.state.selectedUsersGroup === 1 ? ' active' : '')} onClick={this.handleUserGroupSelect.bind(this, 1)}>
+                                Agents
+                                {
+                                    this.state.selectedUsersGroup !== 1 && unread_agents !== 0 ?
+                                    <span>{unread_agents}</span> :
+                                    ''
+                                }
+                            </button>
                         </div>
                         <div className='user-list-group'>
                             {this.state.selectedUsersGroup === 0 ?
