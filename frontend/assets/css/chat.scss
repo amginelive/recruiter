@@ -133,7 +133,7 @@ $primary-color: #ffc211;
   overflow: hidden;
 }
 
-.user-list-item-pane-header {
+.user-list-item-pane-row {
   display: flex;
   justify-content: space-between;
   width: 100%;
@@ -179,11 +179,11 @@ $primary-color: #ffc211;
 }
 
 .user-avatar.user-online::after {
-    background-color: #37a000;
+  background-color: #37a000;
 }
 
 .user-avatar.user-away::after {
-    background-color: $primary-color;
+  background-color: $primary-color;
 }
 
 .user-list-item-unread {
@@ -192,13 +192,18 @@ $primary-color: #ffc211;
   flex-grow: 1;
 }
 
-.user-list-item-unread > span {
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  padding: 1px;
-  border: 1px solid #999;
-  background-color: $primary-color;
+#global-messages-notification {
+  display: inline-flex;
+  margin-left: 5px;
+}
+
+.user-list-item-unread > span, #global-messages-notification > span {
+  border-radius: 3px;
+  width: 20px;
+  height: 20px;
+  background-color: #37a000;
+  color: white;
+  font-weight: 700;
   text-align: center;
 }
 

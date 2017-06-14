@@ -64,13 +64,15 @@ class UserList extends React.Component {
                         <img src={entry[1].get('photo')} />
                     </div>
                     <div className='user-list-item-pane'>
-                        <div className='user-list-item-pane-header'>
+                        <div className='user-list-item-pane-row'>
                             <span className='user-list-item-name'>{entry[1].get('name')}</span>
                             {show_last_message ? <span className='user-list-item-timestamp'>{this.formatDate(entry[1].get('last_message_time'))}</span> : ''}
                         </div>
-                        {show_last_message ? <span className='user-list-item-message'>{entry[1].get('last_message_text')}</span> : ''}
+                        <div className='user-list-item-pane-row'>
+                            {show_last_message ? <span className='user-list-item-message'>{entry[1].get('last_message_text')}</span> : ''}
+                            {entry[1].get('unread') > 0 ? <div className='user-list-item-unread'><span>{entry[1].get('unread')}</span></div> : ''}
+                        </div>
                     </div>
-                    {entry[1].get('unread') > 0 ? <div className='user-list-item-unread'><span>{entry[1].get('unread')}</span></div> : ''}
                 </div>
             );
         }).toArray();
