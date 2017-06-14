@@ -2,8 +2,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.http import JsonResponse
 from django.template.defaultfilters import date
+from django.middleware.csrf import get_token
 from django.views.generic import (
     CreateView,
+    DeleteView,
     UpdateView,
     View,
 )
@@ -118,12 +120,16 @@ class UserNoteCreateAPIView(LoginRequiredMixin, CreateView, JSONResponseMixin):
             'success': True,
             'data': {
                 'pk': user_note.pk,
+                'note_to': {
+                    'pk': user_note.note_to.pk,
+                },
                 'type': user_note.type,
                 'text': user_note.text,
                 'created_at': {
                     'proper': date(user_note.created_at, 'D, F d, o P'),
                     'timeago': naturaltime(user_note.created_at),
                 },
+                'csrf_token': get_token(self.request),
             }
         })
 
@@ -152,6 +158,9 @@ class UserNoteUpdateAPIView(LoginRequiredMixin, UpdateView, JSONResponseMixin):
             'success': True,
             'data': {
                 'pk': user_note.pk,
+                'note_to': {
+                    'pk': user_note.note_to.pk,
+                },
                 'type': user_note.type,
                 'text': user_note.text,
                 'created_at': {
@@ -168,3 +177,19 @@ class UserNoteUpdateAPIView(LoginRequiredMixin, UpdateView, JSONResponseMixin):
         })
 
 user_note_update = UserNoteUpdateAPIView.as_view()
+
+
+class UserNoteDeleteAPIView(LoginRequiredMixin, DeleteView, JSONResponseMixin):
+    """
+    View for deleting a note on a user.
+    """
+    model = UserNote
+
+    def get_object(self):
+        return UserNote.objects.get(pk=self.kwargs.get('pk'))
+
+    def post(self, request, *args, **kwargs):
+        self.get_object().delete()
+        return self.render_json_response({'success': True})
+
+user_note_delete = UserNoteDeleteAPIView.as_view()
