@@ -11,7 +11,7 @@
     <!-- internal block -->
     <section id="account">
         <div class="container">
-            <div class="col-md-7 text-center profile-navigation">
+            <div class="{% if user == profile.user %}col-md-12{% else %}col-md-7{% endif %} text-center profile-navigation">
                 <div class="col-md-4">
                     <span>Last online: {{ profile.user.last_seen|date:"d/m/y" }}</span>
                 </div>
