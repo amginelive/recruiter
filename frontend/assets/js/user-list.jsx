@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Scrollbars } from 'react-custom-scrollbars';
 import moment from 'moment';
+import { Loader } from 'react-loaders';
 
 import * as actions from './actions/index.js';
 
@@ -26,6 +27,10 @@ class UserList extends React.Component {
     }
 
     userInit(id) {
+        if (id === this.state.activeUser) {
+            return;
+        }
+        this.props.setChatInitPendingState(true);
         this.props.actions.initChat(id);
         this.setState({activeUser: id});
     }
@@ -41,6 +46,9 @@ class UserList extends React.Component {
     }
 
     renderUsersGroup(users, group_name) {
+        if (this.props.users.get('self') === 0) {
+            return <Loader className='empty-user-group' type='ball-pulse' active />;
+        }
         if (users.size === 0) {
             return <div className='empty-user-group'>You have no {group_name} connections</div>
         }

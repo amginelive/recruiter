@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Scrollbars } from 'react-custom-scrollbars';
 import moment from 'moment';
+import { Loader } from 'react-loaders';
 
 import * as actions from './actions/index.js';
 import Message from './message.jsx';
@@ -15,6 +16,7 @@ class MessageList extends React.Component {
         this.scrollList = this.scrollList.bind(this);
         this.state = {
             prevScrollHeight: 0,
+            pendingMore: false
         };
     }
 
@@ -36,7 +38,14 @@ class MessageList extends React.Component {
             setTimeout(() => this.scrollList(this.scroll.getScrollHeight()), 10);
         }
         if (this.props.messages.get('activeChat') !== messages.get('activeChat')) { // Chat init happened
+            this.props.setChatInitPendingState(false);
             setTimeout(() => this.scrollList(this.scroll.getScrollHeight()), 10);
+        }
+        if (this.props.messages.get('activeChat') === messages.get('activeChat')
+            && (messages.get('messageList').size - this.props.messages.get('messageList').size > 1
+                || (messages.get('messageList').size - this.props.messages.get('messageList').size === 1
+                && messages.get('more') !== this.props.messages.get('more')))) { // More messages loaded
+            this.setState({pendingMore: false});
         }
     }
 
@@ -55,13 +64,35 @@ class MessageList extends React.Component {
     }
 
     moreMessages(first_message_id) {
-        this.setState({prevScrollHeight: this.scroll.getScrollHeight()});
+        this.setState({
+            prevScrollHeight: this.scroll.getScrollHeight(),
+            pendingMore: true
+        });
         this.props.actions.moreMessages(first_message_id);
     }
 
-    render() {
-        const { messages, users } = this.props;
+    renderMoreMessagesButton(messages) {
+        if (this.state.pendingMore) {
+            return <Loader type='ball-pulse' active />
+        } else if (messages.get('more')) {
+            return <button onClick={this.moreMessages.bind(this, messages.get('messageList').get(0).get('id'))}>More</button>;
+        } else {
+            return <div />;
+        }
+    }
 
+    render() {
+        const { messages, users, chatInitPending } = this.props;
+
+        if (chatInitPending) {
+            return (
+                <div className='message-list-container'>
+                    <Loader type='ball-pulse' active />
+                </div>
+            );
+        }
+
+        const moreMessagesButtonUI = this.renderMoreMessagesButton(messages);
         return (
             <div className='message-list-container'>
                 <Scrollbars ref={(scroll) => {this.scroll = scroll;}}
@@ -69,7 +100,7 @@ class MessageList extends React.Component {
                             autoHide autoHideTimeout={1000}
                             autoHideDuration={200}>
                     <div className='message-list'>
-                        {messages.get('more') ? <button onClick={this.moreMessages.bind(this, messages.get('messageList').get(0).get('id'))}>More</button> : ''}
+                        {moreMessagesButtonUI}
                         {messages.get('messageList').map((message, index) => {
                             let dateUI = '';
                             if (index === 0 || !moment(message.get('time')).isSame(moment(messages.get('messageList').get(index-1).get('time')), 'day')) {
