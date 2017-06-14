@@ -1,5 +1,7 @@
+from datetime import datetime
+
 from django.contrib.auth import get_user_model
-from django.db.models import ObjectDoesNotExist, Q
+from django.db.models import Q
 
 from channels.generic.websockets import JsonWebsocketConsumer
 
@@ -22,7 +24,7 @@ class ChatServer(JsonWebsocketConsumer):
         if message.user.is_authenticated():
             self.send({'accept': True})
         else:
-            self.send({'accept': False})
+            self.send({'close': True})
             return
 
         connections = Connection.objects\
@@ -50,14 +52,32 @@ class ChatServer(JsonWebsocketConsumer):
                     .count()
             else:
                 unread = conversation.messages.all().count()
+            last_message = conversation.messages\
+                .all()\
+                .order_by('created_at')\
+                .last()
+            if last_message:
+                if self.message.user == last_message.author:
+                    last_message_text = 'You: '
+                else:
+                    last_message_text = f'{user.get_full_name()}: '
+                last_message_text += last_message.text
+                last_message_time = last_message.created_at.isoformat()
+            else:
+                last_message_text = ''
+                last_message_time = datetime.fromtimestamp(0).isoformat()
             return {
-                'name': user.email,
+                'name': user.get_full_name(),
                 'photo': user.get_photo_url(),
                 'online': user.online(),
-                'unread': unread
+                'unread': unread,
+                'last_message_time': last_message_time,
+                'last_message_text': last_message_text,
+                'conversation_id': conversation.id
             }
 
         response = {
+            'self': self.message.user.id,
             'activeChat': 0,
             'agents': {},
             'candidates': {}
@@ -88,16 +108,12 @@ class ChatServer(JsonWebsocketConsumer):
         return conversation
 
     def _create_message_data_dict(self, message):
-        if message.author.account_type == User.ACCOUNT_CANDIDATE:
-            user_type = 'candidates'
-        else:
-            user_type = 'agents'
         return {
             'user': {
-                'name': message.author.email,
+                'name': message.author.get_full_name(),
                 'photo': message.author.get_photo_url(),
-                'id': message.author.id if self.message.user != message.author else 0,
-                'type': user_type
+                'id': message.author.id,
+                'type': f'{message.author.get_account_type_display().lower()}s'
             },
             'conversation_id': message.conversation.id,
             'text': message.text,
@@ -158,7 +174,7 @@ class ChatServer(JsonWebsocketConsumer):
         conversation = self.message.channel_session.get('conversation')
 
         response = {'type': 'userTyping',
-                    'payload': {'name': self.message.user.email,
+                    'payload': {'name': self.message.user.get_full_name(),
                                 'id': self.message.user.id,
                                 'conversation_id': conversation.id}}
         for user in conversation.users.exclude(id=self.message.user.id):
@@ -224,6 +240,4 @@ class ChatServer(JsonWebsocketConsumer):
         })
 
     def disconnect(self, message, **kwargs):
-        if not message.user.is_authenticated():
-            return
         self.cmd_idle(False)

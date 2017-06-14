@@ -97,7 +97,29 @@
   border-bottom: 1px solid #999;
 }
 
+.user-list-item-pane {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 .user-list-item-name {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.user-list-item-pane-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.user-list-item-message {
+  color: #999;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;

@@ -5,9 +5,19 @@ import * as config from '../config.js';
 
 const { messageTypes } = config;
 
-const users = (state = new Immutable.Map().withMutations(ctx => ctx.set('activeChat', 0).set('agents', new Immutable.Map()).set('candidates', new Immutable.Map())), action) => {
+function sortUsersMap(map) {
+    ['candidates', 'agents'].forEach(group => {
+        map = map.update(group, users => {
+            return users.sortBy(user => new Date(user.get('last_message_time')), (a, b) => a === b ? 0 : (a > b ? -1 : 1));
+        });
+    });
+    return map;
+}
+
+const users = (state = new Immutable.OrderedMap().withMutations(ctx => ctx.set('self', 0).set('activeChat', 0).set('agents', new Immutable.Map()).set('candidates', new Immutable.Map())), action) => {
     if (action.type === messageTypes.initUsers) {
-        return Immutable.fromJS(action.payload);
+        state = Immutable.OrderedMap(Immutable.fromJS(action.payload));
+        return sortUsersMap(state);
     }
     if (action.type === messageTypes.userPresence) {
         return state.mergeDeep(action.payload);
@@ -24,12 +34,44 @@ const users = (state = new Immutable.Map().withMutations(ctx => ctx.set('activeC
     }
     if (action.type === messageTypes.newMessage) {
         if (action.payload.conversation_id !== state.get('activeChat')) {
-            if (state.get('agents').has(action.payload.user.id.toString())) {
-                state = state.mergeIn(['agents', action.payload.user.id.toString()], {unread: state.getIn(['agents', action.payload.user.id.toString(), 'unread'])+1});
-            } else if (state.get('candidates').has(action.payload.user.id.toString())) {
-                state = state.mergeIn(['candidates', action.payload.user.id.toString()], {unread: state.getIn(['candidates', action.payload.user.id.toString(), 'unread'])+1});
-            }
+            ['candidates', 'agents'].forEach(group => {
+                if (state.get(group).has(action.payload.user.id.toString())) {
+                    state = sortUsersMap(state.mergeIn(
+                        [group, action.payload.user.id.toString()],
+                        {
+                            unread: state.getIn([group, action.payload.user.id.toString(), 'unread']) + 1
+                        }
+                    ));
+                }
+            });
         }
+
+        ['candidates', 'agents'].forEach(group => {
+            if (state.get(group).has(action.payload.user.id.toString())) {
+                state = sortUsersMap(state.mergeIn(
+                    [group, action.payload.user.id.toString()],
+                    {
+                        last_message_text: (action.payload.user.id === state.get('self') ? 'You: ' : `${action.payload.user.name}: `) + action.payload.text,
+                        last_message_time: action.payload.time
+                    }
+                ));
+            }
+        });
+        if (state.get('self') === action.payload.user.id) {
+            ['candidates', 'agents'].forEach(group => {
+                const result = state.get(group).findEntry(value => value.get('conversation_id') === action.payload.conversation_id);
+                if (result) {
+                    state = sortUsersMap(state.mergeIn(
+                        [group, result[0]],
+                        {
+                            last_message_text: `You: ${action.payload.text}`,
+                            last_message_time: action.payload.time
+                        }
+                    ));
+                }
+            });
+        }
+
         if (state.get('agents').has(action.payload.user.id.toString())) {
             return state.mergeIn(['agents', action.payload.user.id.toString()], {online: 2});
         } else if (state.get('candidates').has(action.payload.user.id.toString())) {
