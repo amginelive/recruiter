@@ -11,7 +11,7 @@ class IdleMonitor extends React.Component {
         super(props);
 
         this.state = {
-            timeout: 30
+            timeout: 60
         }
     }
 
