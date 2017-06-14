@@ -238,7 +238,7 @@ CACHES = {
     }
 }
 
-USER_ONLINE_TIMEOUT = 60
+USER_ONLINE_TIMEOUT = 120
 
 # Django-channels settings
 CHANNEL_LAYERS = {

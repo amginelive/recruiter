@@ -1,5 +1,20 @@
+$primary-color: #ffc211;
+@import '~loaders.css/src/animations/ball-pulse.scss';
+
 * {
     box-sizing: border-box;
+}
+
+.loader-hidden {
+  display: none;
+}
+.loader-active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  text-align: center;
 }
 
 #app {
@@ -17,7 +32,7 @@
 
 .chat-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex-grow: 4;
 }
 
@@ -28,8 +43,9 @@
   margin-left: 15px;
 }
 
-.app-inner-row {
+.app-inner-column {
   display: flex;
+  flex-direction: column;
   flex: auto;
   flex-grow: 2;
 }
@@ -43,6 +59,11 @@
 .user-list {
   display: flex;
   flex-direction: column;
+  height: 100%;
+}
+
+.user-list-group {
+  height: 100%;
 }
 
 .user-list-header {
@@ -65,7 +86,7 @@
 }
 
 .user-list-button.active {
-  background-color: #ffc211;
+  background-color: $primary-color;
 }
 
 .user-list-button.button-candidates {
@@ -112,7 +133,7 @@
   overflow: hidden;
 }
 
-.user-list-item-pane-header {
+.user-list-item-pane-row {
   display: flex;
   justify-content: space-between;
   width: 100%;
@@ -158,11 +179,11 @@
 }
 
 .user-avatar.user-online::after {
-    background-color: #37a000;
+  background-color: #37a000;
 }
 
 .user-avatar.user-away::after {
-    background-color: #ffc211;
+  background-color: $primary-color;
 }
 
 .user-list-item-unread {
@@ -171,23 +192,34 @@
   flex-grow: 1;
 }
 
-.user-list-item-unread > span {
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  padding: 1px;
-  border: 1px solid #999;
-  background-color: #ffc211;
+#global-messages-notification {
+  display: inline-flex;
+  margin-left: 5px;
+}
+
+.user-list-button > span {
+  display: inline-block;
+  margin-left: 5px;
+}
+
+.user-list-item-unread > span, #global-messages-notification > span, .user-list-button > span {
+  border-radius: 3px;
+  width: 20px;
+  height: 20px;
+  background-color: #37a000;
+  color: white;
+  font-weight: 700;
   text-align: center;
 }
 
 .user-list-item.active {
-  background: #ffc211;
+  background: $primary-color;
 }
 
 .message-list-container {
   border: 1px solid #999;
   flex-grow: 4;
+  height: 100%;
 }
 
 .message-list {
@@ -197,6 +229,7 @@
 
 .message-list-item {
   display: flex;
+  align-items: flex-start;
   padding: 10px;
 }
 
@@ -280,7 +313,7 @@
   font-size: 100%;
   padding: .25em 1em;
   border: 1px solid #999;
-  background-color: #ffc211;
+  background-color: $primary-color;
   text-decoration: none;
   border-radius: 2px;
 }

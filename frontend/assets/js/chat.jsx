@@ -14,18 +14,28 @@ import '../css/chat.scss';
 class App extends React.Component {
     constructor(props) {
         super(props);
+
+        this.state = {
+            chatInitPending: false
+        };
+    }
+
+    setChatInitPendingState(state) {
+        this.setState({chatInitPending: state});
     }
 
     render() {
         return (
             <div className='app-container'>
                 <div className ='chat-container'>
-                    <div className='app-inner-row'>
-                        <UserList />
-                        <MessageList />
+                    <UserList setChatInitPendingState={this.setChatInitPendingState.bind(this)} />
+                    <div className='app-inner-column'>
+                        <MessageList setChatInitPendingState={this.setChatInitPendingState.bind(this)}
+                                     chatInitPending={this.state.chatInitPending}
+                        />
+                        <TypingList />
+                        <MessageForm />
                     </div>
-                    <TypingList />
-                    <MessageForm />
                 </div>
                 <div className='placeholder'></div>
             </div>

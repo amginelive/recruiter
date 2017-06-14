@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Scrollbars } from 'react-custom-scrollbars';
 import moment from 'moment';
+import { Loader } from 'react-loaders';
 
 import * as actions from './actions/index.js';
 
@@ -26,6 +27,10 @@ class UserList extends React.Component {
     }
 
     userInit(id) {
+        if (id === this.state.activeUser) {
+            return;
+        }
+        this.props.setChatInitPendingState(true);
         this.props.actions.initChat(id);
         this.setState({activeUser: id});
     }
@@ -41,6 +46,9 @@ class UserList extends React.Component {
     }
 
     renderUsersGroup(users, group_name) {
+        if (this.props.users.get('self') === 0) {
+            return <Loader className='empty-user-group' type='ball-pulse' active />;
+        }
         if (users.size === 0) {
             return <div className='empty-user-group'>You have no {group_name} connections</div>
         }
@@ -56,13 +64,15 @@ class UserList extends React.Component {
                         <img src={entry[1].get('photo')} />
                     </div>
                     <div className='user-list-item-pane'>
-                        <div className='user-list-item-pane-header'>
+                        <div className='user-list-item-pane-row'>
                             <span className='user-list-item-name'>{entry[1].get('name')}</span>
                             {show_last_message ? <span className='user-list-item-timestamp'>{this.formatDate(entry[1].get('last_message_time'))}</span> : ''}
                         </div>
-                        {show_last_message ? <span className='user-list-item-message'>{entry[1].get('last_message_text')}</span> : ''}
+                        <div className='user-list-item-pane-row'>
+                            {show_last_message ? <span className='user-list-item-message'>{entry[1].get('last_message_text')}</span> : ''}
+                            {entry[1].get('unread') > 0 ? <div className='user-list-item-unread'><span>{entry[1].get('unread')}</span></div> : ''}
+                        </div>
                     </div>
-                    {entry[1].get('unread') > 0 ? <div className='user-list-item-unread'><span>{entry[1].get('unread')}</span></div> : ''}
                 </div>
             );
         }).toArray();
@@ -74,6 +84,8 @@ class UserList extends React.Component {
 
     render() {
         const { users } = this.props;
+        const unread_candidates = this.props.users.get('candidates').reduce((result, user) => result + user.get('unread'), 0);
+        const unread_agents = this.props.users.get('agents').reduce((result, user) => result + user.get('unread'), 0);
         return (
             <div className='user-list-container'>
                 <Scrollbars ref={(scroll) => {this.scroll = scroll;}}
@@ -82,8 +94,22 @@ class UserList extends React.Component {
                                 autoHideDuration={200}>
                     <div className='user-list'>
                         <div className='user-list-header'>
-                            <button className={'chat-button user-list-button button-candidates' + (this.state.selectedUsersGroup === 0 ? ' active' : '')} onClick={this.handleUserGroupSelect.bind(this, 0)}>Candidates</button>
-                            <button className={'chat-button user-list-button button-agents' + (this.state.selectedUsersGroup === 1 ? ' active' : '')} onClick={this.handleUserGroupSelect.bind(this, 1)}>Agents</button>
+                            <button className={'chat-button user-list-button button-candidates' + (this.state.selectedUsersGroup === 0 ? ' active' : '')} onClick={this.handleUserGroupSelect.bind(this, 0)}>
+                                Candidates
+                                {
+                                    this.state.selectedUsersGroup !== 0 && unread_candidates !== 0 ?
+                                    <span>{unread_candidates}</span> :
+                                    ''
+                                }
+                            </button>
+                            <button className={'chat-button user-list-button button-agents' + (this.state.selectedUsersGroup === 1 ? ' active' : '')} onClick={this.handleUserGroupSelect.bind(this, 1)}>
+                                Agents
+                                {
+                                    this.state.selectedUsersGroup !== 1 && unread_agents !== 0 ?
+                                    <span>{unread_agents}</span> :
+                                    ''
+                                }
+                            </button>
                         </div>
                         <div className='user-list-group'>
                             {this.state.selectedUsersGroup === 0 ?

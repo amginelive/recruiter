@@ -15,7 +15,7 @@ User = get_user_model()
 class ChatServer(JsonWebsocketConsumer):
     http_user = True
 
-    message_list_limit = 10
+    message_list_limit = 15
 
     def connection_groups(self, **kwargs):
         return [str(self.message.user.id)]
