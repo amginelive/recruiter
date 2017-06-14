@@ -1565,7 +1565,9 @@ section#job-posts .job-posts-table {
 }
 
 .job-stats {
+    padding: 15px;
     margin-left: 20px;
+    margin-bottom: 35px;
     border: solid 1px #f2f1ec;
 }
 

@@ -124,14 +124,15 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         context = super(ProfileDetailView, self).get_context_data(*args, **kwargs)
         profile = self.get_object()
 
+        context['user_note'] = UserNote
+        context['user_notes'] = UserNote.objects\
+            .filter(note_by=self.request.user, note_to=profile.user)\
+            .order_by('-created_at')
+
         if profile.user.account_type == User.ACCOUNT_CANDIDATE:
             context['photo_form'] = CandidatePhotoUploadForm
             context['completeness'] = get_profile_completeness(profile)
             context['candidate_form'] = CandidateUpdateForm(instance=profile)
-            context['user_note'] = UserNote
-            context['user_notes'] = UserNote.objects\
-                .filter(note_by=self.request.user, note_to=profile.user)\
-                .order_by('-created_at')
             if self.request.user.account_type == User.ACCOUNT_AGENT:
                 messages_sent = Message.objects.filter(author=self.request.user).order_by('created_at')
                 context['first_contact_sent'] = messages_sent.first()
