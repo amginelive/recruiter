@@ -25,6 +25,9 @@ class MessageList extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) { // This is keeping scroll in place on requesting more messages.
+        if (!this.scroll) {
+            return;
+        }
         if (prevProps.messages.get('messageList').size !== 0 && (this.props.messages.get('messageList').size - prevProps.messages.get('messageList').size > 1)) {
             this.scrollList(this.scroll.getScrollHeight() - this.state.prevScrollHeight);
         }
