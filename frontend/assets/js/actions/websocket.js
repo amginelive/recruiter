@@ -36,7 +36,7 @@ class ChatSocket {
         function generateInterval (k) {
             return Math.min(30, (Math.pow(2, k) - 1)) * 1000;
         }
-        this.websocket.onclose = () => {
+        this.websocket.onclose = () => { // TODO: stop reconnecting attempts on legit server decline.
             const time = generateInterval(that.attempts);
 
             setTimeout(() => {

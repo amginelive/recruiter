@@ -24,7 +24,7 @@ class ChatServer(JsonWebsocketConsumer):
         if message.user.is_authenticated():
             self.send({'accept': True})
         else:
-            self.send({'accept': False})
+            self.send({'close': True})
             return
 
         connections = Connection.objects\
