@@ -13,26 +13,31 @@ class UserList extends React.Component {
         super(props);
 
         this.state = {
-            activeUser: 0,
             userPresencePollingInterval: 10,
             selectedUsersGroup: 0
         };
         setInterval(() => this.props.actions.userPresence(), this.state.userPresencePollingInterval*1000);
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        /*if (this.props.users.size > 0 && this.state.activeUser === 0) {
-            this.setState({activeUser: this.props.users.toArray()[0].get('id')});
-        }*/
+    componentWillReceiveProps(nextProps) {
+        const activeChat = nextProps.users.get('activeChat');
+        if (this.props.users.get('activeChat') === 0 && activeChat !== 0) {
+            ['candidates', 'agents'].some((group, index) => {
+                const value = nextProps.users.get(group).find(user => user.get('conversation_id') === activeChat);
+                if (value) {
+                    this.setState({selectedUsersGroup: index});
+                    return true;
+                } else return false;
+            });
+        }
     }
 
     userInit(id) {
-        if (id === this.state.activeUser) {
+        if (id === this.props.users.get('activeChat')) {
             return;
         }
         this.props.setChatInitPendingState(true);
         this.props.actions.initChat(id);
-        this.setState({activeUser: id});
     }
 
     formatDate(date) {
@@ -52,25 +57,25 @@ class UserList extends React.Component {
         if (users.size === 0) {
             return <div className='empty-user-group'>You have no {group_name} connections</div>
         }
-        return users.entrySeq().map(entry => {
-            const show_last_message = moment(entry[1].get('last_message_time')).valueOf() > 60*60*24;
+        return users.map(user => {
+            const show_last_message = moment(user.get('last_message_time')).valueOf() > 60*60*24;
             return (
                 <div
-                    onClick={() => {this.userInit(entry[0])}}
-                    key={entry[0]}
-                    className={'user-list-item' + (entry[0] === this.state.activeUser ? ' active' : '')}
+                    onClick={() => {this.userInit(user.get('conversation_id'))}}
+                    key={user.get('conversation_id')}
+                    className={'user-list-item' + (user.get('conversation_id') === this.props.users.get('activeChat') ? ' active' : '')}
                 >
-                    <div className={'user-avatar' + (entry[1].get('online') === 2 ? ' user-online' : (entry[1].get('online') === 1 ? ' user-away': ''))}>
-                        <img src={entry[1].get('photo')} />
+                    <div className={'user-avatar' + (user.get('online') === 2 ? ' user-online' : (user.get('online') === 1 ? ' user-away': ''))}>
+                        <img src={user.get('photo')} />
                     </div>
                     <div className='user-list-item-pane'>
                         <div className='user-list-item-pane-row'>
-                            <span className='user-list-item-name'>{entry[1].get('name')}</span>
-                            {show_last_message ? <span className='user-list-item-timestamp'>{this.formatDate(entry[1].get('last_message_time'))}</span> : ''}
+                            <span className='user-list-item-name'>{user.get('name')}</span>
+                            {show_last_message ? <span className='user-list-item-timestamp'>{this.formatDate(user.get('last_message_time'))}</span> : ''}
                         </div>
                         <div className='user-list-item-pane-row'>
-                            {show_last_message ? <span className='user-list-item-message'>{entry[1].get('last_message_text')}</span> : ''}
-                            {entry[1].get('unread') > 0 ? <div className='user-list-item-unread'><span>{entry[1].get('unread')}</span></div> : ''}
+                            {show_last_message ? <span className='user-list-item-message'>{user.get('last_message_text')}</span> : ''}
+                            {user.get('unread') > 0 ? <div className='user-list-item-unread'><span>{user.get('unread')}</span></div> : ''}
                         </div>
                     </div>
                 </div>
