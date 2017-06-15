@@ -225,6 +225,8 @@ $primary-color: #ffc211;
   display: flex;
   align-items: flex-start;
   padding: 10px;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .message-list-item-body {
