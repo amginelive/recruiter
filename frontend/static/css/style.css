@@ -29,7 +29,7 @@ nav.navbar {
     line-height: 15px;
 }
 
-.navbar-header .logo {
+.logo {
     float: left;
     height: 60px;
 }
@@ -207,12 +207,12 @@ section#account .container form button, .btn.action-btn {
 
 /* start Illya K. */
 section#account h5 {font-family:PangramRegular; font-size:18px;}
-section#account .profile-left {border:1px solid #f8f8f8; padding-top:15px;}
+section#account .profile-left {border:1px solid #f8f8f8; padding-top:15px; padding-bottom:25px;}
 section#account .account-actions a {padding-left:0px; padding-top:14px; font-family:PangramRegular;}
 section#account .account-actions a:hover {color:#ff5005}
 section#account .account-actions a i {margin-right:5px;}
 
-section#account .profile-right {padding-top:15px; min-height:341px}
+section#account .profile-right {padding-top:10px; padding-bottom:10px;}
 section#account .profile-right h4 {padding-bottom:0;}
 section#account .profile-right .progress {width:100%; background-color:#f8f8f8; border:1px solid #ccc; line-height:30px; min-height:30px;}
 section#account .profile-right .progress-bar {width:0%; min-height:30px; margin:0; padding:0; color:#fff; line-height:30px; vertical-align:middle;}
@@ -1563,3 +1563,18 @@ section#job-posts .job-posts-table {
     height: inherit !important;
     margin: 0px !important;
 }
+
+.job-stats {
+    padding: 15px;
+    margin-left: 20px;
+    margin-bottom: 35px;
+    border: solid 1px #f2f1ec;
+}
+
+.marginBottom-0 {margin-bottom:0;}
+
+.dropdown-submenu{position:relative;}
+.dropdown-submenu>.dropdown-menu{top:0;margin-top:-6px;margin-left:-1px;-webkit-border-radius:0 6px 6px 6px;-moz-border-radius:0 6px 6px 6px;border-radius:0 6px 6px 6px;}
+.dropdown-submenu>a:after{display:block;content:" ";float:right;width:0;height:0;border-color:transparent;border-style:solid;border-width:5px 0 5px 5px;border-left-color:#cccccc;margin-top:5px;margin-right:-10px;}
+.dropdown-submenu:hover>a:after{border-left-color:#555;}
+.dropdown-submenu.pull-left{float:none;}.dropdown-submenu.pull-left>.dropdown-menu{left:-100%;margin-left:10px;-webkit-border-radius:6px 0 6px 6px;-moz-border-radius:6px 0 6px 6px;border-radius:6px 0 6px 6px;}
