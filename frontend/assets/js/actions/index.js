@@ -42,15 +42,9 @@ export function moreMessages(message_id) {
     }
 }
 
-export function userIdle() {
+export function userIdle(idle) {
     return (dispatch, getState, {emit}) => {
-        emit(messageTypes.userIdle, {});
-    }
-}
-
-export function userActive() {
-    return (dispatch, getState, {emit}) => {
-        emit(messageTypes.userActive, {});
+        emit(messageTypes.userIdle, idle);
     }
 }
 

@@ -136,9 +136,7 @@ class ChatServer(JsonWebsocketConsumer):
         elif content.get('type') == 'moreMessages':
             self.cmd_more_messages(content.get('payload'))
         elif content.get('type') == 'userIdle':
-            self.cmd_idle(True)
-        elif content.get('type') == 'userActive':
-            self.cmd_idle(False)
+            self.cmd_idle(content.get('payload'))
         elif content.get('type') == 'readMessage':
             self.cmd_read_message(content.get('payload'))
 

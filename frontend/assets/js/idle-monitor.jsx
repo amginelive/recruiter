@@ -18,8 +18,8 @@ class IdleMonitor extends React.Component {
     render() {
         return <IdleTimer
             element={document}
-            activeAction={this.props.actions.userActive}
-            idleAction={this.props.actions.userIdle}
+            activeAction={this.props.actions.userIdle.bind(this, false)}
+            idleAction={this.props.actions.userIdle.bind(this, true)}
             timeout={this.state.timeout*1000} />;
     }
 }
