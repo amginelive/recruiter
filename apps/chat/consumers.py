@@ -87,8 +87,9 @@ class ChatServer(JsonWebsocketConsumer):
             response[account_type][str(user.id)] = create_user_data_dict(user)
         self.send({'type': 'initUsers', 'payload': response})
 
-        if kwargs['mode'] != 'bg'\
-                and len(response['agents']) + len(response['candidates']) > 0:
+        users_count = len(response.get('agents'))\
+            + len(response.get('candidates'))
+        if kwargs.get('mode') != 'bg' and users_count > 0:
             last_conversation = self.message.user.participations\
                 .order_by('updated_at')\
                 .last()\
@@ -147,7 +148,8 @@ class ChatServer(JsonWebsocketConsumer):
             self.cmd_read_message(content.get('payload'))
 
     def cmd_init(self, payload):
-        conversation = self.message.user.participations.get(conversation_id=payload).conversation
+        conversation = self.message.user.participations.get(
+            conversation_id=payload).conversation
         if not conversation:
             return
         self.message.channel_session['conversation'] = conversation
