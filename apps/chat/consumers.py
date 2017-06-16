@@ -86,8 +86,15 @@ class ChatServer(JsonWebsocketConsumer):
             account_type = f'{user.get_account_type_display().lower()}s'
             response[account_type][str(user.id)] = create_user_data_dict(user)
         self.send({'type': 'initUsers', 'payload': response})
-        #if len(response) > 0:
-        #    self.cmd_init({'user_id': response[0].get('id')})
+
+        users_count = len(response.get('agents'))\
+            + len(response.get('candidates'))
+        if kwargs.get('mode') != 'bg' and users_count > 0:
+            last_conversation = self.message.user.participations\
+                .order_by('updated_at')\
+                .last()\
+                .conversation
+            self.cmd_init(last_conversation.id)
 
     def _get_or_create_conversation(self, user):
         conversation = Conversation.objects \
@@ -136,14 +143,15 @@ class ChatServer(JsonWebsocketConsumer):
         elif content.get('type') == 'moreMessages':
             self.cmd_more_messages(content.get('payload'))
         elif content.get('type') == 'userIdle':
-            self.cmd_idle(True)
-        elif content.get('type') == 'userActive':
-            self.cmd_idle(False)
+            self.cmd_idle(content.get('payload'))
         elif content.get('type') == 'readMessage':
             self.cmd_read_message(content.get('payload'))
 
     def cmd_init(self, payload):
-        conversation = self._get_or_create_conversation(payload.get('user_id'))
+        conversation = self.message.user.participations.get(
+            conversation_id=payload).conversation
+        if not conversation:
+            return
         self.message.channel_session['conversation'] = conversation
 
         query = Message.objects.filter(conversation=conversation)\

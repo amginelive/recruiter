@@ -30,9 +30,9 @@ export function typeTimerExpire(payload) {
     return {type: actionTypes.typeTimerExpire, payload}
 }
 
-export function initChat(user_id) {
+export function initChat(conversation_id) {
     return (dispatch, getState, {emit}) => {
-        emit(messageTypes.initChat, {user_id});
+        emit(messageTypes.initChat, conversation_id);
     }
 }
 
@@ -42,15 +42,9 @@ export function moreMessages(message_id) {
     }
 }
 
-export function userIdle() {
+export function userIdle(idle) {
     return (dispatch, getState, {emit}) => {
-        emit(messageTypes.userIdle, {});
-    }
-}
-
-export function userActive() {
-    return (dispatch, getState, {emit}) => {
-        emit(messageTypes.userActive, {});
+        emit(messageTypes.userIdle, idle);
     }
 }
 

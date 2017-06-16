@@ -17,7 +17,15 @@ class GlobalMessagesNotification extends React.Component {
         if (unread_candidates + unread_agents > 0) {
             document.title = `[${unread_candidates + unread_agents}] ${this.state.originalTitle}`;
             return (
-                <span>
+                <span style={{
+                    borderRadius: 3,
+                    width: 20,
+                    height: 20,
+                    backgroundColor: '#37a000',
+                    color: 'white',
+                    fontWeight: 700,
+                    textAlign: 'center'}}
+                >
                     {unread_candidates + unread_agents}
                 </span>
             );

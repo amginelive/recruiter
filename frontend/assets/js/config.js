@@ -9,7 +9,6 @@ const messageTypes = [
     'moreMessages',
     'userTyping',
     'userIdle',
-    'userActive',
     'readMessage'
 ].reduce((accum, msg) => {
     accum[ msg ] = msg;
@@ -17,7 +16,7 @@ const messageTypes = [
 }, {});
 
 const ws_schema = window.location.protocol === 'https:' ? 'wss' : 'ws';
-const uri = `${ws_schema}://${host}/chat/`;
+const uri = `${ws_schema}://${host}/chat/${window.location.pathname === '/chat/' ? '' : 'bg'}`;
 
 export {
     host,
