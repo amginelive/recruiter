@@ -37,7 +37,10 @@ module.exports = {
                     plugins: ['transform-object-rest-spread', 'babel-plugin-syntax-dynamic-import']
                 }
             },
-            exclude: [/node_modules/]
+            include: [
+                path.resolve(__dirname, "frontend/assets"),
+                path.resolve(__dirname, "node_modules/url-regex")
+            ]
         },
         {
             test: /\.scss$/,
