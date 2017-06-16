@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "build": "webpack --config webpack.dev.config.js --profile --colors --progress",
-    "dist": "webpack --config webpack.prod.config.js --profile --colors --progress"
+    "dist": "webpack --config webpack.prod.config.js --profile"
   },
   "repository": {
     "type": "git",
