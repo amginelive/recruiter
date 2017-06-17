@@ -1441,7 +1441,7 @@ section#account .tracking-section .tracking-item {
 }
 
 section#account .profile-navigation {
-    padding-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .orange-text {
@@ -1516,8 +1516,6 @@ section#job-posts .job-posts-table {
 
 .tracking-button.active {
     background-color: #f9690e;
-    margin-top: 20px;
-    margin-bottom: 20px;
 }
 
 .note-type {

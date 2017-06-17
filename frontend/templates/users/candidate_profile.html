@@ -11,25 +11,31 @@
     <!-- internal block -->
     <section id="account">
         <div class="container">
-            <div class="{% if user == profile.user %}col-md-12{% else %}col-md-7{% endif %} text-center profile-navigation">
-                <div class="col-md-4">
-                    <span>Last online: {{ profile.user.last_seen|date:"d/m/y" }}</span>
+            <div class="row">
+                <div class="col-md-7 text-center profile-navigation">
+                    <div class="col-md-4">
+                        <span>Last online: {{ profile.user.last_seen|date:"d/m/y" }}</span>
+                    </div>
+                    {% if user == profile.user %}
+                        <div class="col-md-8 text-right">
+                            <button class="btn btn-primary btn-edit-profile">Edit Profile</button>
+                            <button class="btn btn-primary btn-save-profile hidden">Save</button>
+                        </div>
+                    {% else %}
+                        <div class="col-md-4">
+                            <a href="#">Message me</a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="#">Send job to me</a>
+                        </div>
+                    {% endif %}
                 </div>
-                {% if user == profile.user %}
-                    <div class="col-md-8 text-right">
-                        <button class="btn btn-primary btn-edit-profile">Edit Profile</button>
-                        <button class="btn btn-primary btn-save-profile hidden">Save</button>
-                    </div>
-                {% else %}
-                    <div class="col-md-4">
-                        <a href="#">Message me</a>
-                    </div>
-                    <div class="col-md-4">
-                        <a href="#">Send job to me</a>
-                    </div>
-                {% endif %}
+                <div class="col-md-4 text-center tracking-button-switcher">
+                    <button class="btn btn-secondary tracking-button btn-auto-tracking active">Auto Tracking</button>
+                    <button class="btn btn-secondary tracking-button btn-manual-tracking">Manual Tracking</button>
+                </div>
             </div>
-            <div class="{% if user == profile.user %}col-md-12{% else %}col-md-7{% endif %} profile-detail-section">
+            <div class="col-md-7 profile-detail-section">
                 <div class="row">
                     <div class="col-md-6 text-center">
                         <h3>{{ profile.user.get_full_name }}</h3>
@@ -219,10 +225,6 @@
             </div>
             {% if user.account_type == user.ACCOUNT_AGENT %}
                 <div class="col-md-4 tracking-section">
-                    <div class="row text-center tracking-button-switcher">
-                        <button class="btn btn-secondary tracking-button btn-auto-tracking active">Auto Tracking</button>
-                        <button class="btn btn-secondary tracking-button btn-manual-tracking">Manual Tracking</button>
-                    </div>
                     <div class="row auto-tracking-section">
                         <div class="tracking-item">
                             <span class="orange-text">First contact sent: </span>{{ first_contact_sent.created_at|date:"d/m/y" }}
