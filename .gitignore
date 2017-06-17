@@ -57,3 +57,4 @@ static.prod/
 email_tmp/
 
 webpack-stats.json
+package-lock.json
