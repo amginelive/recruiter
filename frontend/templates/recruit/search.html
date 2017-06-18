@@ -12,7 +12,7 @@
                     <li class="active">Find job positions</li>
                     <li><a href="{% url 'users:candidate_search' %}">Search Candidates</a></li>
                     <li><a href="{% url 'users:agent_search' %}">Search Agents</a></li>
-                    <li><a href="#">My Application</a></li>
+                    <li><a href="{% url 'recruit:application' %}">My Application</a></li>
                 </ol>
             {% elif user.account_type == user.ACCOUNT_AGENT %}
                 <ol class="breadcrumb">
