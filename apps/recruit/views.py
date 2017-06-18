@@ -270,11 +270,16 @@ class JobPostDeleteView(AgentRequiredMixin, DeleteView):
 job_post_delete = JobPostDeleteView.as_view()
 
 
-class ApplicationView(CandidateRequiredMixin, TemplateView):
+class ApplicationView(CandidateRequiredMixin, ListView):
     """
     View for the My Application Page.
     """
-    template_name = "recruit/application.html"
+    model = JobApplication
+    context_object_name = 'job_applications'
+    template_name = 'recruit/application.html'
+
+    def get_queryset(self):
+        return JobApplication.objects.filter(candidate=self.request.user.candidate)
 
 application = ApplicationView.as_view()
 
@@ -316,7 +321,7 @@ class JobApplicantListView(AgentRequiredMixin, ListView):
     """
     model = JobApplication
     context_object_name = 'job_applications'
-    template_name = 'recruit/job_application_list.html'
+    template_name = 'recruit/job_post_applicants_list.html'
 
     def get_queryset(self):
         job_applications = JobApplication.objects.filter(job_post__uuid=self.kwargs.get('uuid'))

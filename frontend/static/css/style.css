@@ -1452,7 +1452,7 @@ section#account .profile-navigation {
     margin-top: 10px
 }
 
-section#job-posts .job-post-title {
+.job-post-title {
     font-size: 24px;
     display: block;
 }
@@ -1587,4 +1587,14 @@ section#job-posts .job-posts-table {
     cursor: pointer;
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+section#my-applications .company-image {
+    width: 50px;
+}
+
+section#my-applications .job-applications-table {
+    margin-top: 20px;
+    border: 1px solid #f2f1ec;
+    padding: 30px;
 }

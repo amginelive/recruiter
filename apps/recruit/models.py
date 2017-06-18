@@ -200,3 +200,7 @@ class JobApplication(AbstractTimeStampedModel):
 
     def __str__(self):
         return self.candidate.user.get_full_name()
+
+    @property
+    def status(self):
+        return 'Applied'
