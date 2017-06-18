@@ -12,7 +12,11 @@ function formatLinks(message) {
             if (i === 0) {
                 result.push(splits[0]);
             } else {
-                result.push(<a key={i} href='#' target='_blank'>{links[i-1]}</a>);
+                let href = links[i-1];
+                if (!href.startsWith('http://') && !href.startsWith('https://')) {
+                    href = `http://${href}`;
+                }
+                result.push(<a key={i} href={href} target='_blank'>{links[i-1]}</a>);
                 result.push(splits[i]);
             }
         }
