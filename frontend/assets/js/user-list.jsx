@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Scrollbars } from 'react-custom-scrollbars';
 import moment from 'moment';
 import { Loader } from 'react-loaders';
+import ReactModal from 'react-modal';
 
 import * as actions from './actions/index.js';
 
@@ -14,7 +15,8 @@ class UserList extends React.Component {
 
         this.state = {
             userPresencePollingInterval: 10,
-            selectedUsersGroup: 0
+            selectedUsersGroup: 0,
+            showModal: false
         };
         setInterval(() => this.props.actions.userPresence(), this.state.userPresencePollingInterval*1000);
     }
@@ -55,7 +57,7 @@ class UserList extends React.Component {
             return <Loader className='empty-user-group' type='ball-pulse' active />;
         }
         if (users.size === 0) {
-            return <div className='empty-user-group'>You have no {group_name} connections</div>
+            return <div className='empty-user-group'>You have no {group_name}</div>
         }
         return users.map(user => {
             const show_last_message = moment(user.get('last_message_time')).valueOf() > 60*60*24;
@@ -87,12 +89,47 @@ class UserList extends React.Component {
         this.setState({selectedUsersGroup: group});
     }
 
+    handleOpenModal () {
+        this.setState({ showModal: true });
+    }
+
+    handleCloseModal () {
+        this.setState({ showModal: false });
+    }
+
     render() {
         const { users } = this.props;
-        const unread_candidates = this.props.users.get('candidates').reduce((result, user) => result + user.get('unread'), 0);
-        const unread_agents = this.props.users.get('agents').reduce((result, user) => result + user.get('unread'), 0);
+        const unreadCandidates = this.props.users.get('candidates').reduce((result, user) => result + user.get('unread'), 0);
+        const unreadAgents = this.props.users.get('agents').reduce((result, user) => result + user.get('unread'), 0);
+        const unreadGroups = 0;
+
+        let userListUI = '';
+        if (this.state.selectedUsersGroup === 0) {
+            userListUI = this.renderUsersGroup(users.get('candidates'), 'team network connections');
+        } else if (this.state.selectedUsersGroup === 1) {
+            userListUI = this.renderUsersGroup(users.get('agents'), 'agents connections');
+        } else {
+            userListUI = this.renderUsersGroup(users.get('groups'), 'group conversations');
+        }
+
         return (
             <div className='user-list-container'>
+                <ReactModal
+                    isOpen={this.state.showModal}
+                    contentLabel='Create group chat'
+                    shouldCloseOnOverlayClick={false}
+                    style={{
+                        overlay: {
+                            top: '100px'
+                        }
+                    }}
+                    className='group-chat-modal'
+
+                >
+                    <div className='group-chat-modal-header'>
+                        <span className='glyphicon glyphicon-remove modal-close' onClick={this.handleCloseModal.bind(this)}></span>
+                    </div>
+                </ReactModal>
                 <Scrollbars ref={(scroll) => {this.scroll = scroll;}}
                                 style={{height: '100%'}}
                                 autoHide autoHideTimeout={1000}
@@ -102,24 +139,31 @@ class UserList extends React.Component {
                             <button className={'chat-button user-list-button button-candidates' + (this.state.selectedUsersGroup === 0 ? ' active' : '')} onClick={this.handleUserGroupSelect.bind(this, 0)}>
                                 Candidates
                                 {
-                                    this.state.selectedUsersGroup !== 0 && unread_candidates !== 0 ?
-                                    <span>{unread_candidates}</span> :
+                                    this.state.selectedUsersGroup !== 0 && unreadCandidates !== 0 ?
+                                    <span>{unreadCandidates}</span> :
                                     ''
                                 }
                             </button>
                             <button className={'chat-button user-list-button button-agents' + (this.state.selectedUsersGroup === 1 ? ' active' : '')} onClick={this.handleUserGroupSelect.bind(this, 1)}>
                                 Agents
                                 {
-                                    this.state.selectedUsersGroup !== 1 && unread_agents !== 0 ?
-                                    <span>{unread_agents}</span> :
+                                    this.state.selectedUsersGroup !== 1 && unreadAgents !== 0 ?
+                                    <span>{unreadAgents}</span> :
+                                    ''
+                                }
+                            </button>
+                            <button className={'chat-button user-list-button button-groups' + (this.state.selectedUsersGroup === 2 ? ' active' : '')} onClick={this.handleUserGroupSelect.bind(this, 2)}>
+                                Groups
+                                {
+                                    this.state.selectedUsersGroup !== 2 && unreadGroups !== 0 ?
+                                    <span>{unreadGroups}</span> :
                                     ''
                                 }
                             </button>
                         </div>
                         <div className='user-list-group'>
-                            {this.state.selectedUsersGroup === 0 ?
-                                this.renderUsersGroup(users.get('candidates'), 'team network') :
-                                this.renderUsersGroup(users.get('agents'), 'agents')}
+                            {userListUI}
+                            {this.state.selectedUsersGroup === 2 ? <span onClick={this.handleOpenModal.bind(this)} id='create-conversation' className='glyphicon glyphicon-plus'></span> : ''}
                         </div>
                     </div>
                 </Scrollbars>
