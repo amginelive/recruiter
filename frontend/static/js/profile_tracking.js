@@ -67,6 +67,16 @@ $(document).ready(function() {
         });
     });
 
+    $('.btn-cancel-create-note').on('click', function(event) {
+        event.preventDefault();
+        $('.create-note-form').addClass('hidden');
+    });
+
+    $('.btn-show-create-note').on('click', function(event) {
+        event.preventDefault();
+        $('.create-note-form').removeClass('hidden');
+    });
+
     $('.btn-create-note').on('click', function(event) {
         event.preventDefault();
         $('.error').html('');
@@ -152,6 +162,7 @@ $(document).ready(function() {
                             </form>\
                         </div>';
 
+                    $('.create-note-form').addClass('hidden');
                     $('.note-history').prepend(html);
                 }
                 else {

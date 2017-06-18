@@ -30,10 +30,12 @@
                         </div>
                     {% endif %}
                 </div>
-                <div class="col-md-4 text-center tracking-button-switcher">
-                    <button class="btn btn-secondary tracking-button btn-auto-tracking active">Auto Tracking</button>
-                    <button class="btn btn-secondary tracking-button btn-manual-tracking">Manual Tracking</button>
-                </div>
+                {% if user.account_type == user.ACCOUNT_AGENT %}
+                    <div class="col-md-4 text-center tracking-button-switcher">
+                        <button class="btn btn-secondary tracking-button btn-auto-tracking active">Auto Tracking</button>
+                        <button class="btn btn-secondary tracking-button btn-manual-tracking">Manual Tracking</button>
+                    </div>
+                {% endif %}
             </div>
             <div class="col-md-7 profile-detail-section">
                 <div class="row">
@@ -237,7 +239,7 @@
                         </div>
                     </div>
                     <div class="row manual-tracking-section hidden">
-                        <form action="{% url 'users:user_note_create' %}" method="POST" class="create-note-form">
+                        <form action="{% url 'users:user_note_create' %}" method="POST" class="create-note-form hidden">
                             {% csrf_token %}
                             <input type="hidden" name="note_to" id="id_note_to" value="{{ profile.user.pk }}">
                             <div class="form-group">
@@ -257,11 +259,19 @@
                                     <div class="type_error error orange-text"></div>
                                 </div>
                                 <div class="col-md-6 text-right">
+                                    <button class="btn btn-primary btn-cancel-create-note">Cancel</button>
                                     <button class="btn btn-primary btn-create-note">Save</button>
                                 </div>
                             </div>
                         </form>
-                        <h5>History</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>History</h5>
+                            </div>
+                            <div class="col-md-6 text-right">
+                                <i class="glyphicon glyphicon-plus btn-show-create-note"></i>
+                            </div>
+                        </div>
                         <div class="note-history">
                             {% for user_note in user_notes %}
                                 <div class="row note-history-item">
