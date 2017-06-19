@@ -37,7 +37,11 @@ class App extends React.Component {
     render() {
         return (
             <div className='app-container'>
-                <GroupChatModal showModal={this.state.showModal} onClose={this.handleCloseModal.bind(this)} />
+                <GroupChatModal
+                    showModal={this.state.showModal}
+                    onClose={this.handleCloseModal.bind(this)}
+                    users={this.props.users}
+                />
                 <div className ='chat-container'>
                     <UserList createGroupModal={this.handleOpenModal.bind(this)} setChatInitPendingState={this.setChatInitPendingState.bind(this)} />
                     <div className='app-inner-column'>
@@ -56,6 +60,7 @@ class App extends React.Component {
 
 function mapStateToProps (state) {
     return {
+        users: state.get('users'),
         messages: state.get('messages'),
         typing: state.get('typing')
     };
