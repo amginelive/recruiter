@@ -8,6 +8,8 @@ class GroupChatModal extends React.Component {
         super(props);
 
         this.state = {
+            groupName: '',
+            groupMessage: '',
             userSearchQuery: '',
             selectedUsers: [],
             queryUsers: [],
@@ -86,6 +88,16 @@ class GroupChatModal extends React.Component {
         this.setState(selectedUsers);
     }
 
+    checkGroupMessage() {
+        const groupMessage = this.groupMessageInput.value;
+        this.setState({groupMessage});
+    }
+
+    checkGroupName() {
+        const groupName = this.groupNameInput.value;
+        this.setState({groupName});
+    }
+
     render() {
         let usersQueryUI = '';
         if (this.state.queryUsers.length > 0) {
@@ -133,7 +145,7 @@ class GroupChatModal extends React.Component {
                             );
                         })}
                     </ul>
-                    <label htmlFor='user-search'>Add user:</label>
+                    <label htmlFor='user-search'>Add person:</label>
                     <input
                         type='text'
                         id='user-search'
@@ -144,6 +156,25 @@ class GroupChatModal extends React.Component {
                         value={this.state.userSearchQuery}
                     />
                     {usersQueryUI}
+                    <label htmlFor='group-name'>Group name:</label>
+                    <input
+                        type='text'
+                        id='group-name'
+                        style={{display: 'block'}}
+                        onKeyDown={this.checkGroupName.bind(this)}
+                        onChange={this.checkGroupName.bind(this)}
+                        ref={input => this.groupNameInput = input}
+                        value={this.state.groupName}
+                    />
+                    <label htmlFor='group-message'>Message:</label>
+                    <textarea
+                        id='group-message'
+                        style={{display: 'block'}}
+                        onKeyDown={this.checkGroupMessage.bind(this)}
+                        onChange={this.checkGroupMessage.bind(this)}
+                        ref={input => this.groupMessageInput = input}
+                        value={this.state.groupMessage}
+                    />
                 </div>
             </ReactModal>
         );
