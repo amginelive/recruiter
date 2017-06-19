@@ -107,7 +107,7 @@ class CandidateProfileDetailUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Candidate
-        fields = ('experience', 'skills', 'city', 'country',
+        fields = ('experience', 'city', 'country',
                   'desired_city', 'desired_country', 'willing_to_relocate',
                   'status', 'in_contract_status', 'out_contract_status',)
 

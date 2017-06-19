@@ -256,6 +256,7 @@ class Candidate(ProfileBase):
     skills = models.ManyToManyField(
         'recruit.Skill',
         related_name='candidates',
+        through='users.CandidateSkill',
         verbose_name=_('Skills')
     )
     job_type = models.IntegerField(_('Job type'), choices=JOB_TYPE_CHOICES, **optional)
@@ -356,3 +357,19 @@ class UserNote(AbstractTimeStampedModel):
 
     def __str__(self):
         return self.note_to.get_full_name()
+
+
+class CandidateSkill(AbstractTimeStampedModel):
+    """
+    Model for Candidate Skill.
+    """
+    candidate = models.ForeignKey('users.Candidate', related_name='core_skills', verbose_name=_('Candidate'))
+    skill = models.ForeignKey('recruit.Skill', related_name='candidate_skills', verbose_name=_('Skill'))
+    experience = models.SmallIntegerField(_('Years of Experience'))
+
+    class Meta:
+        verbose_name = _('Candidate Skill')
+        verbose_name_plural = _('Candidate Skills')
+
+    def __str__(self):
+        return self.skill.name

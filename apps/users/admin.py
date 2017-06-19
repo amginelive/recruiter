@@ -10,7 +10,8 @@ from .forms import (
 from .models import (
     Agent,
     Candidate,
-    UserNote
+    CandidateSkill,
+    UserNote,
 )
 
 User = get_user_model()
@@ -43,5 +44,6 @@ class UserAdmin(UserAdmin):
 
 admin.site.register(Agent)
 admin.site.register(Candidate)
+admin.site.register(CandidateSkill)
 admin.site.register(User, UserAdmin)
 admin.site.register(UserNote)
