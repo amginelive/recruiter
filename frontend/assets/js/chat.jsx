@@ -34,12 +34,17 @@ class App extends React.Component {
         this.setState({ showModal: false });
     }
 
+    handleCreateGroup() {
+        this.setState({ showModal: false });
+    }
+
     render() {
         return (
             <div className='app-container'>
                 <GroupChatModal
                     showModal={this.state.showModal}
                     onClose={this.handleCloseModal.bind(this)}
+                    onCreate={this.handleCreateGroup.bind(this)}
                     users={this.props.users}
                 />
                 <div className ='chat-container'>

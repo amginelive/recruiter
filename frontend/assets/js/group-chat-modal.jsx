@@ -13,7 +13,8 @@ class GroupChatModal extends React.Component {
             userSearchQuery: '',
             selectedUsers: [],
             queryUsers: [],
-            activeQueryIndex: 0
+            activeQueryIndex: 0,
+            queryUserDOMHeight: 20
         };
     }
 
@@ -30,9 +31,16 @@ class GroupChatModal extends React.Component {
         if (event.key === 'ArrowDown') {
             if (this.state.queryUsers.length > 1) {
                 if (this.state.activeQueryIndex < this.state.queryUsers.length - 1) {
-                    this.setState({activeQueryIndex: this.state.activeQueryIndex + 1});
+                    const scrollValues = this.scroll.getValues();
+                    const activeQueryIndex = this.state.activeQueryIndex + 1;
+                    const activeElementScroll = this.state.queryUserDOMHeight*(activeQueryIndex + 1);
+                    if (activeElementScroll > scrollValues.scrollTop + scrollValues.clientHeight) {
+                        this.scroll.scrollTop(scrollValues.scrollTop + this.state.queryUserDOMHeight);
+                    }
+                    this.setState({activeQueryIndex});
                 } else {
                     this.setState({activeQueryIndex: 0});
+                    this.scroll.scrollToTop();
                 }
             }
             event.preventDefault();
@@ -41,9 +49,16 @@ class GroupChatModal extends React.Component {
         if (event.key === 'ArrowUp') {
             if (this.state.queryUsers.length > 1) {
                 if (this.state.activeQueryIndex > 0) {
-                    this.setState({activeQueryIndex: this.state.activeQueryIndex - 1});
+                    const scrollValues = this.scroll.getValues();
+                    const activeQueryIndex = this.state.activeQueryIndex - 1;
+                    const activeElementScroll = this.state.queryUserDOMHeight*(activeQueryIndex);
+                    if (activeElementScroll < scrollValues.scrollTop) {
+                        this.scroll.scrollTop(scrollValues.scrollTop - this.state.queryUserDOMHeight);
+                    }
+                    this.setState({activeQueryIndex});
                 } else {
                     this.setState({activeQueryIndex: this.state.queryUsers.length - 1});
+                    this.scroll.scrollToBottom();
                 }
             }
             event.preventDefault();
@@ -101,12 +116,13 @@ class GroupChatModal extends React.Component {
     render() {
         let usersQueryUI = '';
         if (this.state.queryUsers.length > 0) {
+            const height_max = 60;
+            const height = Math.min(this.state.queryUsers.length * this.state.queryUserDOMHeight, height_max);
             usersQueryUI = (
-                <div className='users-query-list'>
+                <div className='users-query-list' style={{height}}>
                     <Scrollbars ref={(scroll) => {this.scroll = scroll;}}
                                 style={{height: '100%'}}
-                                autoHide autoHideTimeout={1000}
-                                autoHideDuration={200}>
+                    >
                         {this.state.queryUsers.map((user, index) => {
                             return (
                                 <div
@@ -129,53 +145,67 @@ class GroupChatModal extends React.Component {
                 shouldCloseOnOverlayClick={false}
                 style={{
                     overlay: {
-                        top: '100px'
+                        top: '100px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                     }
                 }}
                 className='group-chat-modal'
             >
                 <div className='group-chat-modal-header'>
+                    <h3 style={{margin: 0}}>Create chat group</h3>
                     <span className='glyphicon glyphicon-remove modal-close' onClick={this.props.onClose}></span>
                 </div>
-                <div className='group-chat-modal-body'>
-                    <ul>
-                        {this.state.selectedUsers.map((user, index) => {
-                            return (
-                                <li key={index}>{user.name}<span onClick={this.removeSelectedUser.bind(this, index)}>x</span></li>
-                            );
-                        })}
-                    </ul>
-                    <label htmlFor='user-search'>Add person:</label>
-                    <input
-                        type='text'
-                        id='user-search'
-                        style={{display: 'block'}}
-                        onKeyDown={this.handleKeyPress.bind(this)}
-                        onChange={this.searchUsers.bind(this)}
-                        ref={input => this.userSearchInput = input}
-                        value={this.state.userSearchQuery}
-                    />
-                    {usersQueryUI}
-                    <label htmlFor='group-name'>Group name:</label>
-                    <input
-                        type='text'
-                        id='group-name'
-                        style={{display: 'block'}}
-                        onKeyDown={this.checkGroupName.bind(this)}
-                        onChange={this.checkGroupName.bind(this)}
-                        ref={input => this.groupNameInput = input}
-                        value={this.state.groupName}
-                    />
-                    <label htmlFor='group-message'>Message:</label>
-                    <textarea
-                        id='group-message'
-                        style={{display: 'block'}}
-                        onKeyDown={this.checkGroupMessage.bind(this)}
-                        onChange={this.checkGroupMessage.bind(this)}
-                        ref={input => this.groupMessageInput = input}
-                        value={this.state.groupMessage}
-                    />
-                </div>
+                <form id='create-group-form' onSubmit={this.props.onCreate} autoComplete='off'>
+                    <div className='group-chat-modal-body'>
+                        <ul>
+                            {this.state.selectedUsers.map((user, index) => {
+                                return (
+                                    <li key={index}>{user.name}<span onClick={this.removeSelectedUser.bind(this, index)}>x</span></li>
+                                );
+                            })}
+                        </ul>
+                        <label htmlFor='user-search'>Add person:</label>
+                        <div className='user-query-container'>
+                            <input
+                                type='text'
+                                id='user-search'
+                                className='modal-control'
+                                onKeyDown={this.handleKeyPress.bind(this)}
+                                onChange={this.searchUsers.bind(this)}
+                                ref={input => this.userSearchInput = input}
+                                value={this.state.userSearchQuery}
+                                placeholder='Search person by name'
+                            />
+                            {usersQueryUI}
+                        </div>
+                        <label htmlFor='group-name'>Group name:</label>
+                        <input
+                            type='text'
+                            id='group-name'
+                            className='modal-control'
+                            onKeyDown={this.checkGroupName.bind(this)}
+                            onChange={this.checkGroupName.bind(this)}
+                            ref={input => this.groupNameInput = input}
+                            value={this.state.groupName}
+                        />
+                        <label htmlFor='group-message'>Message:</label>
+                        <textarea
+                            id='group-message'
+                            className='modal-control'
+                            onKeyDown={this.checkGroupMessage.bind(this)}
+                            onChange={this.checkGroupMessage.bind(this)}
+                            ref={input => this.groupMessageInput = input}
+                            value={this.state.groupMessage}
+                        />
+                    </div>
+                    <div className='group-chat-modal-footer'>
+                        <button className='chat-button create-group-button' type='submit' disabled={false}>
+                            Create
+                        </button>
+                    </div>
+                </form>
             </ReactModal>
         );
     }

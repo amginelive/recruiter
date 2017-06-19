@@ -31,12 +31,8 @@ $primary-color: #ffc211;
 
 .group-chat-modal {
   display: flex;
+  width: 400px;
   flex-direction: column;
-  position: absolute;
-  top: 40px;
-  left: 40px;
-  right: 40px;
-  bottom: 40px;
   border: 1px solid #ccc;
   background: #fff;
   overflow: auto;
@@ -53,11 +49,24 @@ $primary-color: #ffc211;
 
 .group-chat-modal-header {
   display: flex;
-  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.group-chat-modal-footer {
+  display: flex;
+}
+
+.user-query-container {
+  position: relative;
 }
 
 .users-query-list {
-  height: 100px;
+  width: 100%;
+  position: absolute;
+  top: 26px;
+  background: white;
+  border: 1px #999 solid;
 }
 
 .users-query-list-item:hover {
@@ -67,6 +76,21 @@ $primary-color: #ffc211;
 
 .users-query-list-item.active {
   background: $primary-color;
+}
+
+.create-group-button {
+  font-size: 100%;
+  padding: .25em 1em;
+  border: 1px solid #999;
+  background-color: $primary-color;
+  text-decoration: none;
+  border-radius: 2px;
+}
+
+.modal-control {
+  display: block;
+  margin-bottom: 20px;
+  width: 100%;
 }
 
 .app-container {
