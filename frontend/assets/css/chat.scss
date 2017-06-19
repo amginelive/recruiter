@@ -60,8 +60,13 @@ $primary-color: #ffc211;
   height: 100px;
 }
 
-.users-query-list-item.active {
+.users-query-list-item:hover {
   background: whitesmoke;
+  cursor: pointer;
+}
+
+.users-query-list-item.active {
+  background: $primary-color;
 }
 
 .app-container {

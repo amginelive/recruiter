@@ -15,6 +15,15 @@ class GroupChatModal extends React.Component {
         };
     }
 
+    selectUser(index) {
+        this.setState({
+            selectedUsers: [...this.state.selectedUsers, this.state.queryUsers[index]],
+            activeQueryIndex: 0,
+            userSearchQuery: '',
+            queryUsers: []
+        });
+    }
+
     handleKeyPress(event) {
         if (event.key === 'ArrowDown') {
             if (this.state.queryUsers.length > 1) {
@@ -43,16 +52,10 @@ class GroupChatModal extends React.Component {
             event.preventDefault();
         }
         if (event.key === 'Enter') {
-            if (this.state.queryUsers.length > 0) {
-                this.setState({
-                    selectedUsers: [...this.state.selectedUsers, this.state.queryUsers[this.state.activeQueryIndex]],
-                    activeQueryIndex: 0,
-                    userSearchQuery: '',
-                    queryUsers: []
-                });
-                return;
-            }
             event.preventDefault();
+            if (this.state.queryUsers.length > 0) {
+                return this.selectUser(this.state.activeQueryIndex);
+            }
         }
         this.searchUsers();
     }
@@ -94,7 +97,13 @@ class GroupChatModal extends React.Component {
                                 autoHideDuration={200}>
                         {this.state.queryUsers.map((user, index) => {
                             return (
-                                <div key={index} className={'users-query-list-item' + (index === this.state.activeQueryIndex ? ' active' : '')}>{user.name}</div>
+                                <div
+                                    key={index}
+                                    className={'users-query-list-item' + (index === this.state.activeQueryIndex ? ' active' : '')}
+                                    onClick={this.selectUser.bind(this, index)}
+                                >
+                                    {user.name}
+                                </div>
                             )
                         })}
                     </Scrollbars>
@@ -128,6 +137,7 @@ class GroupChatModal extends React.Component {
                     <input
                         type='text'
                         id='user-search'
+                        style={{display: 'block'}}
                         onKeyDown={this.handleKeyPress.bind(this)}
                         onChange={this.searchUsers.bind(this)}
                         ref={input => this.userSearchInput = input}
