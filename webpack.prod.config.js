@@ -1,6 +1,3 @@
-/**
- * Created by funn on 5/31/17.
- */
 const path = require('path');
 const glob = require('glob-all');
 const webpack = require('webpack');

@@ -80,7 +80,8 @@ class ChatServer(JsonWebsocketConsumer):
             'self': self.message.user.id,
             'activeChat': 0,
             'agents': {},
-            'candidates': {}
+            'candidates': {},
+            'groups': {}
         }
         for user in user_list:
             account_type = f'{user.get_account_type_display().lower()}s'

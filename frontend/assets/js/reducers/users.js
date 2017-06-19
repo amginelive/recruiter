@@ -14,7 +14,7 @@ function sortUsersMap(map) {
     return map;
 }
 
-const users = (state = new Immutable.OrderedMap().withMutations(ctx => ctx.set('self', 0).set('activeChat', 0).set('agents', new Immutable.Map()).set('candidates', new Immutable.Map())), action) => {
+const users = (state = new Immutable.OrderedMap().withMutations(ctx => ctx.set('self', 0).set('activeChat', 0).set('agents', new Immutable.Map()).set('candidates', new Immutable.Map()).set('groups', new Immutable.Map())), action) => {
     if (action.type === messageTypes.initUsers) {
         state = Immutable.OrderedMap(Immutable.fromJS(action.payload));
         return sortUsersMap(state);

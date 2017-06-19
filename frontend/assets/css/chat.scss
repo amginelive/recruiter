@@ -21,6 +21,79 @@ $primary-color: #ffc211;
   height: calc(100vh - 100px);
 }
 
+#create-conversation {
+  margin-top: 15px;
+  font-size: 32px;
+  color: #37a000;
+  cursor: pointer;
+  align-self: center;
+}
+
+.group-chat-modal {
+  display: flex;
+  width: 400px;
+  flex-direction: column;
+  border: 1px solid #ccc;
+  background: #fff;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 4px;
+  outline: none;
+  padding: 20px;
+}
+
+.modal-close {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.group-chat-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.group-chat-modal-footer {
+  display: flex;
+}
+
+.user-query-container {
+  position: relative;
+}
+
+.users-query-list {
+  width: 100%;
+  position: absolute;
+  top: 26px;
+  background: white;
+  border: 1px #999 solid;
+  box-shadow: 0 3px 10px #000000;
+}
+
+.users-query-list-item:hover {
+  background: whitesmoke;
+  cursor: pointer;
+}
+
+.users-query-list-item.active {
+  background: $primary-color;
+}
+
+.create-group-button {
+  font-size: 100%;
+  padding: .25em 1em;
+  border: 1px solid #999;
+  background-color: $primary-color;
+  text-decoration: none;
+  border-radius: 2px;
+}
+
+.modal-control {
+  display: block;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
 .app-container {
   display: flex;
   flex-direction: row;
@@ -51,7 +124,7 @@ $primary-color: #ffc211;
 
 .user-list-container {
   border: 1px solid #999;
-  width: 250px;
+  width: 300px;
   margin-right: 10px;
 }
 
@@ -63,6 +136,8 @@ $primary-color: #ffc211;
 
 .user-list-group {
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .user-list-header {
@@ -95,6 +170,12 @@ $primary-color: #ffc211;
 }
 
 .user-list-button.button-agents {
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+}
+
+.user-list-button.button-groups {
   border-left: 1px solid #999;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
@@ -104,6 +185,7 @@ $primary-color: #ffc211;
   margin-top: 10px;
   font-style: italic;
   text-align: center;
+  align-self: center;
 }
 
 .user-list-item {
