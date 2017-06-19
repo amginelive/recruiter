@@ -160,7 +160,7 @@ class GroupChatModal extends React.Component {
                 shouldCloseOnOverlayClick={false}
                 style={{
                     overlay: {
-                        top: '100px',
+                        top: '80px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
