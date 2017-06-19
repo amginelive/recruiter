@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { Scrollbars } from 'react-custom-scrollbars';
 import moment from 'moment';
 import { Loader } from 'react-loaders';
-import ReactModal from 'react-modal';
 
 import * as actions from './actions/index.js';
 
@@ -15,8 +14,7 @@ class UserList extends React.Component {
 
         this.state = {
             userPresencePollingInterval: 10,
-            selectedUsersGroup: 0,
-            showModal: false
+            selectedUsersGroup: 0
         };
         setInterval(() => this.props.actions.userPresence(), this.state.userPresencePollingInterval*1000);
     }
@@ -89,14 +87,6 @@ class UserList extends React.Component {
         this.setState({selectedUsersGroup: group});
     }
 
-    handleOpenModal () {
-        this.setState({ showModal: true });
-    }
-
-    handleCloseModal () {
-        this.setState({ showModal: false });
-    }
-
     render() {
         const { users } = this.props;
         const unreadCandidates = this.props.users.get('candidates').reduce((result, user) => result + user.get('unread'), 0);
@@ -114,22 +104,6 @@ class UserList extends React.Component {
 
         return (
             <div className='user-list-container'>
-                <ReactModal
-                    isOpen={this.state.showModal}
-                    contentLabel='Create group chat'
-                    shouldCloseOnOverlayClick={false}
-                    style={{
-                        overlay: {
-                            top: '100px'
-                        }
-                    }}
-                    className='group-chat-modal'
-
-                >
-                    <div className='group-chat-modal-header'>
-                        <span className='glyphicon glyphicon-remove modal-close' onClick={this.handleCloseModal.bind(this)}></span>
-                    </div>
-                </ReactModal>
                 <Scrollbars ref={(scroll) => {this.scroll = scroll;}}
                                 style={{height: '100%'}}
                                 autoHide autoHideTimeout={1000}
@@ -163,7 +137,7 @@ class UserList extends React.Component {
                         </div>
                         <div className='user-list-group'>
                             {userListUI}
-                            {this.state.selectedUsersGroup === 2 ? <span onClick={this.handleOpenModal.bind(this)} id='create-conversation' className='glyphicon glyphicon-plus'></span> : ''}
+                            {this.state.selectedUsersGroup === 2 ? <span onClick={this.props.createGroupModal} id='create-conversation' className='glyphicon glyphicon-plus'></span> : ''}
                         </div>
                     </div>
                 </Scrollbars>

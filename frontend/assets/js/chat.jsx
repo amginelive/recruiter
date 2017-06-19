@@ -7,6 +7,7 @@ import UserList from './user-list.jsx';
 import MessageList from './message-list.jsx';
 import MessageForm from './message-send-form.jsx';
 import TypingList from './typing-list.jsx';
+import GroupChatModal from './group-chat-modal.jsx';
 
 import '../css/chat.scss';
 
@@ -16,7 +17,8 @@ class App extends React.Component {
         super(props);
 
         this.state = {
-            chatInitPending: false
+            chatInitPending: false,
+            showModal: false
         };
     }
 
@@ -24,11 +26,20 @@ class App extends React.Component {
         this.setState({chatInitPending: state});
     }
 
+    handleOpenModal () {
+        this.setState({ showModal: true });
+    }
+
+    handleCloseModal () {
+        this.setState({ showModal: false });
+    }
+
     render() {
         return (
             <div className='app-container'>
+                <GroupChatModal showModal={this.state.showModal} onClose={this.handleCloseModal.bind(this)} />
                 <div className ='chat-container'>
-                    <UserList setChatInitPendingState={this.setChatInitPendingState.bind(this)} />
+                    <UserList createGroupModal={this.handleOpenModal.bind(this)} setChatInitPendingState={this.setChatInitPendingState.bind(this)} />
                     <div className='app-inner-column'>
                         <MessageList setChatInitPendingState={this.setChatInitPendingState.bind(this)}
                                      chatInitPending={this.state.chatInitPending}
