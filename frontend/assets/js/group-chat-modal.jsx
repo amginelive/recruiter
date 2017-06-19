@@ -138,6 +138,21 @@ class GroupChatModal extends React.Component {
                 </div>
             );
         }
+        let selectedUsersUI = '';
+        if (this.state.selectedUsers.length > 0) {
+            selectedUsersUI = (
+                <div>
+                    <label>Selected people:</label>
+                    <ul>
+                        {this.state.selectedUsers.map((user, index) => {
+                            return (
+                                <li key={index}>{user.name}<span style={{fontSize: '10px', marginLeft: '5px', cursor: 'pointer'}} className='glyphicon glyphicon-remove' onClick={this.removeSelectedUser.bind(this, index)} /></li>
+                            );
+                        })}
+                    </ul>
+                </div>
+            );
+        }
         return (
             <ReactModal
                 isOpen={this.props.showModal}
@@ -159,13 +174,6 @@ class GroupChatModal extends React.Component {
                 </div>
                 <form id='create-group-form' onSubmit={this.props.onCreate} autoComplete='off'>
                     <div className='group-chat-modal-body'>
-                        <ul>
-                            {this.state.selectedUsers.map((user, index) => {
-                                return (
-                                    <li key={index}>{user.name}<span onClick={this.removeSelectedUser.bind(this, index)}>x</span></li>
-                                );
-                            })}
-                        </ul>
                         <label htmlFor='user-search'>Add person:</label>
                         <div className='user-query-container'>
                             <input
@@ -180,6 +188,7 @@ class GroupChatModal extends React.Component {
                             />
                             {usersQueryUI}
                         </div>
+                        {selectedUsersUI}
                         <label htmlFor='group-name'>Group name:</label>
                         <input
                             type='text'
