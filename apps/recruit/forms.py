@@ -28,7 +28,7 @@ class JobPostForm(forms.ModelForm):
     """
     class Meta:
         model = JobPost
-        exclude = ('posted_by',)
+        exclude = ('posted_by', 'applications',)
 
     def __init__(self, *args, **kwargs):
         super(JobPostForm, self).__init__(*args, **kwargs)
