@@ -68,6 +68,7 @@ class ChatServer(JsonWebsocketConsumer):
                 last_message_time = datetime.fromtimestamp(0).isoformat()
             return {
                 'name': user.get_full_name(),
+                'email': user.email,
                 'photo': user.get_photo_url(),
                 'online': user.online(),
                 'unread': unread,

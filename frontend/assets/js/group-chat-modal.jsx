@@ -84,7 +84,11 @@ class GroupChatModal extends React.Component {
             this.setState({userSearchQuery});
             this.setState({activeQueryIndex: 0});
             if (userSearchQuery.length > 0) {
-                let queryUsers = users.filter(user => user.get('name').toLowerCase().includes(userSearchQuery.toLowerCase()));
+                let queryUsers = users.filter(user => {
+                    const has_name = user.get('name').toLowerCase().includes(userSearchQuery.toLowerCase());
+                    const has_email = user.get('email').toLowerCase().includes(userSearchQuery.toLowerCase());
+                    return has_email || has_name;
+                });
                 queryUsers = queryUsers.map((user, id) => {
                     return user.set('id', parseInt(id)).toObject();
                 }).toArray();
@@ -142,7 +146,7 @@ class GroupChatModal extends React.Component {
                                     className={'users-query-list-item' + (index === this.state.activeQueryIndex ? ' active' : '')}
                                     onClick={this.selectUser.bind(this, index)}
                                 >
-                                    {user.name}
+                                    {`${user.name} <${user.email}>`}
                                 </div>
                             )
                         })}
@@ -200,7 +204,7 @@ class GroupChatModal extends React.Component {
                                 onChange={this.searchUsers.bind(this)}
                                 ref={input => this.userSearchInput = input}
                                 value={this.state.userSearchQuery}
-                                placeholder='Search person by name'
+                                placeholder='Search person by name or email'
                             />
                             {usersQueryUI}
                         </div>
