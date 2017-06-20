@@ -311,6 +311,10 @@ class Candidate(ProfileBase):
         else:
             return None
 
+    @property
+    def candidate_skills(self):
+        return self.core_skills.filter(candidate=self)
+
 
 class Agent(ProfileBase):
     """
