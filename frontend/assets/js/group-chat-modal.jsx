@@ -64,11 +64,7 @@ class GroupChatModal extends React.Component {
             event.preventDefault();
             return;
         }
-        if (event.key === 'Tab') {
-            this.userSearchInput.value = this.state.queryUsers[this.state.activeQueryIndex].name;
-            event.preventDefault();
-        }
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' || event.key === 'Tab') {
             event.preventDefault();
             if (this.state.queryUsers.length > 0) {
                 return this.selectUser(this.state.activeQueryIndex);
