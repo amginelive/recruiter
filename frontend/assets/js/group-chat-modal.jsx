@@ -162,12 +162,12 @@ class GroupChatModal extends React.Component {
         if (this.state.selectedUsers.length === 0) {
             valid.users = false;
         }
-        if (valid != this.state.valid) {
+        if (valid !== this.state.valid) {
             this.setState({valid});
         }
         setTimeout(() => {
             if (Object.values(this.state.valid).every(value => value)) {
-                this.props.onCreate();
+                this.props.onCreate(this.state.selectedUsers.map(user => user.id), this.state.groupName, this.state.groupMessage);
                 this.resetState();
             }
         });

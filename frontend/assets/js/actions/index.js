@@ -53,3 +53,9 @@ export function readMessage(message_id) {
         emit(messageTypes.readMessage, message_id); // TODO: refactor other actions like this.
     }
 }
+
+export function createGroup(payload) {
+    return (dispatch, getState, {emit}) => {
+        emit(messageTypes.createGroup, payload);
+    }
+}
