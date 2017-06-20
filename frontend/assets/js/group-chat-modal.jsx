@@ -113,6 +113,18 @@ class GroupChatModal extends React.Component {
         this.setState({groupName});
     }
 
+    handleClose() {
+        this.setState({
+            groupName: '',
+            groupMessage: '',
+            userSearchQuery: '',
+            selectedUsers: [],
+            queryUsers: [],
+            activeQueryIndex: 0
+        });
+        this.props.onClose();
+    }
+
     render() {
         let usersQueryUI = '';
         if (this.state.queryUsers.length > 0) {
@@ -157,7 +169,7 @@ class GroupChatModal extends React.Component {
             <ReactModal
                 isOpen={this.props.showModal}
                 contentLabel='Create group chat'
-                shouldCloseOnOverlayClick={false}
+                onRequestClose={this.handleClose.bind(this)}
                 style={{
                     overlay: {
                         top: '80px',
@@ -170,7 +182,11 @@ class GroupChatModal extends React.Component {
             >
                 <div className='group-chat-modal-header'>
                     <h3 style={{margin: 0}}>Create chat group</h3>
-                    <span className='glyphicon glyphicon-remove modal-close' onClick={this.props.onClose}></span>
+                    <span
+                        className='glyphicon glyphicon-remove modal-close'
+                        onClick={this.handleClose.bind(this)}
+                    >
+                    </span>
                 </div>
                 <form id='create-group-form' onSubmit={this.props.onCreate} autoComplete='off'>
                     <div className='group-chat-modal-body'>
