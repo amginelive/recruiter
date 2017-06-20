@@ -14,12 +14,18 @@ class GroupChatModal extends React.Component {
             selectedUsers: [],
             queryUsers: [],
             activeQueryIndex: 0,
-            queryUserDOMHeight: 20
+            queryUserDOMHeight: 20,
+            valid: {
+                users: true,
+                name: true,
+                message: true
+            }
         };
     }
 
     selectUser(index) {
         this.setState({
+            valid: {...this.state.valid, users: true},
             selectedUsers: [...this.state.selectedUsers, this.state.queryUsers[index]],
             activeQueryIndex: 0,
             userSearchQuery: '',
@@ -105,24 +111,66 @@ class GroupChatModal extends React.Component {
 
     checkGroupMessage() {
         const groupMessage = this.groupMessageInput.value;
-        this.setState({groupMessage});
+        if (groupMessage.length > 0) {
+            this.setState({
+                groupMessage,
+                valid: {...this.state.valid, message: true}
+            });
+        }
     }
 
     checkGroupName() {
         const groupName = this.groupNameInput.value;
-        this.setState({groupName});
+        if (groupName.length > 0) {
+            this.setState({
+                groupName,
+                valid: {...this.state.valid, name: true}
+            });
+        }
     }
 
-    handleClose() {
+    resetState() {
         this.setState({
             groupName: '',
             groupMessage: '',
             userSearchQuery: '',
             selectedUsers: [],
             queryUsers: [],
-            activeQueryIndex: 0
+            activeQueryIndex: 0,
+            valid: {
+                users: true,
+                name: true,
+                message: true
+            }
         });
+    }
+
+    handleClose() {
         this.props.onClose();
+        this.resetState();
+    }
+
+    handleCreate(event) {
+        event.preventDefault();
+        let valid = {...this.state.valid};
+        if (this.state.groupName.length === 0) {
+            valid.name = false;
+        }
+        if (this.state.groupMessage.length === 0) {
+            valid.message = false;
+        }
+        if (this.state.selectedUsers.length === 0) {
+            valid.users = false;
+        }
+        if (valid != this.state.valid) {
+            this.setState({valid});
+        }
+        setTimeout(() => {
+            if (Object.values(this.state.valid).every(value => value)) {
+                this.props.onCreate();
+                this.resetState();
+            }
+        });
     }
 
     render() {
@@ -144,7 +192,7 @@ class GroupChatModal extends React.Component {
                                 >
                                     {`${user.name} <${user.email}>`}
                                 </div>
-                            )
+                            );
                         })}
                     </Scrollbars>
                 </div>
@@ -188,14 +236,12 @@ class GroupChatModal extends React.Component {
                     >
                     </span>
                 </div>
-                <form id='create-group-form' onSubmit={this.props.onCreate} autoComplete='off'>
+                <form id='create-group-form' onSubmit={this.handleCreate.bind(this)} autoComplete='off'>
                     <div className='group-chat-modal-body'>
-                        <label htmlFor='user-search'>Add person:</label>
-                        <div className='user-query-container'>
+                        <label>Add person:</label>
+                        <div id='user-search' className={'user-query-container modal-control' + (this.state.valid.users ? '' : ' error')}>
                             <input
                                 type='text'
-                                id='user-search'
-                                className='modal-control'
                                 onKeyDown={this.handleKeyPress.bind(this)}
                                 onChange={this.searchUsers.bind(this)}
                                 ref={input => this.userSearchInput = input}
@@ -205,25 +251,25 @@ class GroupChatModal extends React.Component {
                             {usersQueryUI}
                         </div>
                         {selectedUsersUI}
-                        <label htmlFor='group-name'>Group name:</label>
-                        <input
-                            type='text'
-                            id='group-name'
-                            className='modal-control'
-                            onKeyDown={this.checkGroupName.bind(this)}
-                            onChange={this.checkGroupName.bind(this)}
-                            ref={input => this.groupNameInput = input}
-                            value={this.state.groupName}
-                        />
-                        <label htmlFor='group-message'>Message:</label>
-                        <textarea
-                            id='group-message'
-                            className='modal-control'
-                            onKeyDown={this.checkGroupMessage.bind(this)}
-                            onChange={this.checkGroupMessage.bind(this)}
-                            ref={input => this.groupMessageInput = input}
-                            value={this.state.groupMessage}
-                        />
+                        <label>Group name:</label>
+                        <div id='group-name' className={'modal-control' + (this.state.valid.name ? '' : ' error')}>
+                            <input
+                                type='text'
+                                onKeyDown={this.checkGroupName.bind(this)}
+                                onChange={this.checkGroupName.bind(this)}
+                                ref={input => this.groupNameInput = input}
+                                value={this.state.groupName}
+                            />
+                        </div>
+                        <label>Message:</label>
+                        <div id='group-message' className={'modal-control' + (this.state.valid.message ? '' : ' error')}>
+                            <textarea
+                                onKeyDown={this.checkGroupMessage.bind(this)}
+                                onChange={this.checkGroupMessage.bind(this)}
+                                ref={input => this.groupMessageInput = input}
+                                value={this.state.groupMessage}
+                            />
+                        </div>
                     </div>
                     <div className='group-chat-modal-footer'>
                         <button className='chat-button create-group-button' type='submit' disabled={false}>
