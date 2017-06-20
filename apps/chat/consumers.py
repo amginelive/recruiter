@@ -68,6 +68,7 @@ class ChatServer(JsonWebsocketConsumer):
                 last_message_time = datetime.fromtimestamp(0).isoformat()
             return {
                 'name': user.get_full_name(),
+                'email': user.email,
                 'photo': user.get_photo_url(),
                 'online': user.online(),
                 'unread': unread,
@@ -147,6 +148,8 @@ class ChatServer(JsonWebsocketConsumer):
             self.cmd_idle(content.get('payload'))
         elif content.get('type') == 'readMessage':
             self.cmd_read_message(content.get('payload'))
+        elif content.get('type') == 'createGroup':
+            self.cmd_create_group(content.get('payload'))
 
     def cmd_init(self, payload):
         conversation = self.message.user.participations.get(
@@ -247,6 +250,9 @@ class ChatServer(JsonWebsocketConsumer):
             'payload': conversation.participants
                     .exclude(id=participant.id).first().user.id
         })
+
+    def cmd_create_group(self, payload):
+        pass
 
     def disconnect(self, message, **kwargs):
         self.cmd_idle(False)

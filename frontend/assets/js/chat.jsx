@@ -34,7 +34,8 @@ class App extends React.Component {
         this.setState({ showModal: false });
     }
 
-    handleCreateGroup() {
+    handleCreateGroup(user_ids, name, message) {
+        this.props.actions.createGroup({user_ids, name, message});
         this.setState({ showModal: false });
     }
 

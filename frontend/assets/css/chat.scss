@@ -62,6 +62,7 @@ $primary-color: #ffc211;
 }
 
 .users-query-list {
+  z-index: 10;
   width: 100%;
   position: absolute;
   top: 26px;
@@ -89,9 +90,36 @@ $primary-color: #ffc211;
 }
 
 .modal-control {
+  position: relative;
+}
+
+.modal-control > input, .modal-control > textarea {
   display: block;
   margin-bottom: 20px;
   width: 100%;
+  border: 1px solid #999
+}
+
+.modal-control.error > input, .modal-control.error > textarea {
+  border: 1px solid red;
+}
+
+.modal-control.error:after {
+  position: absolute;
+  bottom: -20px;
+  color: red;
+}
+
+#group-name.error:after {
+  content: '▪ Group chat name is required';
+}
+
+#group-message.error:after {
+  content: '▪ Group chat invitation message is required';
+}
+
+#user-search.error:after {
+  content: '▪ Add at least one person';
 }
 
 .app-container {
