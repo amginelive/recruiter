@@ -1,6 +1,6 @@
 {% extends 'users/index.html' %}
 
-{% load staticfiles i18n bootstrap humanize %}
+{% load staticfiles i18n bootstrap humanize jsonify %}
 
 {% block extra_css %}
 <link href="{% static 'css/cropper.min.css' %}" rel="stylesheet">
@@ -69,10 +69,10 @@
                             <div class="core-skills">
                                 {% for candidate_skill in profile.candidate_skills %}
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-8">
                                             <span class="core-skill-item">{{ candidate_skill.skill.name }}</span>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <span class="core-skill-item">{{ candidate_skill.experience }} year{{ candidate_skill.experience|pluralize }}</span>
                                         </div>
                                     </div>
@@ -108,7 +108,7 @@
                                             <div class="skill_{{ forloop.counter0 }}_error error orange-text"></div>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="control-label" for="id_form-{{ forloop.counter0 }}-experience">Experience</label>
+                                            <label class="control-label" for="id_form-{{ forloop.counter0 }}-experience">Experience(years)</label>
                                             <div class=" ">
                                                 <input type="number" name="form-{{ forloop.counter0 }}-experience" class="form-control experience-field" id="id_form-{{ forloop.counter0 }}-experience" value="{{ form.experience.value }}">
                                             </div>
@@ -406,6 +406,12 @@
 <script src="{% static 'js/cropper.min.js' %}" type="text/javascript"></script>
 <script src="{% static 'js/profile_tracking.js' %}" type="text/javascript"></script>
 <script>
+    var skills = {{ skills|jsonify }};
+
+    $(".skill-field").autocomplete({
+      source: skills,
+    });
+
     $('.btn-add-skill').on('click', function(event) {
         event.preventDefault();
         var count = $('#id_form-TOTAL_FORMS').val();
@@ -417,7 +423,7 @@
                 <div class="col-md-6">\
                     <label class="control-label" for="id_form-' + count + '-skill">Skill</label>\
                     <div class=" ">\
-                        <input type="text" name="form-' + count + '-skill" class="form-control skill-field" id="id_form-' + count + '-skill"">\
+                        <input type="text" name="form-' + count + '-skill" class="form-control skill-field" id="id_form-' + count + '-skill">\
                     </div>\
                 </div>\
                 <div class="col-md-4">\
