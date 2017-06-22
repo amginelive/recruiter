@@ -84,6 +84,14 @@ class MessageList extends React.Component {
         }
     }
 
+    acceptInvite(conversation_id) {
+        this.props.actions.answerInvite({accept: true, conversation_id});
+    }
+
+    declineInvite(conversation_id) {
+        this.props.actions.answerInvite({accept: false, conversation_id});
+    }
+
     render() {
         const { messages, users, chatInitPending } = this.props;
 
@@ -112,7 +120,17 @@ class MessageList extends React.Component {
                             return (
                                 <div key={index}>
                                     {dateUI}
-                                    <Message user={message.get('user').get('id') === users.get('self') ? message.get('user').set('online', 2) : users.get(message.get('user').get('type')).get(message.get('user').get('id').toString())} text={message.get('text')} time={message.get('time')}/>
+                                    <Message
+                                        user={
+                                            message.get('user').get('id') === users.get('self') ? message.get('user').set('online', 2)
+                                                : users.get(message.get('user').get('type')).get(message.get('conversation_id').toString())
+                                        }
+                                        text={message.get('text')}
+                                        time={message.get('time')}
+                                        event={message.get('event')}
+                                        onAccept={this.acceptInvite.bind(this)}
+                                        onDecline={this.declineInvite.bind(this)}
+                                    />
                                 </div>
                             );
                         }).toArray()}

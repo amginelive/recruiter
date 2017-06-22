@@ -39,7 +39,7 @@ class TypingList extends React.Component {
         return (
             <div className='user-type-list'>
                 {typing.get('typingMap').map((user, index) => {
-                    return <div key={index} className='user-type-list-item'>{user.get('user_name') + ' is typing...'}</div>
+                    return <div key={index} className='user-type-list-item'>{user.get('user_name') + ' is typing...'}</div> // TODO: obviously we want one string here.
                 }).toArray()}
             </div>
         );

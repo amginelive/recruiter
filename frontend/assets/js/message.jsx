@@ -36,6 +36,9 @@ const Message = props => {
                     <span className='message-list-item-time'>{moment(props.time, moment.ISO_8601).format('h:mm a')}</span>
                 </div>
                 <p className='message-list-item-text'>{formatLinks(props.text)}</p>
+                {props.event && props.event.get('status') === 1 ? <div className='message-list-item-event'><button onClick={() => props.onAccept(props.event.get('conversation_id'))} className='chat-button'>Accept</button><button onClick={() => props.onDecline(props.event.get('conversation_id'))} className='chat-button'>Decline</button></div> : ''}
+                {props.event && props.event.get('status') === 2 ? <div className='message-list-item-event'>Declined invitation</div> : ''}
+                {props.event && props.event.get('status') === 0 ? <div className='message-list-item-event'>Accepted invitation</div> : ''}
             </div>
         </div>
     );

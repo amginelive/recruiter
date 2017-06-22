@@ -22,8 +22,8 @@ class UserList extends React.Component {
     componentWillReceiveProps(nextProps) {
         const activeChat = nextProps.users.get('activeChat');
         if (this.props.users.get('activeChat') === 0 && activeChat !== 0) {
-            ['candidates', 'agents'].some((group, index) => {
-                const value = nextProps.users.get(group).find(user => user.get('conversation_id') === activeChat);
+            ['candidates', 'agents', 'groups'].some((group, index) => {
+                const value = nextProps.users.get(group).find((user, conversation_id) => parseInt(conversation_id) === activeChat);
                 if (value) {
                     this.setState({selectedUsersGroup: index});
                     return true;
@@ -57,13 +57,13 @@ class UserList extends React.Component {
         if (users.size === 0) {
             return <div className='empty-user-group'>You have no {group_name}</div>
         }
-        return users.map(user => {
+        return users.map((user, conversation_id) => {
             const show_last_message = moment(user.get('last_message_time')).valueOf() > 60*60*24;
             return (
                 <div
-                    onClick={() => {this.userInit(user.get('conversation_id'))}}
-                    key={user.get('conversation_id')}
-                    className={'user-list-item' + (user.get('conversation_id') === this.props.users.get('activeChat') ? ' active' : '')}
+                    onClick={() => {this.userInit(conversation_id)}}
+                    key={conversation_id}
+                    className={'user-list-item' + (parseInt(conversation_id) === this.props.users.get('activeChat') ? ' active' : '')}
                 >
                     <div className={'user-avatar' + (user.get('online') === 2 ? ' user-online' : (user.get('online') === 1 ? ' user-away': ''))}>
                         <img src={user.get('photo')} />
@@ -91,7 +91,7 @@ class UserList extends React.Component {
         const { users } = this.props;
         const unreadCandidates = this.props.users.get('candidates').reduce((result, user) => result + user.get('unread'), 0);
         const unreadAgents = this.props.users.get('agents').reduce((result, user) => result + user.get('unread'), 0);
-        const unreadGroups = 0;
+        const unreadGroups = this.props.users.get('groups').reduce((result, user) => result + user.get('unread'), 0);
 
         let userListUI = '';
         if (this.state.selectedUsersGroup === 0) {

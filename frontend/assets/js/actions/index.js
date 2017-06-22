@@ -59,3 +59,9 @@ export function createGroup(payload) {
         emit(messageTypes.createGroup, payload);
     }
 }
+
+export function answerInvite(payload) {
+    return (dispatch, getState, {emit}) => {
+        emit(messageTypes.answerInvite, payload);
+    }
+}
