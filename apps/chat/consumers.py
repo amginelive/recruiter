@@ -388,6 +388,7 @@ class ChatServer(JsonWebsocketConsumer):
         current_conversation = self.message.channel_session.get('conversation')
         if payload.get('accept'):
             participant.status = Participant.PARTICIPANT_ACCEPTED
+            participant.save()
             response = self._create_group_chat_data_dict(participant.conversation)
             response['id'] = participant.conversation.id
             self.group_send(
