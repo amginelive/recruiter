@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.forms import BaseFormSet, formset_factory
 from django.utils.translation import ugettext_lazy as _
 
 from phonenumber_field.formfields import PhoneNumberField
@@ -10,11 +11,13 @@ from PIL import Image
 from .models import (
     Agent,
     Candidate,
+    CandidateSkill,
     UserNote,
 )
 from recruit.models import (
     Connection,
     ConnectionInvite,
+    Skill,
 )
 
 
@@ -107,9 +110,88 @@ class CandidateProfileDetailUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Candidate
-        fields = ('experience', 'skills', 'city', 'country',
+        fields = ('experience', 'city', 'country',
                   'desired_city', 'desired_country', 'willing_to_relocate',
                   'status', 'in_contract_status', 'out_contract_status',)
+
+    def __init__(self, *args, **kwargs):
+        super(CandidateProfileDetailUpdateForm, self).__init__(*args, **kwargs)
+
+        initial = [
+            {
+                'skill': candidate_skill.skill.name,
+                'experience': candidate_skill.experience,
+            }
+            for candidate_skill in self.instance.candidate_skills
+        ]
+        self.candidate_skill_formset = CandidateSkillFormSet(initial=initial)
+
+    def clean(self):
+        super(CandidateProfileDetailUpdateForm, self).clean()
+        self.candidate_skill_formset = CandidateSkillFormSet(self.data)
+
+        if not self.candidate_skill_formset.is_valid() or self.candidate_skill_formset.non_form_errors():
+            raise forms.ValidationError(_('Please check the core skill errors.'))
+
+        return self.cleaned_data
+
+    def save(self, *args, **kwargs):
+        candidate = super(CandidateProfileDetailUpdateForm, self).save()
+
+        CandidateSkill.objects.filter(candidate=candidate).delete()
+        for form in self.candidate_skill_formset.forms:
+            if form.is_valid() and form.cleaned_data:
+                form.initial['candidate'] = candidate
+                form.save()
+
+        return candidate
+
+
+class CandidateSkillForm(forms.ModelForm):
+    """
+    Form for Candidate Skill.
+    """
+    skill = forms.CharField(max_length=100, label=_('Skill'))
+
+    class Meta:
+        model = CandidateSkill
+        fields = ('experience',)
+
+    def save(self, *args, **kwargs):
+        candidate_skill = super(CandidateSkillForm, self).save(commit=False)
+
+        candidate_skill.candidate = self.initial.get('candidate')
+
+        skill = Skill.objects.filter(name__iexact=self.cleaned_data.get('skill'))
+        if skill.exists():
+            skill = skill.first()
+        else:
+            skill = Skill.objects.create(name=self.cleaned_data.get('skill'))
+        candidate_skill.skill = skill
+
+        candidate_skill.save()
+
+        return candidate_skill
+
+
+class BaseCandidateSkillFormSet(BaseFormSet):
+    """
+    Base formset for Candidate Skill.
+    """
+    def clean(self):
+        if any(self.errors):
+            return
+
+        skills = []
+        for form in self.forms:
+            if form.is_valid() and form.cleaned_data:
+                skill = form.cleaned_data['skill'].lower()
+                if skill in skills:
+                    raise forms.ValidationError(_('You cannot add duplicate skills.'))
+                skills.append(skill)
+
+
+CandidateSkillFormSet = formset_factory(CandidateSkillForm, formset=BaseCandidateSkillFormSet)
 
 
 class AgentUpdateForm(forms.ModelForm):
@@ -186,6 +268,7 @@ class UserNoteForm(forms.ModelForm):
     """
     Form for UserNote.
     """
+
     class Meta:
         model = UserNote
         fields = ('note_to', 'text', 'type',)

@@ -1598,3 +1598,16 @@ section#my-applications .job-applications-table {
     border: 1px solid #f2f1ec;
     padding: 30px;
 }
+
+.btn-remove-skill {
+    cursor: pointer;
+    font-size: 20px;
+    margin-top: 30px;
+}
+
+.btn-add-skill {
+    min-width: inherit !important;
+    height: inherit !important;
+    margin: 0px !important;
+}
+

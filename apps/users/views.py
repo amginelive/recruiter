@@ -30,7 +30,10 @@ from .models import (
 from .utils import get_profile_completeness
 from chat.models import Message
 from companies.models import CompanyRequestInvitation
-from recruit.models import ConnectionRequest
+from recruit.models import (
+    ConnectionRequest,
+    Skill,
+)
 
 
 User = get_user_model()
@@ -130,6 +133,7 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
             .order_by('-created_at')
 
         if profile.user.account_type == User.ACCOUNT_CANDIDATE:
+            context['skills'] = [skill.name for skill in Skill.objects.all()]
             context['photo_form'] = CandidatePhotoUploadForm
             context['completeness'] = get_profile_completeness(profile)
             context['candidate_form'] = CandidateUpdateForm(instance=profile)

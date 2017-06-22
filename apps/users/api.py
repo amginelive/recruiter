@@ -99,6 +99,10 @@ class CandidateProfileDetailUpdateAPIView(CandidateRequiredMixin, UpdateView, JS
         return self.render_json_response({
             'success': False,
             'errors': form.errors,
+            'formset': {
+                'non_form_errors': form.candidate_skill_formset.non_form_errors(),
+                'field_errors': form.candidate_skill_formset.errors,
+            },
         })
 
 candidate_profile_detail_update = CandidateProfileDetailUpdateAPIView.as_view()

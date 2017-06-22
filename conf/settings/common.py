@@ -60,11 +60,13 @@ INSTALLED_APPS = (
     'django_js_reverse',
 #    'djangoseo',
     'easy_thumbnails',
+    'jsonify',
     'phonenumber_field',
     'webpack_loader',
 
     'chat',
     'companies',
+    'core',
     'recruit',
     'users'
 )
