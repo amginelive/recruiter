@@ -218,11 +218,11 @@ class ChatServer(JsonWebsocketConsumer):
             return
         self.message.channel_session['conversation'] = conversation
         query = Message.objects.filter(conversation=conversation) \
-            .exclude(event__group__owner=self.message.user) \
-            .order_by('-created_at')[:self.message_list_limit]
+            .exclude(event__group__owner=self.message.user)
         messages = []
-        more = conversation.messages.count() > self.message_list_limit
-        for message in reversed(query):
+        more = query.count() > self.message_list_limit
+        last_messages = query.order_by('-created_at')[:self.message_list_limit]
+        for message in reversed(last_messages):
             messages.append(self._create_message_data_dict(message))
         self.send({'type': 'initChat',
                    'payload': {'conversation_id': conversation.id,
