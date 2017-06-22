@@ -38,17 +38,6 @@
                                     <div class="orange-text">{{ form.title.errors }}</div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label" for="id_skills">Skills</label>
-                                    <div class=" ">
-                                        <select name="skills" class=" form-control" required="" id="id_skills" multiple="multiple">
-                                            {% for key, value in form.skills.field.choices %}
-                                                <option value="{{ key }}" {% if key in form.skills.value %}selected="selected"{% endif %}>{{ value }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="orange-text">{{ form.skills.errors }}</div>
-                                </div>
-                                <div class="form-group">
                                     <label class="control-label" for="id_job_type">{{ form.job_type.label }}</label>
                                     <div class=" ">
                                         <select name="job_type" class=" form-control" required="" id="id_job_type">
@@ -178,10 +167,6 @@
 {% block footer_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script>
-    $("#id_skills").select2({
-        tags: true,
-    })
-
     $('#id_status').on('change', function() {
         $('.in-contract-status-field').removeClass('hidden');
         $('.out-contract-status-field').removeClass('hidden');
