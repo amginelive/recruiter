@@ -29,7 +29,7 @@ const messages = (state = new Immutable.Map().withMutations(ctx => ctx.set('acti
         return state.update('messageList', messageList => {
             return messageList.map(message => {
                 if (message.get('event')) {
-                    return message.updateIn(['event', 'status'], action.payload.accept ? 0 : 2);
+                    return message.updateIn(['event', 'status'], () => action.payload.accept ? 0 : 2);
                 } else return message;
             });
         });
