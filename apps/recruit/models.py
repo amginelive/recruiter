@@ -1,8 +1,8 @@
 import uuid
 
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-
 
 from core.models import AbstractTimeStampedModel, optional
 from django_countries.fields import CountryField
@@ -200,6 +200,20 @@ class JobApplication(AbstractTimeStampedModel):
 
     def __str__(self):
         return self.candidate.user.get_full_name()
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            connection = Connection.objects.filter(
+                (Q(connecter=self.candidate.user) & Q(connectee=self.job_post.posted_by.user)) |
+                (Q(connecter=self.job_post.posted_by.user) & Q(connectee=self.candidate.user))
+            )
+            if not connection.exists():
+                Connection.objects.create(
+                    connecter=self.candidate.user,
+                    connectee=self.job_post.posted_by.user,
+                    connection_type=Connection.CONNECTION_CANDIDATE_TO_AGENT_NETWORK
+                )
+        return super(JobApplication, self).save(*args, **kwargs)
 
     @property
     def status(self):
