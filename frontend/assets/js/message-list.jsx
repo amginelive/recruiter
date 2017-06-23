@@ -93,7 +93,7 @@ class MessageList extends React.Component {
     }
 
     render() {
-        const { messages, users, chatInitPending } = this.props;
+        const { messages, users, chats, chatInitPending } = this.props;
 
         if (chatInitPending) {
             return (
@@ -102,6 +102,14 @@ class MessageList extends React.Component {
                 </div>
             );
         }
+
+        let chat = null;
+        ['candidates', 'agents', 'groups'].some(group => {
+            if (chats.get(group).has(chats.get('activeChat').toString())) {
+                chat = chats.get(group).get(chats.get('activeChat').toString());
+                return true;
+            } else return false;
+        });
 
         const moreMessagesButtonUI = this.renderMoreMessagesButton(messages);
         return (
@@ -121,9 +129,9 @@ class MessageList extends React.Component {
                                 <div key={index}>
                                     {dateUI}
                                     <Message
-                                        user={
-                                            message.get('user').get('id') === users.get('self') ? message.get('user').set('online', 2)
-                                                : users.get(message.get('user').get('type')).get(message.get('conversation_id').toString())
+                                        user={chat.get('user') || users.has(message.get('user').get('id').toString()) ?
+                                            users.get(message.get('user').get('id').toString()) :
+                                            users.get('extra').get(message.get('user').get('id').toString())
                                         }
                                         text={message.get('text')}
                                         time={message.get('time')}
@@ -144,7 +152,8 @@ class MessageList extends React.Component {
 function mapStateToProps (state) {
     return {
         messages: state.get('messages'),
-        users: state.get('users')
+        users: state.get('users'),
+        chats: state.get('chats')
     };
 }
 

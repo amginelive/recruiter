@@ -27,6 +27,7 @@ function formatLinks(message) {
 const Message = props => {
     return (
         <div className='message-list-item'>
+            {}
             <div className={'user-avatar' + (props.user.get('online') === 2 ? ' user-online' : (props.user.get('online') === 1 ? ' user-away': ''))}>
                 <img src={props.user.get('photo')} />
             </div>

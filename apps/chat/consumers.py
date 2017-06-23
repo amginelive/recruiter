@@ -46,12 +46,60 @@ class ChatServer(JsonWebsocketConsumer):
             last_message_text = ''
             last_message_time = datetime.fromtimestamp(0).isoformat()
         return {
+            'users': [participant.user.id for participant in group_chat.participants.exclude(user=self.message.user)],
             'name': group_chat.name,
-            'photo': self.message.user.get_photo_url(),
             'unread': unread,
             'last_message_time': last_message_time,
             'last_message_text': last_message_text
         }
+
+    def _create_user_chat_data_dict(self, user):
+        conversation = self._get_or_create_conversation(user)
+        last_read_message = self.message.user.participations \
+            .get(conversation=conversation) \
+            .last_read_message
+        if last_read_message:
+            unread = conversation.messages \
+                .exclude(event__group__owner=self.message.user) \
+                .filter(created_at__gt=last_read_message.created_at) \
+                .count()
+        else:
+            unread = conversation.messages.all().count()
+        last_message = conversation.messages \
+            .exclude(event__group__owner=self.message.user) \
+            .order_by('created_at') \
+            .last()
+        if last_message:
+            if self.message.user == last_message.author:
+                last_message_text = 'You: '
+            else:
+                last_message_text = f'{user.get_full_name()}: '
+            last_message_text += last_message.text
+            last_message_time = last_message.created_at.isoformat()
+        else:
+            last_message_text = ''
+            last_message_time = datetime.fromtimestamp(0).isoformat()
+        return (
+            conversation.id,
+            {
+                'user': user.id,
+                'name': user.get_full_name(),
+                'unread': unread,
+                'last_message_time': last_message_time,
+                'last_message_text': last_message_text
+            }
+        )
+
+    @staticmethod
+    def _create_user_data_dict(user, include_email=True):
+        response = {
+            'name': user.get_full_name(),
+            'photo': user.get_photo_url(),
+            'online': user.online()
+        }
+        if include_email:
+            response['email'] = user.email
+        return response
 
     def connect(self, message, **kwargs):
         if message.user.is_authenticated():
@@ -74,71 +122,42 @@ class ChatServer(JsonWebsocketConsumer):
             for connection in connections
         ]
         self.message.channel_session['user_list'] = user_list
-
-        def create_user_data_dict(user):
-            conversation = self._get_or_create_conversation(user)
-            last_read_message = self.message.user.participations.get(
-                conversation=conversation).last_read_message
-            if last_read_message:
-                unread = conversation.messages \
-                    .exclude(event__group__owner=self.message.user) \
-                    .filter(created_at__gt=last_read_message.created_at) \
-                    .count()
-            else:
-                unread = conversation.messages.all().count()
-            last_message = conversation.messages \
-                .exclude(event__group__owner=self.message.user) \
-                .order_by('created_at') \
-                .last()
-            if last_message:
-                if self.message.user == last_message.author:
-                    last_message_text = 'You: '
-                else:
-                    last_message_text = f'{user.get_full_name()}: '
-                last_message_text += last_message.text
-                last_message_time = last_message.created_at.isoformat()
-            else:
-                last_message_text = ''
-                last_message_time = datetime.fromtimestamp(0).isoformat()
-            return (
-                conversation.id,
-                {
-                    'id': user.id,
-                    'name': user.get_full_name(),
-                    'email': user.email,
-                    'photo': user.get_photo_url(),
-                    'online': user.online(),
-                    'unread': unread,
-                    'last_message_time': last_message_time,
-                    'last_message_text': last_message_text
-                }
-            )
+        group_participants = Participant.objects.filter(conversation__conversation_type=Conversation.CONVERSATION_GROUP).filter(conversation__users=self.message.user).exclude(user=self.message.user).distinct()
+        self.message.channel_session['extra'] = {participant.user for participant in group_participants if participant.user not in user_list}
 
         response = {
-            'self': self.message.user.id,
-            'activeChat': 0,
-            'agents': {},
-            'candidates': {},
-            'groups': {}
+            'users': {
+                'self': self.message.user.id,
+                str(self.message.user.id): self._create_user_data_dict(self.message.user),
+                'extra': {user.id: self._create_user_data_dict(user) for user in self.message.channel_session['extra']}
+            },
+            'chats': {
+                'activeChat': 0,
+                'agents': {},
+                'candidates': {},
+                'groups': {}
+            }
         }
         for user in user_list:
             account_type = f'{user.get_account_type_display().lower()}s'
-            user_id, user_dict = create_user_data_dict(user)
-            response[account_type][str(user_id)] = user_dict
+            conversation_id, user_dict = self._create_user_chat_data_dict(user)
+            response['chats'][account_type][str(conversation_id)] = user_dict
+            response['users'][str(user.id)] = self._create_user_data_dict(user)
         group_chats = Conversation.objects \
             .filter(conversation_type=Conversation.CONVERSATION_GROUP) \
             .filter(participants__user=self.message.user,
                     participants__status=Participant.PARTICIPANT_ACCEPTED)
         for group_chat in group_chats:
-            response['groups'][str(group_chat.id)] = self._create_group_chat_data_dict(group_chat)
-        self.send({'type': 'initUsers', 'payload': response})
+            response['chats']['groups'][str(group_chat.id)] = self._create_group_chat_data_dict(group_chat)
+        self.send({'type': 'init', 'payload': response})
 
-        users_count = len(response.get('agents'))\
-            + len(response.get('candidates'))
+        users_count = len(response.get('chats').get('agents')) \
+            + len(response.get('chats').get('candidates'))
         if kwargs.get('mode') != 'bg' and users_count > 0:
-            last_conversation = self.message.user.participations\
-                .order_by('updated_at')\
-                .last()\
+            last_conversation = self.message.user.participations \
+                .filter(status=Participant.PARTICIPANT_ACCEPTED) \
+                .order_by('updated_at') \
+                .last() \
                 .conversation
             self.cmd_init(last_conversation.id)
 
@@ -176,10 +195,8 @@ class ChatServer(JsonWebsocketConsumer):
             event = None
         return {
             'user': {
-                'name': message.author.get_full_name(),
-                'photo': message.author.get_photo_url(),
                 'id': message.author.id,
-                'type': f'{message.author.get_account_type_display().lower()}s'
+                'name': message.author.get_full_name()
             },
             'event': event,
             'conversation_id': message.conversation.id,
@@ -261,20 +278,15 @@ class ChatServer(JsonWebsocketConsumer):
 
     def cmd_presence(self):
         user_list = self.message.channel_session['user_list']
+        extra = self.message.channel_session['extra']
+        payload = {
+            str(user.id): {'online': user.online()}
+            for user in user_list
+        }
+        payload['extra'] = {user.id: self._create_user_data_dict(user) for user in extra}
         response = {
             'type': 'userPresence',
-            'payload': {
-                'agents': {
-                    str(user.id): {'online': user.online()}
-                    for user in user_list
-                    if user.account_type == User.ACCOUNT_AGENT
-                },
-                'candidates': {
-                    str(user.id): {'online': user.online()}
-                    for user in user_list
-                    if user.account_type == User.ACCOUNT_CANDIDATE
-                }
-            }
+            'payload': payload
         }
         return self.send(response)
 
@@ -357,6 +369,7 @@ class ChatServer(JsonWebsocketConsumer):
 
         response = self._create_group_chat_data_dict(chat_group)
         response['id'] = chat_group.id
+        response['extra'] = dict()
         self.send({
             'type': 'createGroup',
             'payload': response
@@ -391,6 +404,10 @@ class ChatServer(JsonWebsocketConsumer):
             participant.save()
             response = self._create_group_chat_data_dict(participant.conversation)
             response['id'] = participant.conversation.id
+            user_list = self.message.channel_session['user_list']
+            extra_users = {participant.user for participant in participant.conversation.participants.exclude(user=self.message.user) if participant.user not in user_list}
+            response['extra'] = {user.id: self._create_user_data_dict(user, include_email=False) for user in extra_users}
+            self.message.channel_session['extra'].update(extra_users)
             self.group_send(
                 str(self.message.user.id),
                 {'type': 'createGroup', 'payload': response}
@@ -408,12 +425,15 @@ class ChatServer(JsonWebsocketConsumer):
             self.cmd_init(participant.conversation.id)
         else:
             participant.status = Participant.PARTICIPANT_DECLINED
+            participant.save()
+            current_conversation.participants.get(user=self.message.user).save()
             self.group_send(
                 str(self.message.user.id),
                 {
                     'type': 'answerInvite',
                     'payload': {
                         'accept': False,
+                        'group_id': participant.conversation.id,
                         'conversation_id': current_conversation.id
                     }
                 }

@@ -80,7 +80,7 @@ class GroupChatModal extends React.Component {
     }
 
     searchUsers() {
-        const users = this.props.users.get('candidates').merge(this.props.users.get('agents'));
+        const users = this.props.users.delete('self').delete('extra').delete(this.props.users.get('self').toString());
         const userSearchQuery = this.userSearchInput.value;
         if (userSearchQuery !== this.state.userSearchQuery) {
             this.setState({userSearchQuery});
@@ -91,8 +91,8 @@ class GroupChatModal extends React.Component {
                     const has_email = user.get('email').toLowerCase().includes(userSearchQuery.toLowerCase());
                     return has_email || has_name;
                 });
-                queryUsers = queryUsers.map(user => {
-                    return user.set('id', user.get('id')).toObject();
+                queryUsers = queryUsers.map((user, id) => {
+                    return user.set('id', parseInt(id)).toObject();
                 }).toArray();
                 const selected_ids = this.state.selectedUsers.map(user => user.id);
                 queryUsers = queryUsers.filter(user => !selected_ids.some(id => id === user.id));
