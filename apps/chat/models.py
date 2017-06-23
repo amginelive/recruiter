@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 
 from core.models import AbstractTimeStampedModel, optional
 
@@ -20,6 +21,13 @@ class Message(AbstractTimeStampedModel):
         related_name='messages',
         verbose_name=_('Conversation')
     )
+    group_invite = models.ForeignKey(
+        'chat.GroupInvite',
+        on_delete=models.CASCADE,
+        related_name='messages',
+        verbose_name=_('Event linked to message'),
+        **optional
+    )
 
     class Meta:
         verbose_name = _('Message')
@@ -29,16 +37,74 @@ class Message(AbstractTimeStampedModel):
         return self.author.get_full_name()
 
 
+class GroupInvite(AbstractTimeStampedModel):
+    conversation = models.OneToOneField(
+        'chat.Conversation',
+        on_delete=models.CASCADE,
+        related_name='invite',
+        verbose_name=_('Conversation to invite into')
+    )
+    text = models.TextField(_('Invite text'))
+
+    class Meta:
+        verbose_name = _('Group invite')
+        verbose_name_plural = _('Group invites')
+
+    def __str__(self):
+        return self.conversation.name
+
+
 class Conversation(AbstractTimeStampedModel):
     """
     Model for conversation.
     """
+    CONVERSATION_USER = 0
+    CONVERSATION_GROUP = 1
+    CONVERSATION_TYPE_CHOICES = (
+        (CONVERSATION_USER, _('User chat')),
+        (CONVERSATION_GROUP, _('Group chat')),
+    )
+
+    conversation_type = models.IntegerField(
+        _('Conversation Type'),
+        choices=CONVERSATION_TYPE_CHOICES,
+        default=CONVERSATION_USER,
+        help_text=_('Conversation type based on how it was created.')
+    )
+    name = models.CharField(
+        max_length=200,
+        verbose_name=_('Conversation name'),
+        **optional
+    )
+    owner = models.ForeignKey(
+        'users.User',
+        on_delete=models.CASCADE,
+        related_name='own_conversations',
+        verbose_name=_('Conversation owner'),
+        **optional
+    )
     users = models.ManyToManyField(
         'users.User',
         through='chat.Participant',
         related_name='conversations',
         verbose_name=_('Conversation participants')
     )
+
+    def clean(self):
+        validations = {}
+
+        if self.conversation_type == self.CONVERSATION_GROUP and not self.owner:
+            validations['owner'] = ValidationError(
+                _('Owner field should be set in group conversations'))
+        if self.conversation_type == self.CONVERSATION_GROUP and not self.name:
+            validations['name'] = ValidationError(
+                _('Name field should be set in group conversations'))
+        if self.owner not in self.users.all():
+            validations['users'] = ValidationError(
+                _('Owner should be present in conversation'))
+
+        if validations:
+            raise ValidationError(validations)
 
     class Meta:
         verbose_name = _('Conversation')
@@ -49,9 +115,24 @@ class Conversation(AbstractTimeStampedModel):
 
 
 class Participant(AbstractTimeStampedModel):
+    PARTICIPANT_ACCEPTED = 0
+    PARTICIPANT_PENDING = 1
+    PARTICIPANT_DECLINED = 2
+    PARTICIPANT_STATUS_CHOICES = (
+        (PARTICIPANT_ACCEPTED, _('Participant accepted')),
+        (PARTICIPANT_PENDING, _('Participant pending')),
+        (PARTICIPANT_DECLINED, _('Participant declined')),
+    )
+
+    status = models.IntegerField(
+        _('Participant status'),
+        choices=PARTICIPANT_STATUS_CHOICES,
+        default=PARTICIPANT_ACCEPTED,
+        help_text=_('Participant invite acceptance status.')
+    )
     last_read_message = models.ForeignKey(
         'chat.Message',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='+',
         verbose_name='Last read message',
         **optional

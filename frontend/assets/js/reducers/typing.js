@@ -34,9 +34,9 @@ const typing = (state = new Immutable.Map().withMutations(ctx => ctx.set('active
         }
     }
     if (action.type === messageTypes.initChat) {
-        return new Immutable.Map().withMutations(ctx => ctx.set('activeChat', action.payload['conversation_id']).set('typingMap', new Immutable.Map()));
+        return new Immutable.Map().withMutations(ctx => ctx.set('activeChat', action.payload.conversation_id).set('typingMap', new Immutable.Map()));
     }
-    if (action.type === messageTypes.newMessage && action.payload['conversation_id'] === state.get('activeChat')) {
+    if (action.type === messageTypes.newMessage && action.payload.conversation_id === state.get('activeChat')) {
         return state.deleteIn(['typingMap', action.payload.user.id]);
     }
     return state;

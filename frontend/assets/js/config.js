@@ -2,15 +2,16 @@ const host = window.location.host;
 
 // makes an object of the form {userJoined: 'userJoined'}
 const messageTypes = [
+    'init',
     'initChat',
-    'initUsers',
     'userPresence',
     'newMessage',
     'moreMessages',
     'userTyping',
     'userIdle',
     'readMessage',
-    'createGroup'
+    'createGroup',
+    'answerInvite'
 ].reduce((accum, msg) => {
     accum[ msg ] = msg;
     return accum;

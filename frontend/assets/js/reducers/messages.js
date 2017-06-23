@@ -25,6 +25,15 @@ const messages = (state = new Immutable.Map().withMutations(ctx => ctx.set('acti
                 .set('more', Immutable.fromJS(action.payload.more));
         });
     }
+    if (action.type === messageTypes.answerInvite && action.payload.conversation_id === state.get('activeChat')) {
+        return state.update('messageList', messageList => {
+            return messageList.map(message => {
+                if (message.get('group_invite') && message.get('group_invite').get('conversation_id') === action.payload.group_id) {
+                    return message.updateIn(['group_invite', 'status'], () => action.payload.accept ? 0 : 2);
+                } else return message;
+            });
+        });
+    }
     return state;
 };
 

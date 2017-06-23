@@ -80,7 +80,7 @@ class GroupChatModal extends React.Component {
     }
 
     searchUsers() {
-        const users = this.props.users.get('candidates').merge(this.props.users.get('agents'));
+        const users = this.props.users.delete('self').delete('extra').delete(this.props.users.get('self').toString());
         const userSearchQuery = this.userSearchInput.value;
         if (userSearchQuery !== this.state.userSearchQuery) {
             this.setState({userSearchQuery});

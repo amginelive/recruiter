@@ -20,10 +20,10 @@ class UserList extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const activeChat = nextProps.users.get('activeChat');
-        if (this.props.users.get('activeChat') === 0 && activeChat !== 0) {
-            ['candidates', 'agents'].some((group, index) => {
-                const value = nextProps.users.get(group).find(user => user.get('conversation_id') === activeChat);
+        const activeChat = nextProps.chats.get('activeChat');
+        if (this.props.chats.get('activeChat') !== activeChat) {
+            ['candidates', 'agents', 'groups'].some((group, index) => {
+                const value = nextProps.chats.get(group).find((chat, conversation_id) => parseInt(conversation_id) === activeChat);
                 if (value) {
                     this.setState({selectedUsersGroup: index});
                     return true;
@@ -32,8 +32,8 @@ class UserList extends React.Component {
         }
     }
 
-    userInit(id) {
-        if (id === this.props.users.get('activeChat')) {
+    chatInit(id) {
+        if (id === this.props.chats.get('activeChat')) {
             return;
         }
         this.props.setChatInitPendingState(true);
@@ -50,32 +50,39 @@ class UserList extends React.Component {
         }
     }
 
-    renderUsersGroup(users, group_name) {
+    renderUsersGroup(chats, group_name) {
         if (this.props.users.get('self') === 0) {
             return <Loader className='empty-user-group' type='ball-pulse' active />;
         }
-        if (users.size === 0) {
+        if (chats.size === 0) {
             return <div className='empty-user-group'>You have no {group_name}</div>
         }
-        return users.map(user => {
-            const show_last_message = moment(user.get('last_message_time')).valueOf() > 60*60*24;
+        const {users} = this.props;
+        return chats.map((chat, conversation_id) => {
+            const show_last_message = moment(chat.get('last_message_time')).valueOf() > 60*60*24;
+            // TODO: Figure out something for group avatar.
             return (
                 <div
-                    onClick={() => {this.userInit(user.get('conversation_id'))}}
-                    key={user.get('conversation_id')}
-                    className={'user-list-item' + (user.get('conversation_id') === this.props.users.get('activeChat') ? ' active' : '')}
+                    onClick={() => {this.chatInit(conversation_id)}}
+                    key={conversation_id}
+                    className={'user-list-item' + (parseInt(conversation_id) === this.props.chats.get('activeChat') ? ' active' : '')}
                 >
-                    <div className={'user-avatar' + (user.get('online') === 2 ? ' user-online' : (user.get('online') === 1 ? ' user-away': ''))}>
-                        <img src={user.get('photo')} />
-                    </div>
+                    {chat.get('user') ?
+                        <div className={'user-avatar' + (users.get(chat.get('user').toString()).get('online') === 2 ? ' user-online' : (users.get(chat.get('user').toString()).get('online') === 1 ? ' user-away': ''))}>
+                            <img src={users.get(chat.get('user').toString()).get('photo')} />
+                        </div> :
+                        <div className='group-avatar'>
+                            <img src={users.get(users.get('self').toString()).get('photo')} />
+                        </div>
+                    }
                     <div className='user-list-item-pane'>
                         <div className='user-list-item-pane-row'>
-                            <span className='user-list-item-name'>{user.get('name')}</span>
-                            {show_last_message ? <span className='user-list-item-timestamp'>{this.formatDate(user.get('last_message_time'))}</span> : ''}
+                            <span className='user-list-item-name'>{chat.get('name')}</span>
+                            {show_last_message ? <span className='user-list-item-timestamp'>{this.formatDate(chat.get('last_message_time'))}</span> : ''}
                         </div>
                         <div className='user-list-item-pane-row'>
-                            {show_last_message ? <span className='user-list-item-message'>{user.get('last_message_text')}</span> : ''}
-                            {user.get('unread') > 0 ? <div className='user-list-item-unread'><span>{user.get('unread')}</span></div> : ''}
+                            {show_last_message ? <span className='user-list-item-message'>{chat.get('last_message_text')}</span> : ''}
+                            {chat.get('unread') > 0 ? <div className='user-list-item-unread'><span>{chat.get('unread')}</span></div> : ''}
                         </div>
                     </div>
                 </div>
@@ -88,18 +95,18 @@ class UserList extends React.Component {
     }
 
     render() {
-        const { users } = this.props;
-        const unreadCandidates = this.props.users.get('candidates').reduce((result, user) => result + user.get('unread'), 0);
-        const unreadAgents = this.props.users.get('agents').reduce((result, user) => result + user.get('unread'), 0);
-        const unreadGroups = 0;
+        const {chats} = this.props;
+        const unreadCandidates = chats.get('candidates').reduce((result, user) => result + user.get('unread'), 0);
+        const unreadAgents = chats.get('agents').reduce((result, user) => result + user.get('unread'), 0);
+        const unreadGroups = chats.get('groups').reduce((result, user) => result + user.get('unread'), 0);
 
         let userListUI = '';
         if (this.state.selectedUsersGroup === 0) {
-            userListUI = this.renderUsersGroup(users.get('candidates'), 'team network connections');
+            userListUI = this.renderUsersGroup(chats.get('candidates'), 'team network connections');
         } else if (this.state.selectedUsersGroup === 1) {
-            userListUI = this.renderUsersGroup(users.get('agents'), 'agents connections');
+            userListUI = this.renderUsersGroup(chats.get('agents'), 'agents connections');
         } else {
-            userListUI = this.renderUsersGroup(users.get('groups'), 'group conversations');
+            userListUI = this.renderUsersGroup(chats.get('groups'), 'group conversations');
         }
 
         return (
@@ -148,7 +155,8 @@ class UserList extends React.Component {
 
 function mapStateToProps (state) {
     return {
-        users: state.get('users')
+        users: state.get('users'),
+        chats: state.get('chats')
     };
 }
 

@@ -12,10 +12,12 @@ class GlobalMessagesNotification extends React.Component {
     }
 
     render() {
-        const unread_candidates = this.props.users.get('candidates').reduce((result, user) => result + user.get('unread'), 0);
-        const unread_agents = this.props.users.get('agents').reduce((result, user) => result + user.get('unread'), 0);
-        if (unread_candidates + unread_agents > 0) {
-            document.title = `[${unread_candidates + unread_agents}] ${this.state.originalTitle}`;
+        const unread_candidates = this.props.chats.get('candidates').reduce((result, chat) => result + chat.get('unread'), 0);
+        const unread_agents = this.props.chats.get('agents').reduce((result, chat) => result + chat.get('unread'), 0);
+        const unread_groups = this.props.chats.get('groups').reduce((result, chat) => result + chat.get('unread'), 0);
+        const unread_sum = unread_candidates + unread_agents + unread_groups
+        if (unread_sum > 0) {
+            document.title = `[${unread_sum}] ${this.state.originalTitle}`;
             return (
                 <span style={{
                     borderRadius: 3,
@@ -26,7 +28,7 @@ class GlobalMessagesNotification extends React.Component {
                     fontWeight: 700,
                     textAlign: 'center'}}
                 >
-                    {unread_candidates + unread_agents}
+                    {unread_sum}
                 </span>
             );
         } else {
@@ -38,7 +40,7 @@ class GlobalMessagesNotification extends React.Component {
 
 function mapStateToProps (state) {
     return {
-        users: state.get('users')
+        chats: state.get('chats')
     };
 }
 

@@ -27,6 +27,7 @@ function formatLinks(message) {
 const Message = props => {
     return (
         <div className='message-list-item'>
+            {}
             <div className={'user-avatar' + (props.user.get('online') === 2 ? ' user-online' : (props.user.get('online') === 1 ? ' user-away': ''))}>
                 <img src={props.user.get('photo')} />
             </div>
@@ -36,6 +37,9 @@ const Message = props => {
                     <span className='message-list-item-time'>{moment(props.time, moment.ISO_8601).format('h:mm a')}</span>
                 </div>
                 <p className='message-list-item-text'>{formatLinks(props.text)}</p>
+                {props.group_invite && props.group_invite.get('status') === 1 ? <div className='message-list-item-event'><button onClick={() => props.onAccept(props.group_invite.get('conversation_id'))} className='chat-button'>Accept</button><button onClick={() => props.onDecline(props.group_invite.get('conversation_id'))} className='chat-button'>Decline</button></div> : ''}
+                {props.group_invite && props.group_invite.get('status') === 2 ? <div className='message-list-item-event'>Declined invitation</div> : ''}
+                {props.group_invite && props.group_invite.get('status') === 0 ? <div className='message-list-item-event'>Accepted invitation</div> : ''}
             </div>
         </div>
     );

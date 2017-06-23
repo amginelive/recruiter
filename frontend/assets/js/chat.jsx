@@ -66,9 +66,7 @@ class App extends React.Component {
 
 function mapStateToProps (state) {
     return {
-        users: state.get('users'),
-        messages: state.get('messages'),
-        typing: state.get('typing')
+        users: state.get('users')
     };
 }
 
