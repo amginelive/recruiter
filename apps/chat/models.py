@@ -103,7 +103,7 @@ class Conversation(AbstractTimeStampedModel):
             validations['users'] = ValidationError(
                 _('Owner should be present in conversation'))
 
-        if len(validations) > 0:
+        if validations:
             raise ValidationError(validations)
 
     class Meta:
