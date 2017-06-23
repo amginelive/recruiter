@@ -22,9 +22,11 @@
                             <button class="btn btn-primary btn-save-profile hidden">Save</button>
                         </div>
                     {% else %}
-                        <div class="col-md-4">
-                            <a href="#">Message me</a>
-                        </div>
+                        {% if is_connected %}
+                            <div class="col-md-4">
+                                <a href="{% url 'chat:chat' %}">Message me</a>
+                            </div>
+                        {% endif %}
                         <div class="col-md-4">
                             <a href="#">Send job to me</a>
                         </div>

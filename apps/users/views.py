@@ -4,7 +4,8 @@ from django.contrib.postgres.search import (
     SearchVector,
 )
 from django.core.urlresolvers import reverse_lazy
-from django.http import HttpResponseRedirect
+from django.db.models import Q
+from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render
 from django.views.generic import (
     DetailView,
@@ -31,6 +32,7 @@ from .utils import get_profile_completeness
 from chat.models import Message
 from companies.models import CompanyRequestInvitation
 from recruit.models import (
+    Connection,
     ConnectionRequest,
     Skill,
 )
@@ -107,6 +109,22 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
 
     context_object_name = 'profile'
 
+    def dispatch(self, request, *args, **kwargs):
+        user = self.get_object().user
+        if request.user != user:
+            is_connected = Connection.objects.filter(
+                (Q(connecter=self.request.user) & Q(connectee=user)) |
+                (Q(connecter=user) & Q(connectee=self.request.user))
+            ).filter(connection_type__in=[
+                Connection.CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK,
+                Connection.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER,
+                Connection.CONNECTION_AGENT_TO_AGENT_NETWORK,
+            ]).exists()
+
+            if request.user.is_authenticated and not is_connected:
+                return HttpResponseNotFound('You are not connected to this user.')
+        return super(ProfileDetailView, self).dispatch(request, *args, **kwargs)
+
     def get_object(self):
         user = User.objects.get(slug=self.kwargs.get('slug'))
 
@@ -131,6 +149,10 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         context['user_notes'] = UserNote.objects\
             .filter(note_by=self.request.user, note_to=profile.user)\
             .order_by('-created_at')
+        context['is_connected'] = Connection.objects.filter(
+            (Q(connecter=self.request.user) & Q(connectee=profile.user)) |
+            (Q(connecter=profile.user) & Q(connectee=self.request.user))
+        ).exists()
 
         if profile.user.account_type == User.ACCOUNT_CANDIDATE:
             context['skills'] = [skill.name for skill in Skill.objects.all()]
