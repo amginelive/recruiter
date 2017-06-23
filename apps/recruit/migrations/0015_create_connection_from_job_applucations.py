@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.utils import timezone
 
 
-def make_many_participants(apps, schema_editor):
+def create_application_connections(apps, schema_editor):
     """
         Populates new relationship from old one.
     """
@@ -34,5 +34,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(make_many_participants)
+        migrations.RunPython(create_application_connections)
     ]
