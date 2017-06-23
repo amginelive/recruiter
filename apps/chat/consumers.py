@@ -64,13 +64,13 @@ class ChatServer(JsonWebsocketConsumer):
             .last_read_message
         if last_read_message:
             unread = conversation.messages \
-                .exclude(event__group__owner=self.message.user) \
+                .exclude(group_invite__conversation__owner=self.message.user) \
                 .filter(created_at__gt=last_read_message.created_at) \
                 .count()
         else:
             unread = conversation.messages.all().count()
         last_message = conversation.messages \
-            .exclude(event__group__owner=self.message.user) \
+            .exclude(group_invite__conversation__owner=self.message.user) \
             .order_by('created_at') \
             .last()
         if last_message:
@@ -179,7 +179,7 @@ class ChatServer(JsonWebsocketConsumer):
 
     def _get_or_create_conversation(self, user):
         conversation = Conversation.objects \
-            .filter(conversation_type=Conversation.CONVERSATION_AUTO) \
+            .filter(conversation_type=Conversation.CONVERSATION_USER) \
             .filter(users=user) \
             .filter(users=self.message.user) \
             .first()
@@ -197,25 +197,25 @@ class ChatServer(JsonWebsocketConsumer):
         return conversation
 
     def _create_message_data_dict(self, message, for_user=False):
-        if message.event:
+        if message.group_invite:
             if for_user:
                 status = Participant.PARTICIPANT_PENDING
             else:
-                status = message.event.group.participants \
+                status = message.group_invite.conversation.participants \
                     .get(user=self.message.user).status
-            event = {
+            group_invite = {
                 'type': 'group_invite',
                 'status': status,
-                'conversation_id': message.event.group.id,
+                'conversation_id': message.group_invite.conversation.id,
             }
         else:
-            event = None
+            group_invite = None
         return {
             'user': {
                 'id': message.author.id,
                 'name': message.author.get_full_name()
             },
-            'event': event,
+            'group_invite': group_invite,
             'conversation_id': message.conversation.id,
             'text': message.text,
             'id': message.id,
@@ -252,7 +252,7 @@ class ChatServer(JsonWebsocketConsumer):
             return
         self.message.channel_session['conversation'] = conversation
         query = Message.objects.filter(conversation=conversation) \
-            .exclude(event__group__owner=self.message.user)
+            .exclude(group_invite__conversation__owner=self.message.user)
         messages = []
         more = query.count() > self.message_list_limit
         last_messages = query.order_by('-created_at')[:self.message_list_limit]
@@ -265,7 +265,7 @@ class ChatServer(JsonWebsocketConsumer):
         if len(messages) > 0:
             self.cmd_read_message(messages[-1]['id'])
 
-    def cmd_message(self, payload, for_user=None, event=None):
+    def cmd_message(self, payload, for_user=None, group_invite=None):
         if not for_user:
             conversation = self.message.channel_session.get('conversation')
         else:
@@ -274,7 +274,7 @@ class ChatServer(JsonWebsocketConsumer):
         message = Message.objects.create(text=payload,
                                          author=self.message.user,
                                          conversation=conversation,
-                                         event=event)
+                                         group_invite=group_invite)
         response = {
             'type': 'newMessage',
             'payload': self._create_message_data_dict(
@@ -324,7 +324,7 @@ class ChatServer(JsonWebsocketConsumer):
             .get(id=payload.get('message_id')) \
             .created_at
         query = conversation.messages \
-            .exclude(event__owner=self.message.user) \
+            .exclude(group_invite__owner=self.message.user) \
             .filter(created_at__lt=from_time) \
             .order_by('-created_at')
 
@@ -393,7 +393,7 @@ class ChatServer(JsonWebsocketConsumer):
         chat_group.save()
 
         invite = GroupInvite.objects.create(
-            group=chat_group,
+            conversation=chat_group,
             text=payload.get('message')
         )
 
@@ -425,7 +425,7 @@ class ChatServer(JsonWebsocketConsumer):
 
     def cmd_answer_invite(self, payload):
         participant = Participant.objects \
-            .filter(conversation__invite__group_id=payload.get('conversation_id')) \
+            .filter(conversation__invite__conversation_id=payload.get('conversation_id')) \
             .get(user=self.message.user)
 
         if participant.status != Participant.PARTICIPANT_PENDING:

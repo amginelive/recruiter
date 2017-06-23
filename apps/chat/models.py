@@ -21,7 +21,7 @@ class Message(AbstractTimeStampedModel):
         related_name='messages',
         verbose_name=_('Conversation')
     )
-    event = models.ForeignKey(
+    group_invite = models.ForeignKey(
         'chat.GroupInvite',
         on_delete=models.CASCADE,
         related_name='messages',
@@ -38,7 +38,7 @@ class Message(AbstractTimeStampedModel):
 
 
 class GroupInvite(AbstractTimeStampedModel):
-    group = models.OneToOneField(
+    conversation = models.OneToOneField(
         'chat.Conversation',
         on_delete=models.CASCADE,
         related_name='invite',
@@ -51,24 +51,24 @@ class GroupInvite(AbstractTimeStampedModel):
         verbose_name_plural = _('Group invites')
 
     def __str__(self):
-        return self.group.name
+        return self.conversation.name
 
 
 class Conversation(AbstractTimeStampedModel):
     """
     Model for conversation.
     """
-    CONVERSATION_AUTO = 0
+    CONVERSATION_USER = 0
     CONVERSATION_GROUP = 1
     CONVERSATION_TYPE_CHOICES = (
-        (CONVERSATION_AUTO, _('User chat')),
+        (CONVERSATION_USER, _('User chat')),
         (CONVERSATION_GROUP, _('Group chat')),
     )
 
     conversation_type = models.IntegerField(
         _('Conversation Type'),
         choices=CONVERSATION_TYPE_CHOICES,
-        default=CONVERSATION_AUTO,
+        default=CONVERSATION_USER,
         help_text=_('Conversation type based on how it was created.')
     )
     name = models.CharField(
@@ -91,14 +91,20 @@ class Conversation(AbstractTimeStampedModel):
     )
 
     def clean(self):
+        validations = {}
+
         if self.conversation_type == self.CONVERSATION_GROUP and not self.owner:
-            raise ValidationError(_('Owner field should be set'
-                                    ' in group conversations'))
+            validations['owner'] = ValidationError(
+                _('Owner field should be set in group conversations'))
         if self.conversation_type == self.CONVERSATION_GROUP and not self.name:
-            raise ValidationError(_('Name field should be set'
-                                    ' in group conversations'))
+            validations['name'] = ValidationError(
+                _('Name field should be set in group conversations'))
         if self.owner not in self.users.all():
-            raise ValidationError(_('Owner should be present in conversation'))
+            validations['users'] = ValidationError(
+                _('Owner should be present in conversation'))
+
+        if len(validations) > 0:
+            raise ValidationError(validations)
 
     class Meta:
         verbose_name = _('Conversation')

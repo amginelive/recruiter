@@ -135,7 +135,7 @@ class MessageList extends React.Component {
                                         }
                                         text={message.get('text')}
                                         time={message.get('time')}
-                                        event={message.get('event')}
+                                        group_invite={message.get('group_invite')}
                                         onAccept={this.acceptInvite.bind(this)}
                                         onDecline={this.declineInvite.bind(this)}
                                     />
