@@ -60,6 +60,7 @@ class UserList extends React.Component {
         const {users} = this.props;
         return chats.map((chat, conversation_id) => {
             const show_last_message = moment(chat.get('last_message_time')).valueOf() > 60*60*24;
+            // TODO: Figure out something for group avatar.
             return (
                 <div
                     onClick={() => {this.chatInit(conversation_id)}}
@@ -71,7 +72,7 @@ class UserList extends React.Component {
                             <img src={users.get(chat.get('user').toString()).get('photo')} />
                         </div> :
                         <div className='group-avatar'>
-                            <img src='#' />
+                            <img src={users.get(users.get('self').toString()).get('photo')} />
                         </div>
                     }
                     <div className='user-list-item-pane'>
