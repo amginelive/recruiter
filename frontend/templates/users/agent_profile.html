@@ -16,7 +16,7 @@
                     <div class="col-md-4 text-left">
                         <span>Last online: {{ profile.user.last_seen|date:"d/m/y" }}</span>
                     </div>
-                    {% if user != profile.user %}
+                    {% if user != profile.user and is_connected %}
                         <div class="col-md-4 text-center">
                             <a href="{% url 'chat:chat' %}">Message me</a>
                         </div>

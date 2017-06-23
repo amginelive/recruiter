@@ -4,6 +4,7 @@ from django.contrib.postgres.search import (
     SearchVector,
 )
 from django.core.urlresolvers import reverse_lazy
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import (
@@ -31,6 +32,7 @@ from .utils import get_profile_completeness
 from chat.models import Message
 from companies.models import CompanyRequestInvitation
 from recruit.models import (
+    Connection,
     ConnectionRequest,
     Skill,
 )
@@ -131,6 +133,10 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         context['user_notes'] = UserNote.objects\
             .filter(note_by=self.request.user, note_to=profile.user)\
             .order_by('-created_at')
+        context['is_connected'] = Connection.objects.filter(
+            (Q(connecter=self.request.user) & Q(connectee=profile.user)) |
+            (Q(connecter=profile.user) & Q(connectee=self.request.user))
+        ).exists()
 
         if profile.user.account_type == User.ACCOUNT_CANDIDATE:
             context['skills'] = [skill.name for skill in Skill.objects.all()]
