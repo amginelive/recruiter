@@ -46,7 +46,11 @@ class ChatServer(JsonWebsocketConsumer):
             last_message_text = ''
             last_message_time = datetime.fromtimestamp(0).isoformat()
         return {
-            'users': [participant.user.id for participant in group_chat.participants.exclude(user=self.message.user)],
+            'users': [
+                participant.user.id
+                for participant
+                in group_chat.participants.exclude(user=self.message.user)
+            ],
             'name': group_chat.name,
             'unread': unread,
             'last_message_time': last_message_time,
@@ -108,9 +112,9 @@ class ChatServer(JsonWebsocketConsumer):
             self.send({'close': True})
             return
 
-        connections = Connection.objects\
+        connections = Connection.objects \
             .filter(Q(connecter=message.user) |
-                    Q(connectee=message.user))\
+                    Q(connectee=message.user)) \
             .filter(connection_type__in=(
                 Connection.CONNECTION_CANDIDATE_TO_AGENT_NETWORK,
                 Connection.CONNECTION_AGENT_TO_AGENT_NETWORK if
@@ -122,14 +126,26 @@ class ChatServer(JsonWebsocketConsumer):
             for connection in connections
         ]
         self.message.channel_session['user_list'] = user_list
-        group_participants = Participant.objects.filter(conversation__conversation_type=Conversation.CONVERSATION_GROUP).filter(conversation__users=self.message.user).exclude(user=self.message.user).distinct()
-        self.message.channel_session['extra'] = {participant.user for participant in group_participants if participant.user not in user_list}
+        group_participants = Participant.objects \
+            .filter(conversation__conversation_type=Conversation.CONVERSATION_GROUP) \
+            .filter(conversation__users=self.message.user) \
+            .exclude(user=self.message.user)
+        self.message.channel_session['extra'] = {
+            participant.user
+            for participant
+            in group_participants
+            if participant.user not in user_list
+        }
 
         response = {
             'users': {
                 'self': self.message.user.id,
                 str(self.message.user.id): self._create_user_data_dict(self.message.user),
-                'extra': {user.id: self._create_user_data_dict(user) for user in self.message.channel_session['extra']}
+                'extra': {
+                    user.id: self._create_user_data_dict(user)
+                    for user
+                    in self.message.channel_session.get('extra')
+                }
             },
             'chats': {
                 'activeChat': 0,
@@ -185,7 +201,8 @@ class ChatServer(JsonWebsocketConsumer):
             if for_user:
                 status = Participant.PARTICIPANT_PENDING
             else:
-                status = message.event.group.participants.get(user=self.message.user).status
+                status = message.event.group.participants \
+                    .get(user=self.message.user).status
             event = {
                 'type': 'group_invite',
                 'status': status,
@@ -258,10 +275,16 @@ class ChatServer(JsonWebsocketConsumer):
                                          author=self.message.user,
                                          conversation=conversation,
                                          event=event)
-        response = {'type': 'newMessage',
-                    'payload': self._create_message_data_dict(message, for_user is not None)}
+        response = {
+            'type': 'newMessage',
+            'payload': self._create_message_data_dict(
+                message,
+                for_user is not None
+            )
+        }
         if not for_user:
-            for participant in conversation.participants.filter(status=Participant.PARTICIPANT_ACCEPTED):
+            for participant in conversation.participants \
+                    .filter(status=Participant.PARTICIPANT_ACCEPTED):
                 self.group_send(str(participant.user.id), response)
         else:
             self.group_send(str(for_user.id), response)
@@ -277,13 +300,17 @@ class ChatServer(JsonWebsocketConsumer):
             self.group_send(str(user.id), response)
 
     def cmd_presence(self):
-        user_list = self.message.channel_session['user_list']
-        extra = self.message.channel_session['extra']
+        user_list = self.message.channel_session.get('user_list')
+        extra = self.message.channel_session.get('extra')
         payload = {
             str(user.id): {'online': user.online()}
             for user in user_list
         }
-        payload['extra'] = {user.id: self._create_user_data_dict(user) for user in extra}
+        payload['extra'] = {
+            user.id: self._create_user_data_dict(user)
+            for user
+            in extra
+        }
         response = {
             'type': 'userPresence',
             'payload': payload
@@ -331,8 +358,14 @@ class ChatServer(JsonWebsocketConsumer):
         })
 
     def cmd_create_group(self, payload):
-        network_users_ids = [user.id for user in self.message.channel_session['user_list']]
-        if not all([user_id in network_users_ids for user_id in payload.get('user_ids')]):
+        network_users_ids = [
+            user.id
+            for user
+            in self.message.channel_session.get('user_list')
+        ]
+        if not all([user_id in network_users_ids
+                    for user_id
+                    in payload.get('user_ids')]):
             return
 
         chat_group = Conversation.objects.create(
@@ -404,10 +437,20 @@ class ChatServer(JsonWebsocketConsumer):
             participant.save()
             response = self._create_group_chat_data_dict(participant.conversation)
             response['id'] = participant.conversation.id
-            user_list = self.message.channel_session['user_list']
-            extra_users = {participant.user for participant in participant.conversation.participants.exclude(user=self.message.user) if participant.user not in user_list}
-            response['extra'] = {user.id: self._create_user_data_dict(user, include_email=False) for user in extra_users}
-            self.message.channel_session['extra'].update(extra_users)
+            user_list = self.message.channel_session.get('user_list')
+            extra_users = {
+                participant.user
+                for participant
+                in participant.conversation.participants.exclude(
+                    user=self.message.user)
+                if participant.user not in user_list
+            }
+            response['extra'] = {
+                user.id: self._create_user_data_dict(user, include_email=False)
+                for user
+                in extra_users
+            }
+            self.message.channel_session.get('extra').update(extra_users)
             self.group_send(
                 str(self.message.user.id),
                 {'type': 'createGroup', 'payload': response}
