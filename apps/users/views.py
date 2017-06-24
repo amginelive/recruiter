@@ -109,21 +109,21 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
 
     context_object_name = 'profile'
 
-    def dispatch(self, request, *args, **kwargs):
-        user = self.get_object().user
-        if request.user != user:
-            is_connected = Connection.objects.filter(
-                (Q(connecter=self.request.user) & Q(connectee=user)) |
-                (Q(connecter=user) & Q(connectee=self.request.user))
-            ).filter(connection_type__in=[
-                Connection.CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK,
-                Connection.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER,
-                Connection.CONNECTION_AGENT_TO_AGENT_NETWORK,
-            ]).exists()
+    # def dispatch(self, request, *args, **kwargs):
+    #     user = self.get_object().user
+    #     if request.user != user:
+    #         is_connected = Connection.objects.filter(
+    #             (Q(connecter=self.request.user) & Q(connectee=user)) |
+    #             (Q(connecter=user) & Q(connectee=self.request.user))
+    #         ).filter(connection_type__in=[
+    #             Connection.CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK,
+    #             Connection.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER,
+    #             Connection.CONNECTION_AGENT_TO_AGENT_NETWORK,
+    #         ]).exists()
 
-            if request.user.is_authenticated and not is_connected:
-                return HttpResponseNotFound('You are not connected to this user.')
-        return super(ProfileDetailView, self).dispatch(request, *args, **kwargs)
+    #         if request.user.is_authenticated and not is_connected:
+    #             return HttpResponseNotFound('You are not connected to this user.')
+    #     return super(ProfileDetailView, self).dispatch(request, *args, **kwargs)
 
     def get_object(self):
         user = User.objects.get(slug=self.kwargs.get('slug'))
