@@ -275,3 +275,12 @@ class AgentSearchView(LoginRequiredMixin, TemplateView):
         return context
 
 agent_search = AgentSearchView.as_view()
+
+
+class SettingsView(LoginRequiredMixin, TemplateView):
+    """
+    View for the Settings page.
+    """
+    template_name = 'users/settings.html'
+
+settings = SettingsView.as_view()
