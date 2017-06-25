@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse_lazy
+from django.db.models import Count
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.views.generic import (
@@ -8,6 +9,8 @@ from django.views.generic import (
     TemplateView,
     View,
 )
+
+from braces.views import LoginRequiredMixin
 
 from .forms import (
     CompanyForm,
@@ -18,7 +21,12 @@ from .models import (
     Company,
     CompanyInvitation,
 )
+from chat.models import Message
 from users.mixins import AgentRequiredMixin
+from users.models import (
+    Agent,
+    UserNote,
+)
 
 
 User = get_user_model()
@@ -33,7 +41,7 @@ class CompanyUpdateView(AgentRequiredMixin, View):
     def get(self, request, **kwargs):
         form = []
         try:
-            company = Company.objects.get(owner=request.user)
+            company = Company.objects.get(owner=request.user.agent)
         except Company.DoesNotExist:
             raise Http404('You have no rights to edit company details.')
 
@@ -50,7 +58,7 @@ class CompanyUpdateView(AgentRequiredMixin, View):
         form_values = request.POST.copy()
 
         try:
-            company = Company.objects.get(owner=request.user)
+            company = Company.objects.get(owner=request.user.agent)
             form_values['owner'] = company.owner
         except Company.DoesNotExist:
             raise Http404('You have no rights to edit company details.')
@@ -76,7 +84,7 @@ class CompanyInviteView(AgentRequiredMixin, View):
 
     def get(self, request, **kwargs):
         if (request.user.account_type == User.ACCOUNT_AGENT and
-            request.user.agent.company.owner == request.user):
+            request.user.agent.company.owner == request.user.agent):
 
             return render(request, self.template_name, {})
         else:
@@ -118,7 +126,7 @@ class CompanyCreateView(AgentRequiredMixin, CreateView):
         return reverse_lazy('recruit:dashboard')
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.agent and request.user.agent.company:
+        if request.user.is_authenticated and request.user.agent and request.user.agent.company:
             return HttpResponseRedirect(reverse_lazy('recruit:dashboard'))
         return super(CompanyCreateView, self).dispatch(request, *args, **kwargs)
 
@@ -135,7 +143,7 @@ class CompanyPendingView(AgentRequiredMixin, TemplateView):
     template_name = 'companies/company_pending.html'
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.agent and request.user.agent.company:
+        if request.user.is_authenticated and request.user.agent and request.user.agent.company:
             return HttpResponseRedirect(reverse_lazy('recruit:dashboard'))
         return super(CompanyPendingView, self).dispatch(request, *args, **kwargs)
 
@@ -153,3 +161,50 @@ class CompanyInviteSuccessView(AgentRequiredMixin, DetailView):
         return self.request.user.agent.company
 
 company_invite_success = CompanyInviteSuccessView.as_view()
+
+
+class CompanyDetailView(LoginRequiredMixin, DetailView):
+    """
+    View for the Company's profile.
+    """
+    model = Company
+    template_name = 'companies/company_detail.html'
+
+    def get_object(self):
+        return Company.objects.get(slug=self.kwargs.get('slug'))
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(CompanyDetailView, self).get_context_data(*args, **kwargs)
+
+        company = self.get_object()
+        agent = Agent.objects.filter(pk=self.request.GET.get('agent'))
+        current_agent = agent.first() if agent else company.owner
+        context['current_agent'] = current_agent
+        context['user_note'] = UserNote
+        context['user_notes'] = UserNote.objects\
+            .filter(note_by=self.request.user, note_to=current_agent.user)\
+            .order_by('-created_at')
+
+        messages = Message.objects.filter(author=self.request.user).order_by('created_at')
+        context['first_contact_sent'] = messages.first()
+        context['last_message_sent'] = messages.last()
+        context['last_message_received'] = Message.objects\
+            .filter(conversation__users=self.request.user)\
+            .exclude(author=self.request.user)\
+            .order_by('created_at')\
+            .last()
+
+        company_agents = [company_agent.user for company_agent in company.agents.all()]
+        context['last_person_in_contact'] = messages\
+            .annotate(participant_count=Count('conversation__participants'))\
+            .filter(participant_count=2)\
+            .filter(conversation__users__in=company_agents)\
+            .last().conversation.participants.exclude(user=self.request.user).first()
+        context['last_person_added_manual_track'] = UserNote.objects\
+            .filter(note_by=self.request.user)\
+            .filter(note_to__in=company_agents)\
+            .last().note_to
+
+        return context
+
+company_detail = CompanyDetailView.as_view()
