@@ -20,8 +20,10 @@ from .forms import (
 from .models import (
     Company,
     CompanyInvitation,
+    CompanyRequestInvitation,
 )
 from chat.models import Message
+from users.forms import AgentPhotoUploadForm
 from users.mixins import AgentRequiredMixin
 from users.models import (
     Agent,
@@ -179,6 +181,9 @@ class CompanyDetailView(LoginRequiredMixin, DetailView):
         company = self.get_object()
         agent = Agent.objects.filter(pk=self.request.GET.get('agent'))
         current_agent = agent.first() if agent else company.owner
+
+        context['photo_form'] = AgentPhotoUploadForm
+        context['invitation_requests'] = CompanyRequestInvitation.objects.filter(company=company)
         context['current_agent'] = current_agent
         context['user_note'] = UserNote
         context['user_notes'] = UserNote.objects\
@@ -194,16 +199,17 @@ class CompanyDetailView(LoginRequiredMixin, DetailView):
             .order_by('created_at')\
             .last()
 
-        company_agents = [company_agent.user for company_agent in company.agents.all()]
-        context['last_person_in_contact'] = messages\
-            .annotate(participant_count=Count('conversation__participants'))\
-            .filter(participant_count=2)\
-            .filter(conversation__users__in=company_agents)\
-            .last().conversation.participants.exclude(user=self.request.user).first()
-        context['last_person_added_manual_track'] = UserNote.objects\
-            .filter(note_by=self.request.user)\
-            .filter(note_to__in=company_agents)\
-            .last().note_to
+        company_agent_users = [company_agent.user for company_agent in company.agents.all()]
+        if self.request.user not in company_agent_users:
+            context['last_person_in_contact'] = messages\
+                .annotate(participant_count=Count('conversation__participants'))\
+                .filter(participant_count=2)\
+                .filter(conversation__users__in=company_agent_users)\
+                .last().conversation.participants.exclude(user=self.request.user).first()
+            context['last_person_added_manual_track'] = UserNote.objects\
+                .filter(note_by=self.request.user)\
+                .filter(note_to__in=company_agent_users)\
+                .last().note_to
 
         return context
 

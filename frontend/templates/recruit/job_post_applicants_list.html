@@ -24,7 +24,7 @@
                                 <img src="{% if job_application.candidate.photo %}{{ job_application.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
                             </div>
                             <div class="col-md-8 text-left">
-                                <span class="search-info"><a href="{% url 'users:profile_detail' job_application.candidate.user.slug %}">{{ job_application.candidate.user.get_full_name }}</a></span>
+                                <span class="search-info"><a href="{% url 'users:candidate_profile' job_application.candidate.user.slug %}">{{ job_application.candidate.user.get_full_name }}</a></span>
                                 <span class="search-info">{{ job_application.candidate.user.email }}</span>
                                 <span class="search-info">{{ job_application.candidate.phone }}</span>
                                 <span class="search-info">{{ job_application.candidate.location|default_if_none:"" }}</span>

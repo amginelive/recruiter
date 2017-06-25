@@ -13,9 +13,6 @@
                         <div class="col-md-4 text-left">
                             <h4>{{ request.user.get_full_name }}</h4>
                         </div>
-                        <div class="col-md-8 account-actions">
-                            <a class="btn" href="{% url 'users:profile_detail' user.slug %}"><i class="glyphicon glyphicon-eye-open"></i> My profile</a>
-                        </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12 profile-update">

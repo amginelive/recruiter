@@ -51,7 +51,11 @@
                             </li>
                         {% else %}
                             <li>
-                                <a href="{% url 'users:profile_detail' user.slug %}">{% trans "My Profile" %}</a>
+                                {% if user.account_type == user.ACCOUNT_CANDIDATE %}
+                                    <a href="{% url 'users:candidate_profile' user.slug %}">{% trans "My Profile" %}</a>
+                                {% elif user.account_type == user.ACCOUNT_AGENT %}
+                                    <a href="{% url 'companies:company_detail' user.agent.company.slug %}">{% trans "My Company" %}</a>
+                                {% endif %}
                             </li>
                             <li>
                                 <a href="{% url 'recruit:dashboard' %}">{% trans "My Dashboard" %}</a>

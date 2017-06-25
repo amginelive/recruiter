@@ -7,7 +7,7 @@ from . import (
 
 urlpatterns = (
     url(r'^profile/update/$', views.profile_update, name='profile_update'),
-    url(r'^profile/:slug/$', views.profile_detail, name='profile_detail'),
+    url(r'^profile/:slug/$', views.candidate_profile, name='candidate_profile'),
     url(r'^candidate/search/$', views.candidate_search, name='candidate_search'),
     url(r'^agent/search/$', views.agent_search, name='agent_search'),
     url(r'^settings/$', views.settings, name='settings'),

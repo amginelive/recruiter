@@ -205,7 +205,7 @@ class JobPostListView(AgentRequiredMixin, ListView):
     template_name = 'recruit/job_post_list.html'
 
     def get_queryset(self):
-        return JobPost.objects.filter(posted_by=self.request.user.agent).order_by('-updated_at')
+        return JobPost.objects.filter(posted_by__company=self.request.user.agent.company).order_by('-updated_at')
 
 job_post_list = JobPostListView.as_view()
 

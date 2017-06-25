@@ -5,7 +5,7 @@ from django.contrib.postgres.search import (
 )
 from django.core.urlresolvers import reverse_lazy
 from django.db.models import Q
-from django.http import HttpResponseRedirect, HttpResponseNotFound
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import (
     DetailView,
@@ -16,7 +16,6 @@ from django.views.generic import (
 from braces.views import LoginRequiredMixin
 
 from .forms import (
-    AgentPhotoUploadForm,
     AgentUpdateForm,
     CandidatePhotoUploadForm,
     CandidateUpdateForm,
@@ -30,7 +29,6 @@ from .models import (
 )
 from .utils import get_profile_completeness
 from chat.models import Message
-from companies.models import CompanyRequestInvitation
 from recruit.models import (
     Connection,
     ConnectionRequest,
@@ -102,32 +100,23 @@ class ProfileUpdateView(LoginRequiredMixin, View):
 profile_update = ProfileUpdateView.as_view()
 
 
-class ProfileDetailView(LoginRequiredMixin, DetailView):
+class CandidateProfileView(LoginRequiredMixin, DetailView):
     """
     View for viewing a user's profile.
     """
-
+    model = Candidate
     context_object_name = 'profile'
+    template_name = 'users/candidate_profile.html'
 
     def get_object(self):
-        user = User.objects.get(slug=self.kwargs.get('slug'))
-
-        if user.account_type == User.ACCOUNT_CANDIDATE:
-            return user.candidate
-        elif user.account_type == User.ACCOUNT_AGENT:
-            return user.agent
-
-    def get_template_names(self):
-        profile = self.get_object()
-
-        if profile.user.account_type == User.ACCOUNT_CANDIDATE:
-            return ['users/candidate_profile.html']
-        elif profile.user.account_type == User.ACCOUNT_AGENT:
-            return ['users/agent_profile.html']
+        return Candidate.objects.get(user__slug=self.kwargs.get('slug'))
 
     def get_context_data(self, *args, **kwargs):
-        context = super(ProfileDetailView, self).get_context_data(*args, **kwargs)
+        context = super(CandidateProfileView, self).get_context_data(*args, **kwargs)
         profile = self.get_object()
+
+        if self.request.user == profile.user:
+            context['profile_candidate_form'] = CandidateProfileDetailUpdateForm(instance=profile)
 
         context['user_note'] = UserNote
         context['user_notes'] = UserNote.objects\
@@ -142,47 +131,40 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
             ).exists()
         context['is_connected'] = is_connected
 
-        if profile.user.account_type == User.ACCOUNT_CANDIDATE:
-            context['skills'] = [skill.name for skill in Skill.objects.all()]
-            context['photo_form'] = CandidatePhotoUploadForm
-            context['completeness'] = get_profile_completeness(profile)
-            context['candidate_form'] = CandidateUpdateForm(instance=profile)
-            context['connection_request'] = ConnectionRequest
-            if self.request.user.account_type == User.ACCOUNT_AGENT:
-                messages_sent = Message.objects.filter(author=self.request.user).order_by('created_at')
-                context['first_contact_sent'] = messages_sent.first()
-                context['last_message_sent'] = messages_sent.last()
-                context['last_message_received'] = Message.objects\
-                    .filter(conversation__users=self.request.user)\
-                    .exclude(author=self.request.user)\
-                    .order_by('created_at')\
-                    .last()
-            if self.request.user == profile.user:
-                context['profile_candidate_form'] = CandidateProfileDetailUpdateForm(instance=profile)
-            if not is_connected:
-                connection_request = ConnectionRequest.objects.filter(
-                    (Q(connecter=self.request.user) & Q(connectee=profile.user)) |
-                    (Q(connecter=profile.user) & Q(connectee=self.request.user))
-                )
-                context['candidate_to_candidate_team_member_request'] = connection_request\
-                    .filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER)\
-                    .exists()
-                context['candidate_to_candidate_network_request'] = connection_request\
-                    .filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK)\
-                    .exists()
-                context['candidate_to_agent_team_member_request'] = connection_request\
-                    .filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_AGENT_NETWORK)\
-                    .exists()
+        if not is_connected:
+            connection_request = ConnectionRequest.objects.filter(
+                (Q(connecter=self.request.user) & Q(connectee=profile.user)) |
+                (Q(connecter=profile.user) & Q(connectee=self.request.user))
+            )
+            context['candidate_to_candidate_team_member_request'] = connection_request\
+                .filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER)\
+                .exists()
+            context['candidate_to_candidate_network_request'] = connection_request\
+                .filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK)\
+                .exists()
+            context['candidate_to_agent_team_member_request'] = connection_request\
+                .filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_AGENT_NETWORK)\
+                .exists()
 
-        elif profile.user.account_type == User.ACCOUNT_AGENT:
-            company = profile.company
-            context['company'] = company
-            context['invitation_requests'] = CompanyRequestInvitation.objects.filter(company=company)
-            context['photo_form'] = AgentPhotoUploadForm
+        context['skills'] = [skill.name for skill in Skill.objects.all()]
+        context['photo_form'] = CandidatePhotoUploadForm
+        context['completeness'] = get_profile_completeness(profile)
+        context['candidate_form'] = CandidateUpdateForm(instance=profile)
+        context['connection_request'] = ConnectionRequest
+
+        if self.request.user.account_type == User.ACCOUNT_AGENT:
+            messages_sent = Message.objects.filter(author=self.request.user).order_by('created_at')
+            context['first_contact_sent'] = messages_sent.first()
+            context['last_message_sent'] = messages_sent.last()
+            context['last_message_received'] = Message.objects\
+                .filter(conversation__users=self.request.user)\
+                .exclude(author=self.request.user)\
+                .order_by('created_at')\
+                .last()
 
         return context
 
-profile_detail = ProfileDetailView.as_view()
+candidate_profile = CandidateProfileView.as_view()
 
 
 class CandidateSearchView(CandidateRequiredMixin, TemplateView):

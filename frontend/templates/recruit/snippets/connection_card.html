@@ -8,7 +8,7 @@
                     <img src="{% if connection_user.agent.photo %}{{ connection_user.agent.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
                 </div>
                 <div class="col-md-8 text-left">
-                    <span class="search-info"><a href="{% url 'users:profile_detail' connection_user.slug %}">{{ connection_user.get_full_name }}</a></span>
+                    <span class="search-info"><a href="{% url 'companies:company_detail' connection_user.agent.company.slug %}?agent={{ connection_user.agent.pk }}">{{ connection_user.get_full_name }}</a></span>
                     <span class="search-info">{{ connection_user.agent.company.name|default_if_none:"" }}</span>
                     <span class="search-info">{{ connection_user.agent.company.location|default_if_none:"" }}</span>
                     {% if user.account_type == user.ACCOUNT_CANDIDATE %}
@@ -20,7 +20,7 @@
                     <img src="{% if connection_user.candidate.photo %}{{ connection_user.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
                 </div>
                 <div class="col-md-8 text-left">
-                    <span class="search-info"><a href="{% url 'users:profile_detail' connection_user.slug %}">{{ connection_user.get_full_name }}</a></span>
+                    <span class="search-info"><a href="{% url 'users:candidate_profile' connection_user.slug %}">{{ connection_user.get_full_name }}</a></span>
                     <span class="search-info">{{ connection_user.candidate.title|default_if_none:"" }}</span>
                     <span class="search-info">{{ connection_user.candidate.location|default_if_none:"" }}</span>
                     {% if user.account_type == user.ACCOUNT_CANDIDATE %}

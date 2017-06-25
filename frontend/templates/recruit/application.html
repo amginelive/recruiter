@@ -38,7 +38,7 @@
                                     <span class="job-post-title"><a href="{% url 'recruit:job_post_detail' job_application.job_post.uuid %}">{{ job_application.job_post.title }}</a></span>
                                     <span class="block">
                                         Posted by
-                                        <a href="{% url 'users:profile_detail' job_application.job_post.posted_by.user.slug %}">{{ job_application.job_post.posted_by }}</a>
+                                        <a href="{% url 'companies:company_detail' job_application.job_post.posted_by.company.slug %}?agent={{ job_application.job_post.posted_by.user.agent.pk }}">{{ job_application.job_post.posted_by }}</a>
                                     </span>
                                 </td>
                                 <td>
