@@ -1,11 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.contrib.humanize.templatetags.humanize import naturaltime
+from django.core import serializers
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.template.defaultfilters import date
 from django.views.generic import (
     CreateView,
     DeleteView,
+    ListView,
     UpdateView,
     View,
 )
@@ -197,3 +199,35 @@ class UserNoteDeleteAPIView(LoginRequiredMixin, DeleteView, JSONResponseMixin):
         return self.render_json_response({'success': True})
 
 user_note_delete = UserNoteDeleteAPIView.as_view()
+
+
+class UserNoteToListAPIView(LoginRequiredMixin, ListView, JSONResponseMixin):
+    """
+    View for returning the list of notes made for a user.
+    """
+    model = UserNote
+
+    def get_queryset(self):
+        return UserNote.objects.filter(note_to__pk=self.kwargs.get('pk'), note_by=self.request.user)
+
+    def get(self, request, *args, **kwargs):
+        user_notes = self.get_queryset()
+        data = [
+            {
+                'pk': user_note.pk,
+                'note_to': {
+                    'pk': user_note.note_to.pk,
+                },
+                'type': user_note.type,
+                'text': user_note.text,
+                'created_at': {
+                    'proper': date(user_note.created_at, 'D, F d, o P'),
+                    'timeago': naturaltime(user_note.created_at),
+                },
+                'csrf_token': get_token(self.request),
+            }
+            for user_note in user_notes
+        ]
+        return self.render_json_response({'data': data})
+
+user_note_to_list = UserNoteToListAPIView.as_view()

@@ -17,4 +17,5 @@ urlpatterns = (
     url(r'^user-note/create/api/$', api.user_note_create, name='user_note_create'),
     url(r'^user-note/:pk/update/api/$', api.user_note_update, name='user_note_update'),
     url(r'^user-note/:pk/delete/api/$', api.user_note_delete, name='user_note_delete'),
+    url(r'^user-note/to/:pk/api/$', api.user_note_to_list, name='user_note_to_list'),
 )
