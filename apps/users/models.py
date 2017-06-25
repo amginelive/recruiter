@@ -1,5 +1,6 @@
 import itertools
 import logging
+import os
 
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
@@ -314,6 +315,11 @@ class Candidate(ProfileBase):
     @property
     def candidate_skills(self):
         return self.core_skills.filter(candidate=self)
+
+    @property
+    def cv_file_name(self):
+        directory, file_name = os.path.split(self.cv.name)
+        return file_name
 
 
 class Agent(ProfileBase):
