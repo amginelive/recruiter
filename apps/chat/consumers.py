@@ -324,7 +324,7 @@ class ChatServer(JsonWebsocketConsumer):
             .get(id=payload.get('message_id')) \
             .created_at
         query = conversation.messages \
-            .exclude(group_invite__owner=self.message.user) \
+            .exclude(group_invite__conversation__owner=self.message.user) \
             .filter(created_at__lt=from_time) \
             .order_by('-created_at')
 
