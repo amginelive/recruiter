@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.contrib.auth import get_user_model
-from django.db.models import Q
+from django.db.models import Q, ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 
 from channels.generic.websockets import JsonWebsocketConsumer
@@ -107,9 +107,9 @@ class ChatServer(JsonWebsocketConsumer):
 
     def connect(self, message, **kwargs):
         if message.user.is_authenticated():
-            self.send({'accept': True})
+            self.message.reply_channel.send({'accept': True})
         else:
-            self.send({'close': True})
+            self.message.reply_channel.send({'close': True})
             return
 
         connections = Connection.objects \
@@ -170,6 +170,17 @@ class ChatServer(JsonWebsocketConsumer):
         users_count = len(response.get('chats').get('agents')) \
             + len(response.get('chats').get('candidates'))
         if kwargs.get('mode') != 'bg' and users_count > 0:
+            if kwargs.get('cid'):
+                try:
+                    init_conversation = self.message.user.participations \
+                        .filter(status=Participant.PARTICIPANT_ACCEPTED) \
+                        .get(conversation_id=int(kwargs.get('cid'))) \
+                        .conversation
+                    self.cmd_init(init_conversation.id)
+                    return
+                except ObjectDoesNotExist:
+                    pass
+
             last_conversation = self.message.user.participations \
                 .filter(status=Participant.PARTICIPANT_ACCEPTED) \
                 .order_by('updated_at') \
@@ -324,7 +335,7 @@ class ChatServer(JsonWebsocketConsumer):
             .get(id=payload.get('message_id')) \
             .created_at
         query = conversation.messages \
-            .exclude(group_invite__owner=self.message.user) \
+            .exclude(group_invite__conversation__owner=self.message.user) \
             .filter(created_at__lt=from_time) \
             .order_by('-created_at')
 

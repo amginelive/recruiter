@@ -18,7 +18,7 @@ const messageTypes = [
 }, {});
 
 const ws_schema = window.location.protocol === 'https:' ? 'wss' : 'ws';
-const uri = `${ws_schema}://${host}/chat/${window.location.pathname === '/chat/' ? '' : 'bg'}`;
+const uri = `${ws_schema}://${host}${window.location.pathname.startsWith('/chat/') ? window.location.pathname : '/chat/bg'}`;
 
 export {
     host,

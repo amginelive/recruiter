@@ -4,5 +4,5 @@ from . import views
 
 
 urlpatterns = (
-    url(r'^$', views.chat_view, name='chat'),
+    url(r'^(?P<cid>\d+)?$', views.chat_view, name='chat'),
 )
