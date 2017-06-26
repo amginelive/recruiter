@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.contrib.auth import get_user_model
-from django.db.models import Q
+from django.db.models import Q, ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 
 from channels.generic.websockets import JsonWebsocketConsumer
@@ -170,6 +170,17 @@ class ChatServer(JsonWebsocketConsumer):
         users_count = len(response.get('chats').get('agents')) \
             + len(response.get('chats').get('candidates'))
         if kwargs.get('mode') != 'bg' and users_count > 0:
+            if kwargs.get('cid'):
+                try:
+                    init_conversation = self.message.user.participations \
+                        .filter(status=Participant.PARTICIPANT_ACCEPTED) \
+                        .get(conversation_id=int(kwargs.get('cid'))) \
+                        .conversation
+                    self.cmd_init(init_conversation.id)
+                    return
+                except ObjectDoesNotExist:
+                    pass
+
             last_conversation = self.message.user.participations \
                 .filter(status=Participant.PARTICIPANT_ACCEPTED) \
                 .order_by('updated_at') \
