@@ -109,22 +109,6 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
 
     context_object_name = 'profile'
 
-    # def dispatch(self, request, *args, **kwargs):
-    #     user = self.get_object().user
-    #     if request.user != user:
-    #         is_connected = Connection.objects.filter(
-    #             (Q(connecter=self.request.user) & Q(connectee=user)) |
-    #             (Q(connecter=user) & Q(connectee=self.request.user))
-    #         ).filter(connection_type__in=[
-    #             Connection.CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK,
-    #             Connection.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER,
-    #             Connection.CONNECTION_AGENT_TO_AGENT_NETWORK,
-    #         ]).exists()
-
-    #         if request.user.is_authenticated and not is_connected:
-    #             return HttpResponseNotFound('You are not connected to this user.')
-    #     return super(ProfileDetailView, self).dispatch(request, *args, **kwargs)
-
     def get_object(self):
         user = User.objects.get(slug=self.kwargs.get('slug'))
 
@@ -149,16 +133,21 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         context['user_notes'] = UserNote.objects\
             .filter(note_by=self.request.user, note_to=profile.user)\
             .order_by('-created_at')
-        context['is_connected'] = Connection.objects.filter(
-            (Q(connecter=self.request.user) & Q(connectee=profile.user)) |
-            (Q(connecter=profile.user) & Q(connectee=self.request.user))
-        ).exists()
+
+        is_connected = True
+        if self.request.user != profile.user:
+            is_connected = Connection.objects.filter(
+                (Q(connecter=self.request.user) & Q(connectee=profile.user)) |
+                (Q(connecter=profile.user) & Q(connectee=self.request.user))
+            ).exists()
+        context['is_connected'] = is_connected
 
         if profile.user.account_type == User.ACCOUNT_CANDIDATE:
             context['skills'] = [skill.name for skill in Skill.objects.all()]
             context['photo_form'] = CandidatePhotoUploadForm
             context['completeness'] = get_profile_completeness(profile)
             context['candidate_form'] = CandidateUpdateForm(instance=profile)
+            context['connection_request'] = ConnectionRequest
             if self.request.user.account_type == User.ACCOUNT_AGENT:
                 messages_sent = Message.objects.filter(author=self.request.user).order_by('created_at')
                 context['first_contact_sent'] = messages_sent.first()
@@ -170,6 +159,20 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
                     .last()
             if self.request.user == profile.user:
                 context['profile_candidate_form'] = CandidateProfileDetailUpdateForm(instance=profile)
+            if not is_connected:
+                connection_request = ConnectionRequest.objects.filter(
+                    (Q(connecter=self.request.user) & Q(connectee=profile.user)) |
+                    (Q(connecter=profile.user) & Q(connectee=self.request.user))
+                )
+                context['candidate_to_candidate_team_member_request'] = connection_request\
+                    .filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER)\
+                    .exists()
+                context['candidate_to_candidate_network_request'] = connection_request\
+                    .filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK)\
+                    .exists()
+                context['candidate_to_agent_team_member_request'] = connection_request\
+                    .filter(connection_type=ConnectionRequest.CONNECTION_CANDIDATE_TO_AGENT_NETWORK)\
+                    .exists()
 
         elif profile.user.account_type == User.ACCOUNT_AGENT:
             company = profile.company
