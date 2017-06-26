@@ -107,9 +107,9 @@ class ChatServer(JsonWebsocketConsumer):
 
     def connect(self, message, **kwargs):
         if message.user.is_authenticated():
-            self.send({'accept': True})
+            self.message.reply_channel.send({'accept': True})
         else:
-            self.send({'close': True})
+            self.message.reply_channel.send({'close': True})
             return
 
         connections = Connection.objects \
