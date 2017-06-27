@@ -507,10 +507,12 @@ class ChatServer(JsonWebsocketConsumer):
                 or participant.status != Participant.PARTICIPANT_ACCEPTED:
             return
 
-        if conversation.owner == self.message.user and conversation.users.count() > 1:
-            any_other_user = conversation.users \
-                .exclude(id=self.message.user.id) \
-                .first()
+        active_participants = conversation.participants.filter(status=Participant.PARTICIPANT_ACCEPTED)
+        if conversation.owner == self.message.user and active_participants.count() > 1:
+            any_other_user = active_participants \
+                .exclude(user=self.message.user) \
+                .first() \
+                .user
             conversation.owner = any_other_user
             try:
                 conversation.full_clean()
@@ -518,7 +520,7 @@ class ChatServer(JsonWebsocketConsumer):
                 return
             conversation.save()
 
-        if conversation.users.count() == 1:
+        if active_participants.count() == 1:
             conversation.delete()
         else:
             participant.delete()
