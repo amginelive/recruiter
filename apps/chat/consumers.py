@@ -46,11 +46,11 @@ class ChatServer(JsonWebsocketConsumer):
             last_message_text = ''
             last_message_time = datetime.fromtimestamp(0).isoformat()
         return {
-            'users': [
-                participant.user.id
+            'users': {
+                participant.user.id: {'status': participant.status}
                 for participant
                 in group_chat.participants.all()
-            ],
+            },
             'name': group_chat.name,
             'unread': unread,
             'last_message_time': last_message_time,
