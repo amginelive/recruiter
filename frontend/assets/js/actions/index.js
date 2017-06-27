@@ -65,3 +65,9 @@ export function answerInvite(payload) {
         emit(messageTypes.answerInvite, payload);
     }
 }
+
+export function leaveGroup() {
+    return (dispatch, getState, {emit}) => {
+        emit(messageTypes.leaveGroup, {});
+    }
+}

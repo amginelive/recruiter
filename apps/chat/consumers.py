@@ -64,13 +64,15 @@ class ChatServer(JsonWebsocketConsumer):
             .last_read_message
         if last_read_message:
             unread = conversation.messages \
-                .exclude(group_invite__conversation__owner=self.message.user) \
+                .exclude(Q(group_invite__isnull=False) &
+                         Q(author=self.message.user)) \
                 .filter(created_at__gt=last_read_message.created_at) \
                 .count()
         else:
             unread = conversation.messages.all().count()
         last_message = conversation.messages \
-            .exclude(group_invite__conversation__owner=self.message.user) \
+            .exclude(Q(group_invite__isnull=False) &
+                     Q(author=self.message.user)) \
             .order_by('created_at') \
             .last()
         if last_message:
@@ -255,6 +257,8 @@ class ChatServer(JsonWebsocketConsumer):
             self.cmd_create_group(content.get('payload'))
         elif content.get('type') == 'answerInvite':
             self.cmd_answer_invite(content.get('payload'))
+        elif content.get('type') == 'leaveGroup':
+            self.cmd_leave_group()
 
     def cmd_init(self, payload):
         conversation = self.message.user.participations.get(
@@ -263,7 +267,8 @@ class ChatServer(JsonWebsocketConsumer):
             return
         self.message.channel_session['conversation'] = conversation
         query = Message.objects.filter(conversation=conversation) \
-            .exclude(group_invite__conversation__owner=self.message.user)
+            .exclude(Q(group_invite__isnull=False) &
+                     Q(author=self.message.user))
         messages = []
         more = query.count() > self.message_list_limit
         last_messages = query.order_by('-created_at')[:self.message_list_limit]
@@ -335,7 +340,8 @@ class ChatServer(JsonWebsocketConsumer):
             .get(id=payload.get('message_id')) \
             .created_at
         query = conversation.messages \
-            .exclude(group_invite__conversation__owner=self.message.user) \
+            .exclude(Q(group_invite__isnull=False) &
+                     Q(author=self.message.user)) \
             .filter(created_at__lt=from_time) \
             .order_by('-created_at')
 
@@ -493,6 +499,40 @@ class ChatServer(JsonWebsocketConsumer):
                     }
                 }
             )
+
+    def cmd_leave_group(self):
+        conversation = self.message.channel_session.get('conversation')
+        participant = conversation.participants.get(user=self.message.user)
+        if conversation.conversation_type != Conversation.CONVERSATION_GROUP \
+                or participant.status != Participant.PARTICIPANT_ACCEPTED:
+            return
+
+        if conversation.owner == self.message.user and conversation.users.count() > 1:
+            any_other_user = conversation.users \
+                .exclude(id=self.message.user.id) \
+                .first()
+            conversation.owner = any_other_user
+            try:
+                conversation.full_clean()
+            except ValidationError:
+                return
+            conversation.save()
+
+        if conversation.users.count() == 1:
+            conversation.delete()
+        else:
+            participant.delete()
+
+        self.group_send(str(self.message.user.id), {
+            'type': 'leaveGroup',
+            'payload': conversation.id
+        })
+        last_conversation = self.message.user.participations \
+            .filter(status=Participant.PARTICIPANT_ACCEPTED) \
+            .order_by('updated_at') \
+            .last() \
+            .conversation
+        self.cmd_init(last_conversation.id)
 
     def disconnect(self, message, **kwargs):
         self.cmd_idle(False)

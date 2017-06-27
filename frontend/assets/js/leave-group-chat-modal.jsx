@@ -12,7 +12,7 @@ class LeaveGroupChatModal extends React.Component {
     }
 
     handleLeave() {
-        this.props.onLeave(this.props.group_id);
+        this.props.onLeave();
     }
 
     render() {

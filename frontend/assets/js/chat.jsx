@@ -50,8 +50,8 @@ class App extends React.Component {
         this.setState({showCreateGroupChatModal: false});
     }
 
-    handleLeaveGroup(conversation_id) {
-        //this.props.actions.leaveGroup(conversation_id);
+    handleLeaveGroup() {
+        this.props.actions.leaveGroup();
         this.setState({showLeaveGroupChatModal: false});
     }
 
@@ -68,7 +68,6 @@ class App extends React.Component {
                     showModal={this.state.showLeaveGroupChatModal}
                     onClose={this.handleCloseLeaveGroupChatModal.bind(this)}
                     onLeave={this.handleLeaveGroup.bind(this)}
-                    group_id={this.props.chats.get('activeChat')}
                 />
                 <div className ='chat-container'>
                     <UserList createGroupModal={this.handleOpenCreateGroupChatModal.bind(this)} setChatInitPendingState={this.setChatInitPendingState.bind(this)} />
@@ -89,8 +88,7 @@ class App extends React.Component {
 
 function mapStateToProps (state) {
     return {
-        users: state.get('users'),
-        chats: state.get('chats')
+        users: state.get('users')
     };
 }
 
