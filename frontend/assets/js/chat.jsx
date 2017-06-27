@@ -7,7 +7,9 @@ import UserList from './user-list.jsx';
 import MessageList from './message-list.jsx';
 import MessageForm from './message-send-form.jsx';
 import TypingList from './typing-list.jsx';
-import GroupChatModal from './group-chat-modal.jsx';
+import CreateGroupChatModal from './create-group-chat-modal.jsx';
+import LeaveGroupChatModal from './leave-group-chat-modal.jsx';
+import ChatHeader from './chat-header.jsx';
 
 import '../css/chat.scss';
 
@@ -18,7 +20,8 @@ class App extends React.Component {
 
         this.state = {
             chatInitPending: false,
-            showModal: false
+            showCreateGroupChatModal: false,
+            showLeaveGroupChatModal: false
         };
     }
 
@@ -26,31 +29,51 @@ class App extends React.Component {
         this.setState({chatInitPending: state});
     }
 
-    handleOpenModal () {
-        this.setState({ showModal: true });
+    handleOpenCreateGroupChatModal () {
+        this.setState({showCreateGroupChatModal: true});
     }
 
-    handleCloseModal () {
-        this.setState({ showModal: false });
+    handleCloseCreateGroupChatModal () {
+        this.setState({showCreateGroupChatModal: false});
+    }
+
+    handleOpenLeaveGroupChatModal () {
+        this.setState({showLeaveGroupChatModal: true});
+    }
+
+    handleCloseLeaveGroupChatModal () {
+        this.setState({showLeaveGroupChatModal: false});
     }
 
     handleCreateGroup(user_ids, name, message) {
         this.props.actions.createGroup({user_ids, name, message});
-        this.setState({ showModal: false });
+        this.setState({showCreateGroupChatModal: false});
+    }
+
+    handleLeaveGroup(conversation_id) {
+        //this.props.actions.leaveGroup(conversation_id);
+        this.setState({showLeaveGroupChatModal: false});
     }
 
     render() {
         return (
             <div className='app-container'>
-                <GroupChatModal
-                    showModal={this.state.showModal}
-                    onClose={this.handleCloseModal.bind(this)}
+                <CreateGroupChatModal
+                    showModal={this.state.showCreateGroupChatModal}
+                    onClose={this.handleCloseCreateGroupChatModal.bind(this)}
                     onCreate={this.handleCreateGroup.bind(this)}
                     users={this.props.users}
                 />
+                <LeaveGroupChatModal
+                    showModal={this.state.showLeaveGroupChatModal}
+                    onClose={this.handleCloseLeaveGroupChatModal.bind(this)}
+                    onLeave={this.handleLeaveGroup.bind(this)}
+                    group_id={this.props.chats.get('activeChat')}
+                />
                 <div className ='chat-container'>
-                    <UserList createGroupModal={this.handleOpenModal.bind(this)} setChatInitPendingState={this.setChatInitPendingState.bind(this)} />
+                    <UserList createGroupModal={this.handleOpenCreateGroupChatModal.bind(this)} setChatInitPendingState={this.setChatInitPendingState.bind(this)} />
                     <div className='app-inner-column'>
+                        <ChatHeader leaveGroupModal={this.handleOpenLeaveGroupChatModal.bind(this)} />
                         <MessageList setChatInitPendingState={this.setChatInitPendingState.bind(this)}
                                      chatInitPending={this.state.chatInitPending}
                         />
@@ -66,7 +89,8 @@ class App extends React.Component {
 
 function mapStateToProps (state) {
     return {
-        users: state.get('users')
+        users: state.get('users'),
+        chats: state.get('chats')
     };
 }
 

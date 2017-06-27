@@ -49,7 +49,7 @@ class ChatServer(JsonWebsocketConsumer):
             'users': [
                 participant.user.id
                 for participant
-                in group_chat.participants.exclude(user=self.message.user)
+                in group_chat.participants.all()
             ],
             'name': group_chat.name,
             'unread': unread,

@@ -122,6 +122,34 @@ $primary-color: #ffc211;
   content: '▪ Add at least one person';
 }
 
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-size: 1.6rem;
+  padding: 11.5px;
+  background: whitesmoke;
+  border: 1px solid #999;
+  border-bottom: 0;
+}
+
+.chat-header-names {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.chat-header-actions {
+  font-size: 2.8rem;
+}
+
+.chat-header-actions > span {
+  color: #37a000;
+  cursor: pointer;
+  margin-left: 15px;
+}
+
 .app-container {
   display: flex;
   flex-direction: row;
