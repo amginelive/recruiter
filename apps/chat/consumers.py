@@ -522,15 +522,16 @@ class ChatServer(JsonWebsocketConsumer):
                 return
             conversation.save()
 
+        self.group_send(str(self.message.user.id), {
+            'type': 'leaveGroup',
+            'payload': conversation.id
+        })
+
         if active_participants.count() == 1:
             conversation.delete()
         else:
             participant.delete()
 
-        self.group_send(str(self.message.user.id), {
-            'type': 'leaveGroup',
-            'payload': conversation.id
-        })
         last_conversation = self.message.user.participations \
             .filter(status=Participant.PARTICIPANT_ACCEPTED) \
             .order_by('updated_at') \
