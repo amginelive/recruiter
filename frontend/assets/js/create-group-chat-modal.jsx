@@ -215,7 +215,7 @@ class CreateGroupChatModal extends React.Component {
         }
         return (
             <ReactModal
-                isOpen={this.props.showCreateGroupChatModal}
+                isOpen={this.props.showModal}
                 contentLabel='Create group chat'
                 onRequestClose={this.handleClose.bind(this)}
                 style={{
