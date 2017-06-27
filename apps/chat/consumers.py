@@ -236,7 +236,9 @@ class ChatServer(JsonWebsocketConsumer):
         }
 
     def receive(self, content, **kwargs):
-        if content.get('type') not in ['userIdle', 'userPresence']:
+        if content.get('type') not in ['userIdle', 'userPresence'] \
+                or (content.get('type') == 'userIdle'
+                    and not content.get('payload')):
             update_user_presence(self.message.user)
 
         if content.get('type') == 'initChat':
