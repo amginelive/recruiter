@@ -3,7 +3,7 @@ import ReactModal from 'react-modal';
 import { Scrollbars } from 'react-custom-scrollbars';
 
 
-class GroupChatModal extends React.Component {
+class CreateGroupChatModal extends React.Component {
     constructor(props) {
         super(props);
 
@@ -282,4 +282,4 @@ class GroupChatModal extends React.Component {
     }
 }
 
-export default GroupChatModal;
+export default CreateGroupChatModal;

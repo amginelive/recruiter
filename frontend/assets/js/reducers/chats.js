@@ -61,6 +61,9 @@ const chats = (state = new Immutable.Map().withMutations(ctx => ctx.set('activeC
         const {id, extra, ...payload} = action.payload;
         return sortChatsMap(state.setIn(['groups', id.toString()], Immutable.fromJS(payload)));
     }
+    if (action.type === messageTypes.leaveGroup) {
+        return sortChatsMap(state.deleteIn(['groups', action.payload.toString()]));
+    }
     return state;
 };
 
