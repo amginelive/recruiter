@@ -472,6 +472,7 @@ class ChatServer(JsonWebsocketConsumer):
                     'type': 'answerInvite',
                     'payload': {
                         'accept': True,
+                        'group_id': participant.conversation.id,
                         'conversation_id': current_conversation.id
                     }
                 }
