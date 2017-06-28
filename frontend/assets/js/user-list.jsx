@@ -33,7 +33,7 @@ class UserList extends React.Component {
     }
 
     chatInit(id) {
-        if (id === this.props.chats.get('activeChat')) {
+        if (parseInt(id) === this.props.chats.get('activeChat')) {
             return;
         }
         this.props.setChatInitPendingState(true);

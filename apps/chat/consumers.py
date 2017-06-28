@@ -46,12 +46,13 @@ class ChatServer(JsonWebsocketConsumer):
             last_message_text = ''
             last_message_time = datetime.fromtimestamp(0).isoformat()
         return {
-            'users': [
-                participant.user.id
+            'users': {
+                participant.user.id: {'status': participant.status}
                 for participant
                 in group_chat.participants.all()
-            ],
+            },
             'name': group_chat.name,
+            'owner': group_chat.owner.id,
             'unread': unread,
             'last_message_time': last_message_time,
             'last_message_text': last_message_text
@@ -522,15 +523,16 @@ class ChatServer(JsonWebsocketConsumer):
                 return
             conversation.save()
 
+        self.group_send(str(self.message.user.id), {
+            'type': 'leaveGroup',
+            'payload': conversation.id
+        })
+
         if active_participants.count() == 1:
             conversation.delete()
         else:
             participant.delete()
 
-        self.group_send(str(self.message.user.id), {
-            'type': 'leaveGroup',
-            'payload': conversation.id
-        })
         last_conversation = self.message.user.participations \
             .filter(status=Participant.PARTICIPANT_ACCEPTED) \
             .order_by('updated_at') \

@@ -19,12 +19,12 @@ class ChatHeader extends React.Component {
             UI = (
                 <div className='chat-header'>
                     <div className='chat-header-names'>
-                        {participants.map((user_id, index) => {
-                            return <span key={user_id}>{users.get(user_id.toString()).get('name') + (index + 1 !== participants.size ? ', ' : '')}</span>
-                        })}
+                        {participants.mapEntries((entry, index) => {
+                            return [index, <span key={entry[0]}>{users.get(entry[0].toString()).get('name') + (index + 1 !== participants.size ? ', ' : '')}</span>]
+                        }).toArray()}
                     </div>
                     <div className='chat-header-actions'>
-                        <span className='glyphicon glyphicon-user'></span>
+                        <span className='glyphicon glyphicon-user' onClick={this.props.infoGroupModal}></span>
                         <span className='glyphicon glyphicon-log-out' onClick={this.props.leaveGroupModal}></span>
                     </div>
                 </div>
