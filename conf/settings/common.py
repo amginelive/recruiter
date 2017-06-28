@@ -360,6 +360,11 @@ LOGGING = {
     },
 
     'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
         'mail_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler'
@@ -383,12 +388,12 @@ LOGGING = {
             'propagate': False,
         },
         'django.request': {
-            'handlers': ['mail_admins'],
+            'handlers': ['mail_admins', 'console'],
             'level': 'INFO',
             'propagate': False
         },
         'debug_log': {
-            'handlers': ['debug_log_file'],
+            'handlers': ['debug_log_file', 'console'],
             'level': 'DEBUG',
             'propagate': False
         },
