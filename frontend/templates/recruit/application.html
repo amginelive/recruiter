@@ -1,6 +1,6 @@
 {% extends 'users/index.html' %}
 
-{% load staticfiles i18n humanize %}
+{% load staticfiles i18n humanize chat_tags %}
 
 {% block content %}
 <section id="internal-wrap">
@@ -49,7 +49,8 @@
                                     {{ job_application.created_at|date:"d/m/y" }}
                                 </td>
                                 <td>{{ job_application.status }}</td>
-                                <td><a href="{% url 'chat:chat' %}"><i class="glyphicon glyphicon-envelope"></i></strong></a></td>
+                                {% get_user_conversation user job_application.job_post.posted_by.user as conversation %}
+                                <td><a href="{% url 'chat:chat' conversation.pk %}"><i class="glyphicon glyphicon-envelope"></i></strong></a></td>
                             </tr>
                         {% empty %}
                             <tr class="text-center">

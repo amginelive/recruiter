@@ -1,6 +1,6 @@
 {% extends 'users/index.html' %}
 
-{% load staticfiles i18n bootstrap humanize jsonify %}
+{% load staticfiles i18n bootstrap humanize jsonify chat_tags %}
 
 {% block extra_css %}
 <link href="{% static 'css/cropper.min.css' %}" rel="stylesheet">
@@ -27,7 +27,8 @@
                                 <a href="#">Send job to me</a>
                             </div>
                             <div class="col-md-4">
-                                <a href="{% url 'chat:chat' %}">Message me</a>
+                                {% get_user_conversation user profile.user as conversation %}
+                                <a href="{% url 'chat:chat' conversation.pk %}">Message me</a>
                             </div>
                         {% endif %}
                     </div>

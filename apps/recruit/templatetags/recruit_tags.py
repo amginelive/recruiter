@@ -7,6 +7,7 @@ from django.template import Library
 
 from recruit.models import Connection
 
+
 register = Library()
 
 
