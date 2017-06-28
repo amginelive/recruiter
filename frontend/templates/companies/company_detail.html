@@ -1,6 +1,6 @@
 {% extends 'users/index.html' %}
 
-{% load staticfiles i18n bootstrap humanize %}
+{% load staticfiles i18n bootstrap humanize chat_tags %}
 
 {% block extra_css %}
 <link href="{% static 'css/cropper.min.css' %}" rel="stylesheet">
@@ -25,7 +25,8 @@
                         <div class="col-md-4"></div>
                     {% endif %}
                     <div class="col-md-4 text-right">
-                        <a href="{% url 'chat:chat' %}">Message me</a>
+                        {% get_user_conversation user current_agent.user as conversation %}
+                        <a href="{% url 'chat:chat' conversation.pk %}" class="message-agent">Message me</a>
                     </div>
                 </div>
                 {% if user.account_type == user.ACCOUNT_CANDIDATE %}
@@ -41,6 +42,7 @@
                         <div class="col-md-4 text-center">
                             <span class="hidden authenticated-user">{{ user.pk }}</span>
                             <span class="hidden company-owner">{{ company.owner.user.pk }}</span>
+                            <span class="hidden current-agent-conversation">{{ conversation.pk }}</span>
                             <h4 class="current-agent-name">{{ current_agent.user.get_full_name }}</h4>
                             <img
                                 class="current-agent-photo"
@@ -80,13 +82,15 @@
                                 <div class="text-center">
                                     {% for agent in company.agents.all %}
                                         {% if agent != current_agent %}
+                                            {% get_user_conversation user agent.user as conversation %}
                                             <img
                                                 class="agent_photo agent-staff-photo"
                                                 src="{% if agent.photo %}{{ agent.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}"
                                                 data-toggle="tooltip"
                                                 data-placement="top"
                                                 title="{{ agent.user.get_full_name }}"
-                                                data-user-pk="{{ agent.user.pk }}">
+                                                data-user-pk="{{ agent.user.pk }}"
+                                                data-conversation-pk="{{ conversation.pk }}">
                                         {% endif %}
                                     {% endfor %}
                                 </div>
@@ -165,14 +169,18 @@
         var current_agent_photo = current_agent.attr('src');
         var current_user_pk = current_agent.attr('data-user-pk');
         var current_agent_name = $('.current-agent-name').html();
+        var current_agent_conversation_pk = $('.current-agent-conversation').html();
 
         var agent_staff_photo = $(this).attr('src');
         var agent_staff_pk = $(this).attr('data-user-pk');
         var agent_staff_name = $(this).attr('data-original-title');
+        var agent_staff_conversation_pk = $(this).attr('data-conversation-pk');
 
         current_agent.attr('src', agent_staff_photo);
         current_agent.attr('data-user-pk', agent_staff_pk);
         $('.current-agent-name').html(agent_staff_name);
+        $('.current-agent-conversation').html(agent_staff_conversation_pk);
+        $('.message-agent').attr('href', Urls['chat:chat'](agent_staff_conversation_pk));
 
         $(this).attr('src', current_agent_photo);
         $(this).attr('data-user-pk', current_user_pk);
