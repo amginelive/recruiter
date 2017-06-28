@@ -3,13 +3,16 @@
 <div class="col-md-4 tracking-section">
     <div class="row auto-tracking-section">
         <div class="tracking-item">
-            <span class="orange-text">First contact sent: </span>{{ first_contact_sent.created_at|date:"d/m/y" }}
+            <span class="orange-text">First contact sent:</span>
+            <span class="tracking-first-contact-sent">{{ first_contact_sent.created_at|date:"d/m/y" }}</span>
         </div>
         <div class="tracking-item">
-            <span class="orange-text">Last message sent: </span>{{ last_message_sent.created_at|date:"d/m/y" }}
+            <span class="orange-text">Last message sent:</span>
+            <span class="tracking-last-message-sent">{{ last_message_sent.created_at|date:"d/m/y" }}</span>
         </div>
         <div class="tracking-item">
-            <span class="orange-text">Last message received: </span>{{ last_message_received.created_at|date:"d/m/y" }}
+            <span class="orange-text">Last message received:</span>
+            <span class="tracking-last-received-sent">{{ last_message_received.created_at|date:"d/m/y" }}</span>
         </div>
     </div>
     <div class="row manual-tracking-section hidden">

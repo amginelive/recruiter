@@ -22,7 +22,10 @@ from .models import (
     CompanyInvitation,
     CompanyRequestInvitation,
 )
-from chat.models import Message
+from chat.models import (
+    Conversation,
+    Message,
+)
 from users.forms import AgentPhotoUploadForm
 from users.mixins import AgentRequiredMixin
 from users.models import (
@@ -190,21 +193,25 @@ class CompanyDetailView(LoginRequiredMixin, DetailView):
             .filter(note_by=self.request.user, note_to=current_agent.user)\
             .order_by('-created_at')
 
-        messages = Message.objects.filter(author=self.request.user).order_by('created_at')
-        context['first_contact_sent'] = messages.first()
-        context['last_message_sent'] = messages.last()
-        context['last_message_received'] = Message.objects\
-            .filter(conversation__users=self.request.user)\
-            .exclude(author=self.request.user)\
-            .order_by('created_at')\
-            .last()
+        messages = Message.objects\
+            .filter(conversation__users=current_agent.user)\
+            .filter(conversation__conversation_type=Conversation.CONVERSATION_USER)\
+            .order_by('created_at')
+
+        sent = messages.filter(author=self.request.user)
+        context['first_contact_sent'] = sent.first()
+
+        received = messages.exclude(author=self.request.user)
+        context['last_message_sent'] = sent.last()
+        context['last_message_received'] = received.last()
 
         company_agent_users = [company_agent.user for company_agent in company.agents.all()]
         if self.request.user not in company_agent_users:
-            context['last_person_in_contact'] = messages\
-                .annotate(participant_count=Count('conversation__participants'))\
-                .filter(participant_count=2)\
+            context['last_person_in_contact'] = Message.objects\
                 .filter(conversation__users__in=company_agent_users)\
+                .filter(conversation__conversation_type=Conversation.CONVERSATION_USER)\
+                .filter(author=self.request.user)\
+                .order_by('created_at')\
                 .last().conversation.participants.exclude(user=self.request.user).first()
             context['last_person_added_manual_track'] = UserNote.objects\
                 .filter(note_by=self.request.user)\

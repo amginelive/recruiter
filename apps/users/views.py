@@ -28,7 +28,10 @@ from .models import (
     UserNote,
 )
 from .utils import get_profile_completeness
-from chat.models import Message
+from chat.models import (
+    Conversation,
+    Message,
+)
 from recruit.models import (
     Connection,
     ConnectionRequest,
@@ -153,14 +156,17 @@ class CandidateProfileView(LoginRequiredMixin, DetailView):
         context['connection_request'] = ConnectionRequest
 
         if self.request.user.account_type == User.ACCOUNT_AGENT:
-            messages_sent = Message.objects.filter(author=self.request.user).order_by('created_at')
-            context['first_contact_sent'] = messages_sent.first()
-            context['last_message_sent'] = messages_sent.last()
-            context['last_message_received'] = Message.objects\
-                .filter(conversation__users=self.request.user)\
-                .exclude(author=self.request.user)\
-                .order_by('created_at')\
-                .last()
+            messages = Message.objects\
+            .filter(conversation__users=profile.user)\
+            .filter(conversation__conversation_type=Conversation.CONVERSATION_USER)\
+            .order_by('created_at')
+
+            sent = messages.filter(author=self.request.user)
+            context['first_contact_sent'] = sent.first()
+
+            received = messages.exclude(author=self.request.user)
+            context['last_message_sent'] = sent.last()
+            context['last_message_received'] = received.last()
 
         return context
 

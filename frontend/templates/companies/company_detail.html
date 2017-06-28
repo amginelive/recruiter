@@ -13,9 +13,6 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-7 text-center profile-navigation">
-                    <div class="col-md-4 text-left">
-                        <a href="{% url 'chat:chat' %}">Message me</a>
-                    </div>
                     {% if user.account_type == user.ACCOUNT_CANDIDATE %}
                         <div class="col-md-4 text-left">
                             <span><strong>Last Person in contact:</strong> {{ last_person_in_contact.user.get_full_name }}</span>
@@ -23,7 +20,13 @@
                         <div class="col-md-4 text-left">
                             <span><strong>Last Person added manual track to:</strong> {{ last_person_added_manual_track.get_full_name }}</span>
                         </div>
+                    {% else %}
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4"></div>
                     {% endif %}
+                    <div class="col-md-4 text-right">
+                        <a href="{% url 'chat:chat' %}">Message me</a>
+                    </div>
                 </div>
                 {% if user.account_type == user.ACCOUNT_CANDIDATE %}
                     <div class="col-md-4 text-center tracking-button-switcher">
@@ -184,11 +187,17 @@
         $('#id_note_to').val(agent_staff_pk);
         $.ajax({
             type: 'GET',
-            url: Urls['users:user_note_to_list'](agent_staff_pk),
+            url: Urls['users:tracking'](agent_staff_pk),
             dataType: 'json',
             success: function(response) {
+                // auto tracking
+                $('.tracking-first-contact-sent').html(response.data.auto_tracking.first_contact_sent);
+                $('.tracking-last-message-sent').html(response.data.auto_tracking.last_message_sent);
+                $('.tracking-last-received-sent').html(response.data.auto_tracking.last_message_received);
+
+                // manual tracking
                 var html = '';
-                $.each(response.data, function(key, value) {
+                $.each(response.data.user_notes, function(key, value) {
                     var type = '';
                     if (value.type == 1)
                         type = '<i class="glyphicon glyphicon-phone"></i>';
