@@ -52,6 +52,7 @@ class ChatServer(JsonWebsocketConsumer):
                 in group_chat.participants.all()
             },
             'name': group_chat.name,
+            'owner': group_chat.owner.id,
             'unread': unread,
             'last_message_time': last_message_time,
             'last_message_text': last_message_text

@@ -12,7 +12,9 @@ const messageTypes = [
     'readMessage',
     'createGroup',
     'answerInvite',
-    'leaveGroup'
+    'leaveGroup',
+    'kickUser',
+    'inviteUser'
 ].reduce((accum, msg) => {
     accum[ msg ] = msg;
     return accum;

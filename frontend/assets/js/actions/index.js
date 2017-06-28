@@ -71,3 +71,15 @@ export function leaveGroup() {
         emit(messageTypes.leaveGroup, {});
     }
 }
+
+export function kickUser(user_id) {
+    return (dispatch, getState, {emit}) => {
+        emit(messageTypes.kickUser, user_id);
+    }
+}
+
+export function inviteUser(user_id) {
+    return (dispatch, getState, {emit}) => {
+        emit(messageTypes.inviteUser, user_id);
+    }
+}
