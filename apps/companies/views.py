@@ -218,7 +218,7 @@ class CompanyDetailView(LoginRequiredMixin, DetailView):
             last_user_note = UserNote.objects\
                 .filter(note_by=self.request.user)\
                 .filter(note_to__in=company_agent_users)\
-                .last().note_to
+                .last()
             context['last_person_added_manual_track'] = last_user_note.note_to if last_user_note else None
 
         return context
