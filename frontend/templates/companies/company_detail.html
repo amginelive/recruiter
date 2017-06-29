@@ -54,9 +54,7 @@
                                 <div class="photo-upload-inputs">
                                     {{ photo_form }}
                                 </div>
-                                {% if user == current_agent.user %}
-                                    <button type="button" class="btn" id="photo_upload_btn" OnClick="javascript:void(0)">{% trans "Update Photo" %}</button>
-                                {% endif %}
+                                <button type="button" class="btn {% if user != current_agent.user %}hidden{% endif %}" id="photo_upload_btn" OnClick="javascript:void(0)">{% trans "Update Photo" %}</button>
                             </form>
 
                         </div>
