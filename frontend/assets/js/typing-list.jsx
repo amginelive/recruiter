@@ -36,11 +36,25 @@ class TypingList extends React.Component {
 
     render() {
         const { typing } = this.props;
+        let typingUI = <div />;
+        if (typing.get('typingMap').size > 1) {
+            let typingString = '';
+            typing.get('typingMap').reduce(
+                (result, user) => {
+                    if (typingString.length !== 0) {
+                        typingString += ', '
+                    }
+                    typingString += user.get('user_name');
+                },
+                typingString
+            );
+            typingUI = <div className='user-type-list-item'>{`${typingString} are typing...`}</div>;
+        } else if (typing.get('typingMap').size === 1) {
+            typingUI = <div className='user-type-list-item'>{typing.get('typingMap').first().get('user_name') + ' is typing...'}</div>;
+        }
         return (
             <div className='user-type-list'>
-                {typing.get('typingMap').map((user, index) => {
-                    return <div key={index} className='user-type-list-item'>{user.get('user_name') + ' is typing...'}</div> // TODO: obviously we want one string here.
-                }).toArray()}
+                {typingUI}
             </div>
         );
     }
