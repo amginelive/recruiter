@@ -1,7 +1,3 @@
-from __future__ import (
-    absolute_import,
-)
-
 from django.template import Library
 
 from chat.models import Conversation
