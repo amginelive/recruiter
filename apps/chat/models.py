@@ -21,11 +21,11 @@ class Message(AbstractTimeStampedModel):
         related_name='messages',
         verbose_name=_('Conversation')
     )
-    group_invite = models.ForeignKey(
+    group_invite = models.OneToOneField(
         'chat.GroupInvite',
         on_delete=models.CASCADE,
         related_name='messages',
-        verbose_name=_('Event linked to message'),
+        verbose_name=_('Invite linked to message'),
         **optional
     )
 
@@ -38,11 +38,26 @@ class Message(AbstractTimeStampedModel):
 
 
 class GroupInvite(AbstractTimeStampedModel):
-    conversation = models.OneToOneField(
-        'chat.Conversation',
+    INVITE_ACCEPTED = 0
+    INVITE_PENDING = 1
+    INVITE_DECLINED = 2
+    INVITE_STATUS_CHOICES = (
+        (INVITE_ACCEPTED, _('Invite accepted')),
+        (INVITE_PENDING, _('Invite pending')),
+        (INVITE_DECLINED, _('Invite declined')),
+    )
+
+    status = models.IntegerField(
+        _('Participant status'),
+        choices=INVITE_STATUS_CHOICES,
+        default=INVITE_PENDING,
+        help_text=_('Group chat invite acceptance status.')
+    )
+    participant = models.ForeignKey(
+        'chat.Participant',
         on_delete=models.CASCADE,
-        related_name='invite',
-        verbose_name=_('Conversation to invite into')
+        related_name='invites',
+        verbose_name=_('Participant receiving invite')
     )
     text = models.TextField(_('Invite text'))
 
@@ -51,7 +66,7 @@ class GroupInvite(AbstractTimeStampedModel):
         verbose_name_plural = _('Group invites')
 
     def __str__(self):
-        return self.conversation.name
+        return self.participant.user.get_full_name()
 
 
 class Conversation(AbstractTimeStampedModel):

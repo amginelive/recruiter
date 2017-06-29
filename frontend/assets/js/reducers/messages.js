@@ -29,7 +29,11 @@ const messages = (state = new Immutable.Map().withMutations(ctx => ctx.set('acti
         return state.update('messageList', messageList => {
             return messageList.map(message => {
                 if (message.get('group_invite') && message.get('group_invite').get('conversation_id') === action.payload.group_id) {
-                    return message.updateIn(['group_invite', 'status'], () => action.payload.accept ? 0 : 2);
+                    if (action.payload.accept && message.getIn(['group_invite', 'status']) === 1) {
+                        return message.updateIn(['group_invite', 'status'], () => 0);
+                    } else if (!action.payload.accept && message.getIn(['group_invite', 'invite_id']) === action.payload.invite_id) {
+                        return message.updateIn(['group_invite', 'status'], () => 2);
+                    } else return message;
                 } else return message;
             });
         });

@@ -12,11 +12,11 @@ class InfoGroupChatModal extends React.Component {
     }
 
     handleKick(user_id) {
-        this.props.onKick(user_id);
+        this.props.onKick(parseInt(user_id));
     }
 
     handleInvite(user_id) {
-        this.props.onInvite(user_id);
+        this.props.onInvite(parseInt(user_id));
     }
 
     renderUsersGroup(users, header, owner, reinvite = false) {

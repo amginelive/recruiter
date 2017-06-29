@@ -70,7 +70,10 @@ class ChatServer(JsonWebsocketConsumer):
                 .filter(created_at__gt=last_read_message.created_at) \
                 .count()
         else:
-            unread = conversation.messages.all().count()
+            unread = conversation.messages \
+                .exclude(Q(group_invite__isnull=False) &
+                         Q(author=self.message.user)) \
+                .count()
         last_message = conversation.messages \
             .exclude(Q(group_invite__isnull=False) &
                      Q(author=self.message.user)) \
@@ -210,17 +213,13 @@ class ChatServer(JsonWebsocketConsumer):
             conversation.save()
         return conversation
 
-    def _create_message_data_dict(self, message, for_user=False):
+    def _create_message_data_dict(self, message):
         if message.group_invite:
-            if for_user:
-                status = Participant.PARTICIPANT_PENDING
-            else:
-                status = message.group_invite.conversation.participants \
-                    .get(user=self.message.user).status
             group_invite = {
                 'type': 'group_invite',
-                'status': status,
-                'conversation_id': message.group_invite.conversation.id,
+                'status': message.group_invite.status,
+                'conversation_id': message.group_invite.participant.conversation.id,
+                'invite_id': message.group_invite.id
             }
         else:
             group_invite = None
@@ -262,27 +261,45 @@ class ChatServer(JsonWebsocketConsumer):
             self.cmd_answer_invite(content.get('payload'))
         elif content.get('type') == 'leaveGroup':
             self.cmd_leave_group()
+        elif content.get('type') == 'kickUser':
+            self.cmd_kick_user(content.get('payload'))
+        elif content.get('type') == 'inviteUser':
+            self.cmd_invite_user(content.get('payload'))
 
-    def cmd_init(self, payload):
-        conversation = self.message.user.participations.get(
+    def cmd_init(self, payload, for_user=None):
+        user = for_user if for_user else self.message.user
+        conversation = user.participations.get(
             conversation_id=payload).conversation
         if not conversation:
             return
         self.message.channel_session['conversation'] = conversation
         query = Message.objects.filter(conversation=conversation) \
             .exclude(Q(group_invite__isnull=False) &
-                     Q(author=self.message.user))
+                     Q(author=user))
         messages = []
         more = query.count() > self.message_list_limit
         last_messages = query.order_by('-created_at')[:self.message_list_limit]
         for message in reversed(last_messages):
             messages.append(self._create_message_data_dict(message))
-        self.send({'type': 'initChat',
-                   'payload': {'conversation_id': conversation.id,
-                               'more': more,
-                               'messages': messages}})
+        if not for_user:
+            self.send({'type': 'initChat',
+                       'payload': {'conversation_id': conversation.id,
+                                   'more': more,
+                                   'messages': messages}})
+        else:
+            self.group_send(str(user.id), {
+                'type': 'initChat',
+                'payload': {
+                    'conversation_id': conversation.id,
+                    'more': more,
+                    'messages': messages
+                }
+            })
         if len(messages) > 0:
-            self.cmd_read_message(messages[-1]['id'])
+            if not for_user:
+                self.cmd_read_message(messages[-1]['id'])
+            else:
+                self.cmd_read_message(messages[-1]['id'], for_user=user, conversation=conversation)
 
     def cmd_message(self, payload, for_user=None, group_invite=None):
         if not for_user:
@@ -296,10 +313,7 @@ class ChatServer(JsonWebsocketConsumer):
                                          group_invite=group_invite)
         response = {
             'type': 'newMessage',
-            'payload': self._create_message_data_dict(
-                message,
-                for_user is not None
-            )
+            'payload': self._create_message_data_dict(message)
         }
         if not for_user:
             for participant in conversation.participants \
@@ -366,10 +380,13 @@ class ChatServer(JsonWebsocketConsumer):
     def cmd_idle(self, idle):
         update_user_idle(self.message.user, idle)
 
-    def cmd_read_message(self, payload):
-        conversation = self.message.channel_session.get('conversation')
+    def cmd_read_message(self, payload, for_user=None, conversation=None):
+        user = for_user if for_user else self.message.user
+        if not conversation:
+            conversation = self.message.channel_session.get('conversation')
 
-        participant = conversation.participants.get(user=self.message.user)
+        participant = conversation.participants.get(user=user)
+        # TODO: need some more checks here.
         participant.last_read_message = Message.objects.get(id=payload)
         participant.save()
         self.send({
@@ -398,10 +415,14 @@ class ChatServer(JsonWebsocketConsumer):
             conversation=chat_group
         )
         for user_id in payload.get('user_ids'):
-            Participant.objects.create(
+            participant = Participant.objects.create(
                 user=User.objects.get(id=user_id),
                 conversation=chat_group,
                 status=Participant.PARTICIPANT_PENDING
+            )
+            GroupInvite.objects.create(
+                participant=participant,
+                text=payload.get('message')
             )
 
         try:
@@ -412,13 +433,8 @@ class ChatServer(JsonWebsocketConsumer):
 
         chat_group.save()
 
-        invite = GroupInvite.objects.create(
-            conversation=chat_group,
-            text=payload.get('message')
-        )
-
         for user_id in payload.get('user_ids'):
-            self.cmd_invite_to_group(user_id, chat_group.id)
+            self.cmd_invite_to_group(user_id, group=chat_group)
 
         response = self._create_group_chat_data_dict(chat_group)
         response['id'] = chat_group.id
@@ -429,31 +445,45 @@ class ChatServer(JsonWebsocketConsumer):
         })
         self.cmd_init(chat_group.id)
 
-    def cmd_invite_to_group(self, user_id, group_id):
-        group_chat = Conversation.objects.get(id=group_id)
-        if (not group_chat or
-                group_chat.conversation_type != Conversation.CONVERSATION_GROUP or
-                group_chat.owner != self.message.user):
+    def cmd_invite_to_group(self, user_id, text=None, group=None):
+        if not group:
+            conversation = self.message.channel_session.get('conversation')
+        else:
+            conversation = group
+        if (conversation.conversation_type != Conversation.CONVERSATION_GROUP
+                or conversation.owner != self.message.user):
             return
 
         user = User.objects.get(id=user_id)
-        if (user not in group_chat.users.all() or
-                group_chat.participants.get(user=user).status != Participant.PARTICIPANT_PENDING):
+        participant = conversation.participants.get(user=user)
+        if (user not in conversation.users.all() or
+                participant.status != Participant.PARTICIPANT_PENDING):
             return
 
-        self.cmd_message(group_chat.invite.text, user, group_chat.invite)
+        if not text:  # Initial invitation on group creation
+            invite = participant.invites.last()
+        else:
+            invite = GroupInvite.objects.create(
+                participant=participant,
+                text=text
+            )
+
+        self.cmd_message(invite.text, user, invite)
 
     def cmd_answer_invite(self, payload):
         participant = Participant.objects \
-            .filter(conversation__invite__conversation_id=payload.get('conversation_id')) \
+            .filter(conversation_id=payload.get('conversation_id')) \
             .get(user=self.message.user)
 
-        if participant.status != Participant.PARTICIPANT_PENDING:
+        if participant.status == Participant.PARTICIPANT_ACCEPTED:
             return
 
         current_conversation = self.message.channel_session.get('conversation')
         if payload.get('accept'):
             participant.status = Participant.PARTICIPANT_ACCEPTED
+            for invite in participant.invites.filter(status=GroupInvite.INVITE_PENDING):
+                invite.status = GroupInvite.INVITE_ACCEPTED
+                invite.save()
             participant.save()
             response = self._create_group_chat_data_dict(participant.conversation)
             response['id'] = participant.conversation.id
@@ -488,6 +518,9 @@ class ChatServer(JsonWebsocketConsumer):
             )
             self.cmd_init(participant.conversation.id)
         else:
+            invite = participant.invites.get(id=payload.get('invite_id'))
+            invite.status = GroupInvite.INVITE_DECLINED
+            invite.save()
             participant.status = Participant.PARTICIPANT_DECLINED
             participant.save()
             current_conversation.participants.get(user=self.message.user).save()
@@ -498,10 +531,22 @@ class ChatServer(JsonWebsocketConsumer):
                     'payload': {
                         'accept': False,
                         'group_id': participant.conversation.id,
+                        'invite_id': invite.id,
                         'conversation_id': current_conversation.id
                     }
                 }
             )
+        active_participants = participant.conversation.participants.filter(
+            status=Participant.PARTICIPANT_ACCEPTED)
+        chat_data = self._create_group_chat_data_dict(participant.conversation)
+        for participant in active_participants:
+            self.group_send(str(participant.user.id), {
+                'type': 'chatsUpdate',
+                'payload': {
+                    'id': participant.conversation.id,
+                    'data': chat_data
+                }
+            })
 
     def cmd_leave_group(self):
         conversation = self.message.channel_session.get('conversation')
@@ -510,8 +555,10 @@ class ChatServer(JsonWebsocketConsumer):
                 or participant.status != Participant.PARTICIPANT_ACCEPTED:
             return
 
-        active_participants = conversation.participants.filter(status=Participant.PARTICIPANT_ACCEPTED)
-        if conversation.owner == self.message.user and active_participants.count() > 1:
+        active_participants = conversation.participants.filter(
+            status=Participant.PARTICIPANT_ACCEPTED)
+        if conversation.owner == self.message.user \
+                and active_participants.count() > 1:
             any_other_user = active_participants \
                 .exclude(user=self.message.user) \
                 .first() \
@@ -539,6 +586,47 @@ class ChatServer(JsonWebsocketConsumer):
             .last() \
             .conversation
         self.cmd_init(last_conversation.id)
+
+    def cmd_kick_user(self, user_id):
+        conversation = self.message.channel_session.get('conversation')
+        participant = conversation.participants.get(user=self.message.user)
+        if conversation.conversation_type != Conversation.CONVERSATION_GROUP \
+                or conversation.owner != participant.user \
+                or user_id == self.message.user.id:
+            return
+
+        target = conversation.participants.get(user_id=user_id)
+        if target.status == Participant.PARTICIPANT_DECLINED:
+            return
+
+        if target.status == Participant.PARTICIPANT_ACCEPTED:
+            self.group_send(str(user_id), {
+                'type': 'leaveGroup',
+                'payload': conversation.id
+            })
+            last_conversation = target.user.participations \
+                .filter(status=Participant.PARTICIPANT_ACCEPTED) \
+                .order_by('updated_at') \
+                .last() \
+                .conversation
+            self.cmd_init(last_conversation.id, for_user=target.user)
+
+        target.delete()
+
+        active_participants = conversation.participants.filter(
+            status=Participant.PARTICIPANT_ACCEPTED)
+        chat_data = self._create_group_chat_data_dict(conversation)
+        for participant in active_participants:
+            self.group_send(str(participant.user.id), {
+                'type': 'chatsUpdate',
+                'payload': {
+                    'id': conversation.id,
+                    'data': chat_data
+                }
+            })
+
+    def cmd_invite_user(self, user_id):
+        pass
 
     def disconnect(self, message, **kwargs):
         self.cmd_idle(False)
