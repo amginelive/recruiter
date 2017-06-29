@@ -1,4 +1,5 @@
 import {messageTypes, uri} from '../config.js';
+import { postReceive } from './index.js';
 
 class ChatSocket {
     constructor() {
@@ -57,7 +58,10 @@ const init = (store) => {
     // add listeners to socket messages so we can re-dispatch them as actions
     socket.createWebSocket(socket);
     Object.keys(messageTypes)
-        .forEach(type => socket.on(type, (payload) => store.dispatch({ type, payload })));
+        .forEach(type => socket.on(type, (payload) => {
+            store.dispatch(postReceive({type, payload}));
+            return store.dispatch({type, payload});
+        }));
 };
 
 const emit = (type, payload) => socket.emit(type, payload);

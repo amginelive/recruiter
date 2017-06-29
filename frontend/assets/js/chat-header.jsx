@@ -13,6 +13,7 @@ class ChatHeader extends React.Component {
     render() {
         const {users, chats} = this.props;
 
+        const merged_users = users.merge(users.get('extra')).delete('extra').delete('self');
         let UI = <div />;
         if (chats.get('groups').get(chats.get('activeChat').toString())) {
             const participants = chats.get('groups').get(chats.get('activeChat').toString()).get('users');
@@ -20,7 +21,7 @@ class ChatHeader extends React.Component {
                 <div className='chat-header'>
                     <div className='chat-header-names'>
                         {participants.mapEntries((entry, index) => {
-                            return [index, <span key={entry[0]}>{users.get(entry[0].toString()).get('name') + (index + 1 !== participants.size ? ', ' : '')}</span>]
+                            return [index, <span key={entry[0]}>{merged_users.get(entry[0].toString()).get('name') + (index + 1 !== participants.size ? ', ' : '')}</span>]
                         }).toArray()}
                     </div>
                     <div className='chat-header-actions'>

@@ -83,3 +83,12 @@ export function inviteUser(user_id) {
         emit(messageTypes.inviteUser, user_id);
     }
 }
+
+export function postReceive(data) {
+    return (dispatch, getState, {emit}) => {
+        const {type, payload} = data;
+        if (type === messageTypes.leaveGroup && getState().get('chats').get('activeChat') === payload) {
+            emit(messageTypes.initChat, null);
+        }
+    }
+}
