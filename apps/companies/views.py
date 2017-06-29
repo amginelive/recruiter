@@ -209,8 +209,8 @@ class CompanyDetailView(LoginRequiredMixin, DetailView):
         if self.request.user not in company_agent_users:
             context['last_person_in_contact'] = Message.objects\
                 .filter(conversation__users__in=company_agent_users)\
+                .filter(conversation__users=self.request.user)\
                 .filter(conversation__conversation_type=Conversation.CONVERSATION_USER)\
-                .filter(author=self.request.user)\
                 .order_by('created_at')\
                 .last().conversation.participants.exclude(user=self.request.user).first()
             context['last_person_added_manual_track'] = UserNote.objects\
