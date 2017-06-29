@@ -24,7 +24,7 @@ class Message(AbstractTimeStampedModel):
     group_invite = models.OneToOneField(
         'chat.GroupInvite',
         on_delete=models.CASCADE,
-        related_name='messages',
+        related_name='message',
         verbose_name=_('Invite linked to message'),
         **optional
     )
