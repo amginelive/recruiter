@@ -61,7 +61,9 @@
                                 <form action="{% url 'users:profile_cv_upload' %}" id="cv_upload_form" method="post" role="form" enctype="multipart/form-data" class="cv_form hidden text-center">
                                     {% csrf_token %}
                                     <input type="file" name="cv" id="cv_upload" style="display:none"/>
-                                    <span class="block"><a href="{{ profile.cv.url }}">{{ profile.cv_file_name }}</a></span>
+                                    {% if profile.cv %}
+                                        <span class="block"><a href="{{ profile.cv.url }}">{{ profile.cv_file_name }}</a></span>
+                                    {% endif %}
                                     <button type="button" class="btn" id="cv_upload_btn" OnClick="javascript:void(0)">{% trans "Update CV" %}</button>
                                     <div id="cv_updated" class="label label-success cv_updated">{% trans 'CV updated' %}</div>
                                 </form>
