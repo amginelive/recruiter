@@ -1,3 +1,4 @@
+import itertools
 import uuid
 
 from django.conf import settings
@@ -6,6 +7,7 @@ from django.core.mail import send_mail
 from django.db import models
 from django.db.models.signals import post_save
 from django.template.loader import render_to_string
+from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 
 from django_countries.fields import CountryField
@@ -27,7 +29,7 @@ class Company(AbstractTimeStampedModel):
         (STATUS_INACTIVE, 'Inactive'),
     )
 
-    owner = models.ForeignKey('users.User', on_delete=models.SET_NULL, verbose_name=_('Major company representative'), **optional)
+    owner = models.ForeignKey('users.Agent', on_delete=models.SET_NULL, related_name='companies_owned',verbose_name=_('Major company representative'), **optional)
     name = models.CharField(max_length=200, verbose_name=_('Company name'))
     domain = models.CharField(
         _('Domain name'),
@@ -36,7 +38,7 @@ class Company(AbstractTimeStampedModel):
         help_text='If your email is john@squareballoon.com, your domain name will be squareballon.com.'
     )
     overview = models.CharField(_('Overview'), max_length=255, **optional)
-    alias = models.SlugField(_('Alias/Slug'), max_length=120)
+    slug = models.SlugField(_('Slug'), max_length=120)
     description = models.TextField(_('Description'), **optional)
     logo = models.ImageField(
         _('Logo'),
@@ -52,11 +54,6 @@ class Company(AbstractTimeStampedModel):
     is_charity = models.BooleanField(_('Is it a charity organization?'), default=False)
     allow_auto_invite = models.BooleanField(_('Allow auto invite?'), default=False)
     status = models.IntegerField(_('Status'), choices=STATUS_CHOICES, default=STATUS_ACTIVE)
-
-    index_together = [
-        ['alias', 'status'],
-        ['name', 'status'],
-    ]
 
     class Meta:
         verbose_name = _('Company')
@@ -80,6 +77,16 @@ class Company(AbstractTimeStampedModel):
             if Company.objects.filter(owner=self.owner).exists():
                 raise ValidationError({'user': ['User is allowed to have only one company.']})
             super(Company, self).clean()
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.slug = slug_copy = slugify(self.name)
+            for i in itertools.count(1):
+                if not Company.objects.filter(slug=self.slug).exists():
+                    break
+                self.slug = '{}-{}'.format(slug_copy, i)
+
+        return super(Company, self).save(*args, **kwargs)
 
 
 class CompanyInvitation(AbstractTimeStampedModel):

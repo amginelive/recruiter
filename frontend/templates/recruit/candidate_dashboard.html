@@ -47,7 +47,7 @@
                                             <div class="job-posted-by pull-right">
                                                 <span class="search-info">{{ job_referral.job_post.created_at|date }}</span>
                                                 <span class="search-info"><strong>Posted By:</strong></span>
-                                                <a href="{% url 'users:profile_detail' job_referral.job_post.posted_by.user.slug %}">
+                                                <a href="{% url 'companies:company_detail' job_referral.job_post.posted_by.company.slug %}?agent={{ job_referral.job_post.posted_by.pk }}">
                                                     <img src="{% if job_referral.job_post.posted_by.photo %}{{ job_referral.job_post.posted_by.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:20px; border-radius:50%">
                                                     <span>{{ job_referral.job_post.posted_by.user.get_full_name }}</span>
                                                 </a>
@@ -65,7 +65,7 @@
                                         </div>
                                         <div class="col-md-8 text-right" style="margin-top: 40px;">
                                             <span class="search-info"><strong>Referred By:</strong></span>
-                                                <a href="{% url 'users:profile_detail' job_referral.referred_by.user.slug %}">
+                                                <a href="{% url 'users:candidate_profile' job_referral.referred_by.user.slug %}">
                                                     <img src="{% if job_referral.referred_by.photo %}{{ job_referral.referred_by.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:20px; border-radius:50%">
                                                     <span>{{ job_referral.referred_by.user.get_full_name }}</span>
                                                 </a>
@@ -120,12 +120,16 @@
                                                 <img src="{% if referral.referred_user.candidate.photo %}{{ referral.referred_user.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
                                             </div>
                                             <div class="col-md-8 text-left">
-                                                <span class="search-info"><a href="{% url 'users:profile_detail' referral.referred_user.slug %}">{{ referral.referred_user.get_full_name }}</a></span>
+                                            {% if referral.referred_user.account_type == user.ACCOUNT_CANDIDATE %}
+                                                <span class="search-info"><a href="{% url 'users:candidate_profile' referral.referred_user.slug %}">{{ referral.referred_user.get_full_name }}</a></span>
+                                            {% elif referral.referred_user.account_type == user.ACCOUNT_AGENT %}
+                                                <span class="search-info"><a href="{% url 'companies:company_detail' referral.referred_user.agent.company.slug %}?agent={{ referral.referred_user.agent.pk }}">{{ referral.referred_user.get_full_name }}</a></span>
+                                            {% endif %}
                                                 <span class="search-info">{{ referral.referred_user.candidate.title|default_if_none:"" }}</span>
                                                 <span class="search-info">{{ referral.referred_user.candidate.location|default_if_none:"" }}</span>
                                                 <span class="search-info">{{ referral.referred_user.candidate.location|default_if_none:"" }}</span>
                                                 <span class="search-info"><strong>Referred By:</strong></span>
-                                                <a href="{% url 'users:profile_detail' referral.referred_by.slug %}">
+                                                <a href="{% url 'users:candidate_profile' referral.referred_by.slug %}">
                                                     <img src="{% if referral.referred_by.candidate.photo %}{{ referral.referred_by.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:20px; border-radius:50%">
                                                     <span>{{ referral.referred_by.candidate.user.get_full_name }}</span>
                                                 </a>
@@ -145,11 +149,15 @@
                                                 <img src="{% if referral.referred_user.candidate.photo %}{{ referral.referred_user.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
                                             </div>
                                             <div class="col-md-8 text-left">
-                                                <span class="search-info"><a href="{% url 'users:profile_detail' referral.referred_user.slug %}">{{ referral.referred_user.get_full_name }}</a></span>
+                                                {% if referral.referred_user.account_type == user.ACCOUNT_CANDIDATE %}
+                                                    <span class="search-info"><a href="{% url 'users:candidate_profile' referral.referred_user.slug %}">{{ referral.referred_user.get_full_name }}</a></span>
+                                                {% elif referral.referred_user.account_type == user.ACCOUNT_AGENT %}
+                                                    <span class="search-info"><a href="{% url 'companies:company_detail' referral.referred_user.agent.company.slug %}?agent={{ referral.referred_user.agent.pk }}">{{ referral.referred_user.get_full_name }}</a></span>
+                                                {% endif %}
                                                 <span class="search-info">{{ referral.referred_user.agent.company.name|default_if_none:"" }}</span>
                                                 <span class="search-info">{{ referral.referred_user.agent.company.location|default_if_none:"" }}</span>
                                                 <span class="search-info"><strong>Referred By:</strong></span>
-                                                <a href="{% url 'users:profile_detail' referral.referred_by.slug %}">
+                                                <a href="{% url 'users:candidate_profile' referral.referred_by.slug %}">
                                                     <img src="{% if referral.referred_by.candidate.photo %}{{ referral.referred_by.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:20px; border-radius:50%">
                                                     <span>{{ referral.referred_by.candidate.user.get_full_name }}</span>
                                                 </a>

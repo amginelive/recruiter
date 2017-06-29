@@ -33,7 +33,7 @@
                                 </div>
                                 <h6>{{ job_post.created_at|date }}</h6>
                                 <div class="job-posted-by pull-right">
-                                    <a href="{% url 'users:profile_detail' job_post.posted_by.user.slug %}">
+                                    <a href="{% url 'companies:company_detail' job_post.posted_by.company.slug %}?agent={{ job_post.posted_by.pk }}">
                                         <span>{{ job_post.posted_by.user.get_full_name }}</span>
                                         <img src="{% if job_post.posted_by.photo %}{{ job_post.posted_by.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:30px; border-radius:50%">
                                     </a>

@@ -89,7 +89,7 @@
                                             <div class="job-posted-by pull-right">
                                                 <span class="search-info">{{ result.created_at|date }}</span>
                                                 <span class="search-info"><strong>Posted By:</strong></span>
-                                                <a href="{% url 'users:profile_detail' result.posted_by.user.slug %}">
+                                                <a href="{% url 'companies:company_detail' result.posted_by.company.slug %}?agent={{ result.posted_by.pk }}">
                                                     <img src="{% if result.posted_by.photo %}{{ result.posted_by.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:20px; border-radius:50%">
                                                     <span>{{ result.posted_by.user.get_full_name }}</span>
                                                 </a>
@@ -120,7 +120,7 @@
                                             <img src="{% if result.photo %}{{ result.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:100px; border-radius:50%">
                                         </div>
                                         <div class="col-md-8 text-left">
-                                            <span class="search-info"><a href="{% url 'users:profile_detail' result.user.slug %}">{{ result.user.get_full_name }}</a></span>
+                                            <span class="search-info"><a href="{% url 'users:candidate_profile' result.user.slug %}">{{ result.user.get_full_name }}</a></span>
                                             <span class="search-info">{{ result.user.email }}</span>
                                             <span class="search-info">{{ result.phone }}</span>
                                             <span class="search-info">{{ result.location|default_if_none:"" }}</span>

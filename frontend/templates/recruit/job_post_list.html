@@ -48,7 +48,7 @@
                                         {% if job_post.posted_by == user.agent %}
                                             You
                                         {% else %}
-                                            <a href="{% url 'users:profile_detail' job_post.posted_by.user.slug %}">{{ job_post.posted_by }}</a>
+                                            <a href="{% url 'companies:company_detail' job_post.posted_by.company.slug %}?agent={{ job_post.posted_by.pk }}">{{ job_post.posted_by }}</a>
                                         {% endif %}
                                     </span>
                                     <span class="block"><a href="#">View Suggested Candidates</a></span>

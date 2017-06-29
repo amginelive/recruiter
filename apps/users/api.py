@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.humanize.templatetags.humanize import naturaltime
+from django.db.models import Count
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.template.defaultfilters import date
@@ -26,6 +27,10 @@ from .mixins import CandidateRequiredMixin
 from .models import (
     Candidate,
     UserNote,
+)
+from chat.models import (
+    Conversation,
+    Message,
 )
 
 
@@ -197,3 +202,52 @@ class UserNoteDeleteAPIView(LoginRequiredMixin, DeleteView, JSONResponseMixin):
         return self.render_json_response({'success': True})
 
 user_note_delete = UserNoteDeleteAPIView.as_view()
+
+
+class TrackingAPIView(LoginRequiredMixin, View, JSONResponseMixin):
+    """
+    View for returning the tracking details for a user.
+    """
+    def get(self, request, *args, **kwargs):
+        agent_user = User.objects.get(pk=self.kwargs.get('pk'))
+
+        user_notes = UserNote.objects.filter(note_to=agent_user, note_by=self.request.user).order_by('-created_at')
+
+        messages = Message.objects\
+            .filter(conversation__users=agent_user)\
+            .filter(conversation__conversation_type=Conversation.CONVERSATION_USER)\
+            .order_by('created_at')
+
+        sent = messages.filter(author=self.request.user)
+        first_contact_sent = sent.first()
+        last_message_sent = sent.last()
+
+        received = messages.exclude(author=self.request.user)
+        last_message_received = received.last()
+
+        data = {
+            'auto_tracking': {
+                'first_contact_sent': first_contact_sent.created_at.strftime('%d/%m/%y') if first_contact_sent else None,
+                'last_message_sent': last_message_sent.created_at.strftime('%d/%m/%y') if last_message_sent else None,
+                'last_message_received': last_message_received.created_at.strftime('%d/%m/%y') if last_message_received else None,
+            },
+            'user_notes': [
+                {
+                    'pk': user_note.pk,
+                    'note_to': {
+                        'pk': user_note.note_to.pk,
+                    },
+                    'type': user_note.type,
+                    'text': user_note.text,
+                    'created_at': {
+                        'proper': date(user_note.created_at, 'D, F d, o P'),
+                        'timeago': naturaltime(user_note.created_at),
+                    },
+                    'csrf_token': get_token(self.request),
+                }
+                for user_note in user_notes
+            ]
+        }
+        return self.render_json_response({'data': data})
+
+tracking = TrackingAPIView.as_view()
