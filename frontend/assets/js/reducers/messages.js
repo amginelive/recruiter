@@ -38,6 +38,11 @@ const messages = (state = new Immutable.Map().withMutations(ctx => ctx.set('acti
             });
         });
     }
+    if (action.type === messageTypes.kickUser) {
+        return state.update('messageList', messageList => {
+            return messageList.filter(message => !message.get('group_invite') || message.get('group_invite').get('conversation_id') !== action.payload);
+        });
+    }
     return state;
 };
 

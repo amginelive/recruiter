@@ -572,6 +572,13 @@ class ChatServer(JsonWebsocketConsumer):
         })
 
         if active_participants.count() == 1:
+            pending_participants = conversation.participants.filter(
+                status=Participant.PARTICIPANT_PENDING)
+            for participant in pending_participants:
+                self.group_send(str(participant.user.id), {
+                    'type': 'kickUser',
+                    'payload': conversation.id
+                })
             conversation.delete()
         else:
             participant.delete()
@@ -594,6 +601,12 @@ class ChatServer(JsonWebsocketConsumer):
                 'type': 'leaveGroup',
                 'payload': conversation.id
             })
+        elif target.status == Participant.PARTICIPANT_PENDING:
+            self.group_send(str(user_id), {
+                'type': 'kickUser',
+                'payload': conversation.id
+            })
+
         target.delete()
         self._emit_group_chat_update(conversation)
 
