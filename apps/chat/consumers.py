@@ -542,17 +542,7 @@ class ChatServer(JsonWebsocketConsumer):
                     }
                 }
             )
-        active_participants = participant.conversation.participants.filter(
-            status=Participant.PARTICIPANT_ACCEPTED)
-        chat_data = self._create_group_chat_data_dict(participant.conversation)
-        for participant in active_participants:
-            self.group_send(str(participant.user.id), {
-                'type': 'chatsUpdate',
-                'payload': {
-                    'id': participant.conversation.id,
-                    'data': chat_data
-                }
-            })
+        self._emit_group_chat_update(participant.conversation)
 
     def cmd_leave_group(self):
         conversation = self.message.channel_session.get('conversation')
