@@ -265,7 +265,37 @@
                     {% include "users/snippets/tracking.html" %}
                 {% endif %}
             {% else %}
-                {% include "users/snippets/not_connected.html" %}
+                <div class="col-md-12 text-center">
+                    <h3>{{ profile.user.get_full_name }}</h3>
+                    <img id="profile_photo" src="{% if profile.photo %}{{ profile.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" class="thumbnail img-responsive center-block">
+
+                    <div class="connection-buttons">
+                        {% if candidate_to_candidate_team_member_request %}
+                            <button class="btn btn-primary add-connection" disabled="disabled">Awating Team Member Approval</button>
+                        {% elif candidate_to_candidate_network_request %}
+                            <button class="btn btn-primary add-connection" disabled="disabled">Awating Network Approval</button>
+                        {% else %}
+                            <div class="col-md-6 text-right">
+                                <form action="{% url 'recruit:connection_request_create' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="connectee" value="{{ profile.user.pk }}">
+                                    <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER }}">
+
+                                    <button class="btn btn-primary btn-xs add-connection">Add as team member</button>
+                                </form>
+                            </div>
+                            <div class="col-md-6 text-left">
+                                <form action="{% url 'recruit:connection_request_create' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="connectee" value="{{ profile.user.pk }}">
+                                    <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_CANDIDATE_TO_CANDIDATE_NETWORK }}">
+
+                                    <button class="btn btn-primary btn-xs add-connection">Add to my network</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             {% endif %}
         </div>
     </section>
