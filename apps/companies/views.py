@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse_lazy
-from django.db.models import Count
+from django.db.models import Q
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.views.generic import (
@@ -25,6 +25,10 @@ from .models import (
 from chat.models import (
     Conversation,
     Message,
+)
+from recruit.models import (
+    Connection,
+    ConnectionRequest,
 )
 from users.forms import AgentPhotoUploadForm
 from users.mixins import AgentRequiredMixin
@@ -192,6 +196,15 @@ class CompanyDetailView(LoginRequiredMixin, DetailView):
         context['user_notes'] = UserNote.objects\
             .filter(note_by=self.request.user, note_to=current_agent.user)\
             .order_by('-created_at')
+        context['connection'] = Connection.objects.filter(
+            (Q(connectee=self.request.user) & Q(connecter=current_agent.user)) |
+            (Q(connectee=current_agent.user) & Q(connecter=self.request.user))
+        ).first()
+        context['ConnectionRequest'] = ConnectionRequest
+        context['connection_request'] = ConnectionRequest.objects.filter(
+            (Q(connectee=self.request.user) & Q(connecter=current_agent.user)) |
+            (Q(connectee=current_agent.user) & Q(connecter=self.request.user))
+        ).first()
 
         messages = Message.objects\
             .filter(conversation__users=current_agent.user)\
