@@ -1,8 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import Immutable from 'immutable';
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, compose } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import { AppContainer } from 'react-hot-loader';
 
@@ -17,9 +16,10 @@ import { init as websocketInit, emit } from './actions/websocket.js';
     const thunk = thunkMiddleware.default ? thunkMiddleware.default : thunkMiddleware;
     const middleware = [thunk.withExtraArgument({emit})];
 
-    const setup = applyMiddleware(...middleware)(createStore);
-
-    let store = setup(rootReducer);
+    const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+    const store = createStore(rootReducer, /* preloadedState, */ composeEnhancers(
+        applyMiddleware(...middleware)
+    ));
     websocketInit(store); // setup websocket listeners etc
 
     if (module.hot) {

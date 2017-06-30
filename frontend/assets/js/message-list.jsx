@@ -84,12 +84,12 @@ class MessageList extends React.Component {
         }
     }
 
-    acceptInvite(conversation_id) {
-        this.props.actions.answerInvite({accept: true, conversation_id});
+    acceptInvite(conversation_id, invite_id) {
+        this.props.actions.answerInvite({accept: true, conversation_id, invite_id});
     }
 
-    declineInvite(conversation_id) {
-        this.props.actions.answerInvite({accept: false, conversation_id});
+    declineInvite(conversation_id, invite_id) {
+        this.props.actions.answerInvite({accept: false, conversation_id, invite_id});
     }
 
     render() {
