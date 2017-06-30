@@ -207,16 +207,19 @@ class CompanyDetailView(LoginRequiredMixin, DetailView):
 
         company_agent_users = [company_agent.user for company_agent in company.agents.all()]
         if self.request.user not in company_agent_users:
-            context['last_person_in_contact'] = Message.objects\
+            last_message = Message.objects\
                 .filter(conversation__users__in=company_agent_users)\
                 .filter(conversation__users=self.request.user)\
                 .filter(conversation__conversation_type=Conversation.CONVERSATION_USER)\
                 .order_by('created_at')\
-                .last().conversation.participants.exclude(user=self.request.user).first()
-            context['last_person_added_manual_track'] = UserNote.objects\
+                .last()
+            context['last_person_in_contact'] = last_message.conversation.participants.exclude(user=self.request.user).first() if last_message else None
+
+            last_user_note = UserNote.objects\
                 .filter(note_by=self.request.user)\
                 .filter(note_to__in=company_agent_users)\
-                .last().note_to
+                .last()
+            context['last_person_added_manual_track'] = last_user_note.note_to if last_user_note else None
 
         return context
 

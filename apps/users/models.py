@@ -318,8 +318,10 @@ class Candidate(ProfileBase):
 
     @property
     def cv_file_name(self):
-        directory, file_name = os.path.split(self.cv.name)
-        return file_name
+        if self.cv:
+            directory, file_name = os.path.split(self.cv.name)
+            return file_name
+        return None
 
 
 class Agent(ProfileBase):

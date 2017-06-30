@@ -54,9 +54,7 @@
                                 <div class="photo-upload-inputs">
                                     {{ photo_form }}
                                 </div>
-                                {% if user == current_agent.user %}
-                                    <button type="button" class="btn" id="photo_upload_btn" OnClick="javascript:void(0)">{% trans "Update Photo" %}</button>
-                                {% endif %}
+                                <button type="button" class="btn {% if user != current_agent.user %}hidden{% endif %}" id="photo_upload_btn" OnClick="javascript:void(0)">{% trans "Update Photo" %}</button>
                             </form>
 
                         </div>
@@ -95,7 +93,7 @@
                                     {% endfor %}
                                 </div>
 
-                                <div class="manage-company {% if company.owner == user.agent %}hidden{% endif %}">
+                                <div class="manage-company {% if company.owner != user.agent %}hidden{% endif %}">
                                     <a href="{% url 'companies:company_update' %}" class="btn action-btn"><i class="glyphicon glyphicon-briefcase"></i> {% trans 'Update Company Profile' %}</a>
                                     <a href="{% url 'companies:company_invite' %}" class="btn action-btn"><i class="glyphicon glyphicon-user"></i> {% trans "Add User" %}</a>
                                     <div>
