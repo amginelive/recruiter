@@ -28,7 +28,7 @@ class CompanyForm(forms.ModelForm):
 
     def save(self, *args, **kwargs):
         company = super(CompanyForm, self).save(commit=False)
-        company.owner = self.user
+        company.owner = self.user.agent
         company.save()
 
         self.user.agent.company = company
