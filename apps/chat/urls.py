@@ -1,6 +1,6 @@
 from macrosurl import url
 
-from . import views
+from chat import views
 
 
 urlpatterns = (

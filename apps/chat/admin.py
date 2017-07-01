@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Conversation, GroupInvite, Message, Participant
+from chat.models import Conversation, GroupInvite, Message, Participant
 
 
 admin.site.register(Conversation)

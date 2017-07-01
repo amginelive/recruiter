@@ -7,8 +7,8 @@ from django.core.exceptions import ValidationError
 from channels.generic.websockets import JsonWebsocketConsumer
 
 from recruit.models import Connection
-from .models import Conversation, GroupInvite, Message, Participant
-from .utils import update_user_idle, update_user_presence
+from chat.models import Conversation, GroupInvite, Message, Participant
+from chat.utils import update_user_idle, update_user_presence
 
 User = get_user_model()
 
