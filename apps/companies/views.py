@@ -196,12 +196,12 @@ class CompanyDetailView(LoginRequiredMixin, DetailView):
         context['user_notes'] = UserNote.objects\
             .filter(note_by=self.request.user, note_to=current_agent.user)\
             .order_by('-created_at')
-        context['connection'] = Connection.objects.filter(
+        context['current_agent_connection'] = Connection.objects.filter(
             (Q(connectee=self.request.user) & Q(connecter=current_agent.user)) |
             (Q(connectee=current_agent.user) & Q(connecter=self.request.user))
         ).first()
-        context['ConnectionRequest'] = ConnectionRequest
-        context['connection_request'] = ConnectionRequest.objects.filter(
+        context['connection_request'] = ConnectionRequest
+        context['current_agent_connection_request'] = ConnectionRequest.objects.filter(
             (Q(connectee=self.request.user) & Q(connecter=current_agent.user)) |
             (Q(connectee=current_agent.user) & Q(connecter=self.request.user))
         ).first()

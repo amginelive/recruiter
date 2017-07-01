@@ -1,6 +1,6 @@
 {% extends 'users/index.html' %}
 
-{% load staticfiles i18n bootstrap humanize chat_tags %}
+{% load staticfiles i18n bootstrap humanize chat_tags recruit_tags %}
 
 {% block extra_css %}
 <link href="{% static 'css/cropper.min.css' %}" rel="stylesheet">
@@ -43,6 +43,8 @@
                             <span class="hidden authenticated-user">{{ user.pk }}</span>
                             <span class="hidden company-owner">{{ company.owner.user.pk }}</span>
                             <span class="hidden current-agent-conversation">{{ conversation.pk }}</span>
+                            <span class="hidden current-agent-has-connection">{% if current_agent_connection %}1{% else %}0{% endif %}</span>
+                            <span class="hidden current-agent-has-connection-request">{% if current_agent_connection_request %}1{% else %}0{% endif %}</span>
                             <h4 class="current-agent-name">{{ current_agent.user.get_full_name }}</h4>
                             <img
                                 class="current-agent-photo"
@@ -62,17 +64,17 @@
                                         <input type="hidden" name="connectee" value="{{ current_agent.user.pk }}">
 
                                         {% if user.account_type == user.ACCOUNT_CANDIDATE %}
-                                            <input type="hidden" name="connection_type" value="{{ ConnectionRequest.CONNECTION_CANDIDATE_TO_AGENT_NETWORK }}">
+                                            <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_CANDIDATE_TO_AGENT_NETWORK }}">
                                         {% elif user.account_type == user.ACCOUNT_AGENT %}
-                                            <input type="hidden" name="connection_type" value="{{ ConnectionRequest.CONNECTION_AGENT_TO_AGENT_NETWORK }}">
+                                            <input type="hidden" name="connection_type" value="{{ connection_request.CONNECTION_AGENT_TO_AGENT_NETWORK }}">
                                         {% endif %}
 
-                                        {% if connection %}
+                                        {% if current_agent_connection %}
                                             <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected</button>
-                                        {% elif connection_request %}
+                                        {% elif current_agent_connection_request %}
                                             <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awaiting Network Approval</button>
                                         {% else %}
-                                            <button class="btn btn-primary btn-xs add-connection">Add as network</button>
+                                            <button class="btn btn-primary btn-xs add-connection">Add as Network</button>
                                         {% endif %}
                                     </form>
                                 </div>
@@ -107,7 +109,9 @@
                                                 data-placement="top"
                                                 title="{{ agent.user.get_full_name }}"
                                                 data-user-pk="{{ agent.user.pk }}"
-                                                data-conversation-pk="{{ conversation.pk }}">
+                                                data-conversation-pk="{{ conversation.pk }}"
+                                                data-has-connection="{% if user|has_connection:agent.user %}1{% else %}0{% endif %}"
+                                                data-has-connection-request="{% if user|has_connection_request:agent.user %}1{% else %}0{% endif %}">
                                         {% endif %}
                                     {% endfor %}
                                 </div>
@@ -199,6 +203,8 @@
                         var button_text = 'Awaiting Network Approval'
 
                     $(this).attr('disabled', 'disabled');
+                    $(this).html('Awaiting Network Approval');
+                    $('.current-agent-has-connection-request').html(1);
                 }
                 else {
                     $.each(response.errors, function(key, value){
@@ -215,21 +221,41 @@
         var current_user_pk = current_agent.attr('data-user-pk');
         var current_agent_name = $('.current-agent-name').html();
         var current_agent_conversation_pk = $('.current-agent-conversation').html();
+        var current_agent_has_connection = $('.current-agent-has-connection').html();
+        var current_agent_has_connection_request = $('.current-agent-has-connection-request').html();
 
         var agent_staff_photo = $(this).attr('src');
         var agent_staff_pk = $(this).attr('data-user-pk');
         var agent_staff_name = $(this).attr('data-original-title');
         var agent_staff_conversation_pk = $(this).attr('data-conversation-pk');
+        var agent_staff_has_connection = $(this).attr('data-has-connection');
+        var agent_staff_has_connection_request = $(this).attr('data-has-connection-request');
 
         current_agent.attr('src', agent_staff_photo);
         current_agent.attr('data-user-pk', agent_staff_pk);
         $('.current-agent-name').html(agent_staff_name);
         $('.current-agent-conversation').html(agent_staff_conversation_pk);
+        $('.current-agent-has-connection').html(agent_staff_has_connection);
+        $('.current-agent-has-connection-request').html(agent_staff_has_connection_request);
+        if (agent_staff_has_connection == 1) {
+            $('.add-connection').attr('disabled', 'disabled');
+            $('.add-connection').html('Connected');
+        }
+        else if (agent_staff_has_connection_request == 1) {
+            $('.add-connection').attr('disabled', 'disabled');
+            $('.add-connection').html('Awaiting Network Approval');
+        }
+        else {
+            $('.add-connection').removeAttr('disabled');
+            $('.add-connection').html('Add as Network');
+        }
         $('.message-agent').attr('href', Urls['chat:chat'](agent_staff_conversation_pk));
 
         $(this).attr('src', current_agent_photo);
         $(this).attr('data-user-pk', current_user_pk);
         $(this).attr('data-original-title', current_agent_name);
+        $(this).attr('data-has-connection', current_agent_has_connection);
+        $(this).attr('data-has-connection-request', current_agent_has_connection_request);
         $(this).tooltip('hide');
 
         if ($('.authenticated-user').html() == agent_staff_pk)
