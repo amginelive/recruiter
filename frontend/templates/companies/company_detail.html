@@ -26,7 +26,7 @@
                     {% endif %}
                     <div class="col-md-4 text-right">
                         {% get_user_conversation user current_agent.user as conversation %}
-                        <a href="{% url 'chat:chat' conversation.pk %}" class="message-agent">Message me</a>
+                        <a href="{% url 'chat:chat' conversation.pk %}" class="message-agent {% if not current_agent_connection %}hidden{% endif %}">Message me</a>
                     </div>
                 </div>
                 {% if user.account_type == user.ACCOUNT_CANDIDATE %}
@@ -237,17 +237,21 @@
         $('.current-agent-conversation').html(agent_staff_conversation_pk);
         $('.current-agent-has-connection').html(agent_staff_has_connection);
         $('.current-agent-has-connection-request').html(agent_staff_has_connection_request);
+        $('input[name=connectee]').val(agent_staff_pk);
         if (agent_staff_has_connection == 1) {
             $('.add-connection').attr('disabled', 'disabled');
             $('.add-connection').html('Connected');
+            $('.message-agent').removeClass('hidden');
         }
         else if (agent_staff_has_connection_request == 1) {
             $('.add-connection').attr('disabled', 'disabled');
             $('.add-connection').html('Awaiting Network Approval');
+            $('.message-agent').addClass('hidden');
         }
         else {
             $('.add-connection').removeAttr('disabled');
             $('.add-connection').html('Add as Network');
+            $('.message-agent').addClass('hidden');
         }
         $('.message-agent').attr('href', Urls['chat:chat'](agent_staff_conversation_pk));
 
