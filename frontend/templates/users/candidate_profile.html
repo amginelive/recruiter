@@ -56,7 +56,17 @@
                             {% endif %}
                         </div>
                         <div class="col-md-7">
-                            <h3><a href="{% if profile.cv %}{{ profile.cv.url }}{% endif %}" id="current_cv" {% if not profile.cv %}class="hidden"{% endif %}>Request my CV</a></h3>
+                            <h3>
+                                {% if user == profile.user or user.candidate.settings.auto_cv_download %}
+                                    <a href="{% if profile.cv %}{{ profile.cv.url }}{% endif %}" id="current_cv" {% if not profile.cv %}class="hidden"{% endif %}>Download CV</a>
+                                {% else %}
+                                    <form action="" method="POST" class="request-cv-form">
+                                        {% csrf_token %}
+                                        {{ request_cv_form.as_p }}
+                                        <button class="btn btn-primary">Request CV</button>
+                                    </form>
+                                {% endif %}
+                            </h3>
                             {% if user == profile.user %}
                                 <form action="{% url 'users:profile_cv_upload' %}" id="cv_upload_form" method="post" role="form" enctype="multipart/form-data" class="cv_form hidden text-center">
                                     {% csrf_token %}

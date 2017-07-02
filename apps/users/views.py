@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import (
+    CreateView,
     DetailView,
     TemplateView,
     UpdateView,
@@ -290,7 +291,6 @@ class SettingsUpdateView(LoginRequiredMixin, UpdateView):
     """
     model = CandidateSettings
     form_class = CandidateSettingsForm
-    template_name = 'users/settings.html'
     success_url = reverse_lazy('users:settings')
 
     def get(self, request, *args, **kwargs):
