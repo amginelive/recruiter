@@ -10,6 +10,7 @@ from django.shortcuts import render
 from django.views.generic import (
     DetailView,
     TemplateView,
+    UpdateView,
     View,
 )
 
@@ -20,11 +21,13 @@ from .forms import (
     CandidatePhotoUploadForm,
     CandidateUpdateForm,
     CandidateProfileDetailUpdateForm,
+    CandidateSettingsForm,
 )
 from .mixins import CandidateRequiredMixin
 from .models import (
     Agent,
     Candidate,
+    CandidateSettings,
     UserNote,
 )
 from .utils import get_profile_completeness
@@ -271,4 +274,29 @@ class SettingsView(LoginRequiredMixin, TemplateView):
     """
     template_name = 'users/settings.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(SettingsView, self).get_context_data(**kwargs)
+
+        if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
+            context['form'] = CandidateSettingsForm(instance=self.request.user.candidate.settings)
+
+        return context
 settings = SettingsView.as_view()
+
+
+class SettingsUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    View for the Settings page.
+    """
+    model = CandidateSettings
+    form_class = CandidateSettingsForm
+    template_name = 'users/settings.html'
+    success_url = reverse_lazy('users:settings')
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponseRedirect(self.success_url)
+
+    def get_object(self):
+        return self.request.user.candidate.settings
+
+settings_update = SettingsUpdateView.as_view()

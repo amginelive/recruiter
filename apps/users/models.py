@@ -391,7 +391,7 @@ class CandidateSettings(AbstractTimeStampedModel):
     """
     Model Candidate Settings.
     """
-    candidate = models.ForeignKey('users.Candidate', related_name='settings', verbose_name=_('Candidate'))
+    candidate = models.OneToOneField('users.Candidate', related_name='settings', verbose_name=_('Candidate'))
     auto_cv_download = models.BooleanField(_('Automatic Download of CV?'), default=False)
 
     class Meta:
@@ -399,4 +399,4 @@ class CandidateSettings(AbstractTimeStampedModel):
         verbose_name_plural = _('Candidate Settings')
 
     def __str__(self):
-        return self.candidate.get_full_name
+        return self.candidate.user.get_full_name()

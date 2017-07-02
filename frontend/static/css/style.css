@@ -1615,3 +1615,7 @@ section#my-applications .job-applications-table {
 section#settings .settings {
     margin-top: 30px;
 }
+
+section#settings .settings-form {
+    margin-top: 30px;
+}

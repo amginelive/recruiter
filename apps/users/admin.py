@@ -10,6 +10,7 @@ from .forms import (
 from .models import (
     Agent,
     Candidate,
+    CandidateSettings,
     CandidateSkill,
     UserNote,
 )
@@ -44,6 +45,7 @@ class UserAdmin(UserAdmin):
 
 admin.site.register(Agent)
 admin.site.register(Candidate)
+admin.site.register(CandidateSettings)
 admin.site.register(CandidateSkill)
 admin.site.register(User, UserAdmin)
 admin.site.register(UserNote)

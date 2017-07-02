@@ -11,6 +11,7 @@ from PIL import Image
 from .models import (
     Agent,
     Candidate,
+    CandidateSettings,
     CandidateSkill,
     UserNote,
 )
@@ -287,3 +288,13 @@ class UserNoteForm(forms.ModelForm):
         user_note.save()
 
         return user_note
+
+
+class CandidateSettingsForm(forms.ModelForm):
+    """
+    Form for CandidateSettings.
+    """
+
+    class Meta:
+        model = CandidateSettings
+        fields = ('auto_cv_download',)
