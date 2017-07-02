@@ -20,7 +20,7 @@
                             <a href="#activity-feed" aria-controls="activity-feed" role="tab" data-toggle="tab">Activity Feed</a>
                         </li>
                         <li role="presentation">
-                            <a href="#notifications" aria-controls="notifications" role="tab" data-toggle="tab">Notifications {% if connection_requests %}<span class="badge badge-new badge-notification"><span class="badge-notification-count">{{ connection_requests.count }}</span> New</span>{% endif %}</a>
+                            <a href="#notifications" aria-controls="notifications" role="tab" data-toggle="tab">Notifications {% if connection_requests or cv_requests %}<span class="badge badge-new badge-notification"><span class="badge-notification-count">{{ connection_requests.count|add:cv_requests.count }}</span> New</span>{% endif %}</a>
                         </li>
                         <li role="presentation">
                             <a href="#referrals" aria-controls="referrals" role="tab" data-toggle="tab">Referrals</a>
@@ -77,33 +77,61 @@
                             </div>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="notifications">
-                            <div class="col-md-4">
-                                <h1>Network</h1>
-                                <div class="row">
-                                    {% for connection_request in candidate_to_candidate_network_requests %}
-                                        {% include "recruit/snippets/connection_request_card.html" %}
-                                    {% empty %}
-                                        <p>No requests as of the moment.</p>
-                                    {% endfor %}
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h1>Candidate Network Requests</h1>
+                                    <div class="row">
+                                        {% for connection_request in candidate_to_candidate_network_requests %}
+                                            {% include "recruit/snippets/connection_request_card.html" %}
+                                        {% empty %}
+                                            <p>No requests as of the moment.</p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <h1>Candidate Team Member Requests</h1>
+                                    <div class="row">
+                                        {% for connection_request in candidate_to_candidate_team_member_requests %}
+                                            {% include "recruit/snippets/connection_request_card.html" %}
+                                        {% empty %}
+                                            <p>No requests as of the moment.</p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <h1>Agents Network Requests</h1>
+                                    <div class="row">
+                                        {% for connection_request in candidate_to_agent_network_requests %}
+                                            {% include "recruit/snippets/connection_request_card.html" %}
+                                        {% empty %}
+                                            <p>No requests as of the moment.</p>
+                                        {% endfor %}
+                                    </div>
                                 </div>
                             </div>
-
-                            <div class="col-md-4">
-                                <h1>Team Member</h1>
+                            <div class="row">
+                                <h1>CV Download Requests</h1>
                                 <div class="row">
-                                    {% for connection_request in candidate_to_candidate_team_member_requests %}
-                                        {% include "recruit/snippets/connection_request_card.html" %}
-                                    {% empty %}
-                                        <p>No requests as of the moment.</p>
-                                    {% endfor %}
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <h1>Agents</h1>
-                                <div class="row">
-                                    {% for connection_request in candidate_to_agent_network_requests %}
-                                        {% include "recruit/snippets/connection_request_card.html" %}
+                                    {% for cv_request in cv_requests %}
+                                        <div class="col-md-4 cv-request-card">
+                                            <div class="col-md-4">
+                                                {% if cv_request.requested_by.account_type == user.ACCOUNT_CANDIDATE %}
+                                                    <img src="{% if cv_request.requested_by.candidate.photo %}{{ cv_request.requested_by.candidate.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+                                                {% elif cv_request.requested_by.account_type == user.ACCOUNT_AGENT %}
+                                                    <img src="{% if cv_request.requested_by.agent.photo %}{{ cv_request.requested_by.agent.photo.url }}{% else %}{% static 'img/default_user.jpg' %}{% endif %}" style="width:70px; border-radius:50%">
+                                                {% endif %}
+                                            </div>
+                                            <div class="col-md-8 text-left">
+                                                <span class="search-info">{{ cv_request.requested_by.get_full_name }}</span>
+                                                <form action="{% url 'users:cv_request_update' cv_request.uuid %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <button class="btn btn-primary btn-xs btn-cv-request" data-status="{{ cv_request.STATUS_APPROVED }}">Approve</button>
+                                                    <button class="btn btn-primary btn-xs btn-cv-request" data-status="{{ cv_request.STATUS_DECLINED }}">Decline</button>
+                                                </form>
+                                            </div>
+                                        </div>
                                     {% empty %}
                                         <p>No requests as of the moment.</p>
                                     {% endfor %}
@@ -353,6 +381,40 @@
                     row.html('<p>No requests as of the moment.</p>')
 
                 $(this).closest('.connection-request-card').remove();
+            }
+        });
+    });
+
+    $('.btn-cv-request').on("click", function(e) {
+        e.preventDefault();
+        var form = $(this).closest('form');
+        var uuid = $(this).attr('data-uuid');
+        var status = $(this).attr('data-status');
+        var csrf = form.find('input[name=csrfmiddlewaretoken]').val();
+
+        $.ajax({
+            context: this,
+            type: form.attr('method'),
+            url: form.attr('action'),
+            data: {
+                status: status,
+                csrfmiddlewaretoken: csrf,
+            },
+            dataType: "json",
+            success: function(response) {
+                debugger;
+                var count = $('.badge-notification-count').html();
+                if (count == 1) {
+                    $('.badge-notification').remove();
+                }
+                else {
+                    $('.badge-notification-count').html(count - 1);
+                }
+                var row = $(this).closest('.row');
+                if (row.find('.cv-request-card').length == 1)
+                    row.html('<p>No requests as of the moment.</p>')
+
+                $(this).closest('.cv-request-card').remove();
             }
         });
     });

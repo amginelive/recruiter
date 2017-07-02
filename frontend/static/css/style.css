@@ -1619,3 +1619,9 @@ section#settings .settings {
 section#settings .settings-form {
     margin-top: 30px;
 }
+
+.cv-request-card {
+    border:1px
+    solid #dfdfdf;
+    padding:15px;
+}

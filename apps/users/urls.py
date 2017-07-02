@@ -21,4 +21,5 @@ urlpatterns = (
     url(r'^user-note/:pk/update/api/$', api.user_note_update, name='user_note_update'),
     url(r'^user-note/:pk/delete/api/$', api.user_note_delete, name='user_note_delete'),
     url(r'^tracking/:pk/api/$', api.tracking, name='tracking'),
+    url(r'^cv/request/:uuid/api/$', api.cv_request_update, name='cv_request_update'),
 )

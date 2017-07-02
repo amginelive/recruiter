@@ -42,10 +42,14 @@ from companies.models import (
     Company,
     CompanyRequestInvitation,
 )
-from users.models import Candidate
+from users.forms import CVRequestForm
 from users.mixins import (
     AgentRequiredMixin,
     CandidateRequiredMixin,
+)
+from users.models import (
+    Candidate,
+    CVRequest,
 )
 
 
@@ -111,6 +115,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             user_referrals = UserReferral.objects.filter(referred_to=self.request.user)
             context['candidate_referrals'] = user_referrals.filter(referred_user__account_type=User.ACCOUNT_CANDIDATE)
             context['agent_referrals'] = user_referrals.filter(referred_user__account_type=User.ACCOUNT_AGENT)
+            context['cv_requests']  = CVRequest.objects\
+                .filter(candidate=self.request.user.candidate)\
+                .filter(status=CVRequest.STATUS_PENDING)
 
         return context
 
