@@ -593,8 +593,6 @@ class ChatServer(JsonWebsocketConsumer):
             return
 
         target = conversation.participants.get(user_id=user_id)
-        if target.status == Participant.PARTICIPANT_DECLINED:
-            return
 
         if target.status == Participant.PARTICIPANT_ACCEPTED:
             self.group_send(str(user_id), {
