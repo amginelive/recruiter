@@ -407,8 +407,20 @@ class CVRequest(AbstractTimeStampedModel):
     """
     Model for CV Request.
     """
+
+    STATUS_PENDING = 0
+    STATUS_APPROVED = 1
+    STATUS_DECLINED = 2
+    STATUS_CHOICES = (
+        (STATUS_PENDING, 'Pending'),
+        (STATUS_APPROVED, 'Approved'),
+        (STATUS_DECLINED, 'Declined'),
+    )
+
     candidate = models.ForeignKey('users.Candidate', related_name='cv_requests', verbose_name=_('Candidate'))
+    requested_by = models.ForeignKey('users.User', related_name='cv_requests', verbose_name=_('User'))
     uuid = models.UUIDField(_('Automatic Download of CV?'), default=uuid.uuid4, editable=False)
+    status = models.IntegerField(_('Status'), choices=STATUS_CHOICES, default=STATUS_PENDING)
 
     class Meta:
         verbose_name = _('CV Request')

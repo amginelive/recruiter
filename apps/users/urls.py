@@ -12,6 +12,7 @@ urlpatterns = (
     url(r'^agent/search/$', views.agent_search, name='agent_search'),
     url(r'^settings/$', views.settings, name='settings'),
     url(r'^settings/update/$', views.settings_update, name='settings_update'),
+    url(r'^:slug/cv/request/$', views.cv_request, name='cv_request'),
 
     url(r'^photo/upload/api/$', api.profile_photo_upload, name='profile_photo_upload'),
     url(r'^cv/upload/api/$', api.profile_cv_upload, name='profile_cv_upload'),

@@ -12,6 +12,7 @@ from .models import (
     Candidate,
     CandidateSettings,
     CandidateSkill,
+    CVRequest,
     UserNote,
 )
 
@@ -47,5 +48,6 @@ admin.site.register(Agent)
 admin.site.register(Candidate)
 admin.site.register(CandidateSettings)
 admin.site.register(CandidateSkill)
+admin.site.register(CVRequest)
 admin.site.register(User, UserAdmin)
 admin.site.register(UserNote)
