@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactModal from 'react-modal';
-import { Scrollbars } from 'react-custom-scrollbars';
+
+import UserQueryForm from './user-query-form.jsx';
 
 
 class CreateGroupChatModal extends React.Component {
@@ -10,103 +11,13 @@ class CreateGroupChatModal extends React.Component {
         this.state = {
             groupName: '',
             groupMessage: '',
-            userSearchQuery: '',
-            selectedUsers: [],
-            queryUsers: [],
-            activeQueryIndex: 0,
-            queryUserDOMHeight: 20,
             valid: {
                 users: true,
                 name: true,
                 message: true
-            }
+            },
+            selectedUsers: []
         };
-    }
-
-    selectUser(index) {
-        this.setState({
-            valid: {...this.state.valid, users: true},
-            selectedUsers: [...this.state.selectedUsers, this.state.queryUsers[index]],
-            activeQueryIndex: 0,
-            userSearchQuery: '',
-            queryUsers: []
-        });
-    }
-
-    handleKeyPress(event) {
-        if (event.key === 'ArrowDown') {
-            if (this.state.queryUsers.length > 1) {
-                if (this.state.activeQueryIndex < this.state.queryUsers.length - 1) {
-                    const scrollValues = this.scroll.getValues();
-                    const activeQueryIndex = this.state.activeQueryIndex + 1;
-                    const activeElementScroll = this.state.queryUserDOMHeight*(activeQueryIndex + 1);
-                    if (activeElementScroll > scrollValues.scrollTop + scrollValues.clientHeight) {
-                        this.scroll.scrollTop(scrollValues.scrollTop + this.state.queryUserDOMHeight);
-                    }
-                    this.setState({activeQueryIndex});
-                } else {
-                    this.setState({activeQueryIndex: 0});
-                    this.scroll.scrollToTop();
-                }
-            }
-            event.preventDefault();
-            return;
-        }
-        if (event.key === 'ArrowUp') {
-            if (this.state.queryUsers.length > 1) {
-                if (this.state.activeQueryIndex > 0) {
-                    const scrollValues = this.scroll.getValues();
-                    const activeQueryIndex = this.state.activeQueryIndex - 1;
-                    const activeElementScroll = this.state.queryUserDOMHeight*(activeQueryIndex);
-                    if (activeElementScroll < scrollValues.scrollTop) {
-                        this.scroll.scrollTop(scrollValues.scrollTop - this.state.queryUserDOMHeight);
-                    }
-                    this.setState({activeQueryIndex});
-                } else {
-                    this.setState({activeQueryIndex: this.state.queryUsers.length - 1});
-                    this.scroll.scrollToBottom();
-                }
-            }
-            event.preventDefault();
-            return;
-        }
-        if (event.key === 'Enter' || event.key === 'Tab') {
-            event.preventDefault();
-            if (this.state.queryUsers.length > 0) {
-                return this.selectUser(this.state.activeQueryIndex);
-            }
-        }
-        this.searchUsers();
-    }
-
-    searchUsers() {
-        const users = this.props.users.delete('self').delete('extra').delete(this.props.users.get('self').toString());
-        const userSearchQuery = this.userSearchInput.value;
-        if (userSearchQuery !== this.state.userSearchQuery) {
-            this.setState({userSearchQuery});
-            this.setState({activeQueryIndex: 0});
-            if (userSearchQuery.length > 0) {
-                let queryUsers = users.filter(user => {
-                    const has_name = user.get('name').toLowerCase().includes(userSearchQuery.toLowerCase());
-                    const has_email = user.get('email').toLowerCase().includes(userSearchQuery.toLowerCase());
-                    return has_email || has_name;
-                });
-                queryUsers = queryUsers.map((user, id) => {
-                    return user.set('id', parseInt(id)).toObject();
-                }).toArray();
-                const selected_ids = this.state.selectedUsers.map(user => user.id);
-                queryUsers = queryUsers.filter(user => !selected_ids.some(id => id === user.id));
-                this.setState({queryUsers});
-            } else {
-                this.setState({queryUsers: []});
-            }
-        }
-    }
-
-    removeSelectedUser(index) {
-        const {selectedUsers} = this.state;
-        selectedUsers.splice(index, 1);
-        this.setState(selectedUsers);
     }
 
     checkGroupMessage() {
@@ -133,10 +44,6 @@ class CreateGroupChatModal extends React.Component {
         this.setState({
             groupName: '',
             groupMessage: '',
-            userSearchQuery: '',
-            selectedUsers: [],
-            queryUsers: [],
-            activeQueryIndex: 0,
             valid: {
                 users: true,
                 name: true,
@@ -173,46 +80,15 @@ class CreateGroupChatModal extends React.Component {
         });
     }
 
+    userQueryChange(users) {
+        const valid = users.length > 0;
+        this.setState({
+            selectedUsers: users,
+            valid: {...this.state.valid, users: valid}
+        });
+    }
+
     render() {
-        let usersQueryUI = '';
-        if (this.state.queryUsers.length > 0) {
-            const height_max = 60;
-            const height = Math.min(this.state.queryUsers.length * this.state.queryUserDOMHeight, height_max);
-            usersQueryUI = (
-                <div className='users-query-list' style={{height}}>
-                    <Scrollbars ref={(scroll) => {this.scroll = scroll;}}
-                                style={{height: '100%'}}
-                    >
-                        {this.state.queryUsers.map((user, index) => {
-                            return (
-                                <div
-                                    key={index}
-                                    className={'users-query-list-item' + (index === this.state.activeQueryIndex ? ' active' : '')}
-                                    onClick={this.selectUser.bind(this, index)}
-                                >
-                                    {`${user.name} <${user.email}>`}
-                                </div>
-                            );
-                        })}
-                    </Scrollbars>
-                </div>
-            );
-        }
-        let selectedUsersUI = '';
-        if (this.state.selectedUsers.length > 0) {
-            selectedUsersUI = (
-                <div>
-                    <label>Selected people:</label>
-                    <ul>
-                        {this.state.selectedUsers.map((user, index) => {
-                            return (
-                                <li key={index}>{user.name}<span style={{fontSize: '10px', marginLeft: '5px', cursor: 'pointer'}} className='glyphicon glyphicon-remove' onClick={this.removeSelectedUser.bind(this, index)} /></li>
-                            );
-                        })}
-                    </ul>
-                </div>
-            );
-        }
         return (
             <ReactModal
                 isOpen={this.props.showModal}
@@ -239,18 +115,12 @@ class CreateGroupChatModal extends React.Component {
                 <form id='create-group-form' onSubmit={this.handleCreate.bind(this)} autoComplete='off'>
                     <div className='group-chat-modal-body'>
                         <label>Add person:</label>
-                        <div id='user-search' className={'user-query-container modal-control' + (this.state.valid.users ? '' : ' error')}>
-                            <input
-                                type='text'
-                                onKeyDown={this.handleKeyPress.bind(this)}
-                                onChange={this.searchUsers.bind(this)}
-                                ref={input => this.userSearchInput = input}
-                                value={this.state.userSearchQuery}
-                                placeholder='Search person by name or email'
-                            />
-                            {usersQueryUI}
-                        </div>
-                        {selectedUsersUI}
+                        <UserQueryForm
+                            id='user-search'
+                            users={this.props.users.delete('self').delete('extra').delete(this.props.users.get('self').toString())}
+                            onChange={this.userQueryChange.bind(this)}
+                            valid={this.state.valid.users}
+                        />
                         <label>Group name:</label>
                         <div id='group-name' className={'modal-control' + (this.state.valid.name ? '' : ' error')}>
                             <input
