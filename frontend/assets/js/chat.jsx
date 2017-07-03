@@ -69,8 +69,8 @@ class App extends React.Component {
         this.props.actions.kickUser(user_id);
     }
 
-    handleInviteUser(user_id) {
-        this.props.actions.inviteUser(user_id);
+    handleInviteUsers(payload) {
+        this.props.actions.inviteUsers(payload);
     }
 
     render() {
@@ -91,7 +91,7 @@ class App extends React.Component {
                     showModal={this.state.showInfoGroupChatModal}
                     onClose={this.handleCloseInfoGroupChatModal.bind(this)}
                     onKick={this.handleKickUser.bind(this)}
-                    onInvite={this.handleInviteUser.bind(this)}
+                    onInvite={this.handleInviteUsers.bind(this)}
                     users={this.props.users}
                     chats={this.props.chats}
                 />

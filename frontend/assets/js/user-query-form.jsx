@@ -102,6 +102,15 @@ class UserQueryForm extends React.Component {
         this.setState(selectedUsers);
     }
 
+    resetState() {
+        this.setState({
+            userSearchQuery: '',
+            selectedUsers: [],
+            queryUsers: [],
+            activeQueryIndex: 0
+        });
+    }
+
     render() {
         let usersQueryUI = '';
         if (this.state.queryUsers.length > 0) {

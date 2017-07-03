@@ -264,8 +264,8 @@ class ChatServer(JsonWebsocketConsumer):
             self.cmd_leave_group()
         elif content.get('type') == 'kickUser':
             self.cmd_kick_user(content.get('payload'))
-        elif content.get('type') == 'inviteUser':
-            self.cmd_invite_user(content.get('payload'))
+        elif content.get('type') == 'inviteUsers':
+            self.cmd_invite_users(content.get('payload'))
 
     def cmd_init(self, payload):
         if payload:
@@ -400,15 +400,18 @@ class ChatServer(JsonWebsocketConsumer):
                 }
             })
 
-    def cmd_create_group(self, payload):
+    def _check_user_ids_in_network(self, user_ids):
         network_users_ids = [
             user.id
             for user
             in self.message.channel_session.get('user_list')
         ]
-        if not all([user_id in network_users_ids
+        return all([user_id in network_users_ids
                     for user_id
-                    in payload.get('user_ids')]):
+                    in user_ids])
+
+    def cmd_create_group(self, payload):
+        if not self._check_user_ids_in_network(payload.get('user_ids')):
             return
 
         chat_group = Conversation.objects.create(
@@ -608,8 +611,33 @@ class ChatServer(JsonWebsocketConsumer):
         target.delete()
         self._emit_group_chat_update(conversation)
 
-    def cmd_invite_user(self, user_id):
-        pass
+    def cmd_invite_users(self, payload):
+        conversation = self.message.channel_session.get('conversation')
+        if conversation.conversation_type != Conversation.CONVERSATION_GROUP \
+                or conversation.owner != self.message.user \
+                or not self._check_user_ids_in_network(payload.get('user_ids')):
+            return
+
+        for user_id in payload.get('user_ids'):
+            try:
+                participant = conversation.participants.get(user_id=user_id)
+                if participant.status != participant.PARTICIPANT_DECLINED:
+                    continue
+            except ObjectDoesNotExist:
+                Participant.objects.create(
+                    user=User.objects.get(id=user_id),
+                    conversation=conversation,
+                    status=Participant.PARTICIPANT_PENDING
+                )
+            else:
+                participant.status = Participant.PARTICIPANT_PENDING
+                participant.save()
+            self.cmd_invite_to_group(
+                user_id,
+                group=conversation,
+                text=payload.get('message')
+            )
+        self._emit_group_chat_update(conversation)
 
     def disconnect(self, message, **kwargs):
         self.cmd_idle(False)

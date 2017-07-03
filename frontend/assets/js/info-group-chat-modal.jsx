@@ -10,22 +10,66 @@ class InfoGroupChatModal extends React.Component {
 
         this.state = {
             selectedUsers: [],
+            groupMessage: '',
             valid: {
-                users: true
+                users: true,
+                message: true
             }
         }
     }
 
     handleClose() {
         this.props.onClose();
+        this.resetState();
     }
 
     handleKick(user_id) {
         this.props.onKick(parseInt(user_id));
     }
 
-    handleInvite(user_list) {
-        this.props.onInvite(user_list.map(user_id => parseInt(user_id)));
+    handleInvite(event) {
+        event.preventDefault();
+        let valid = {...this.state.valid};
+        if (this.state.groupMessage.length === 0) {
+            valid.message = false;
+        }
+        if (this.state.selectedUsers.length === 0) {
+            valid.users = false;
+        }
+        if (valid !== this.state.valid) {
+            this.setState({valid});
+        }
+        setTimeout(() => {
+            if (Object.values(this.state.valid).every(value => value)) {
+                this.props.onInvite({
+                    user_ids: this.state.selectedUsers.map(user => user.id),
+                    message: this.state.groupMessage
+                });
+                this.resetState();
+            }
+        });
+    }
+
+    resetState() {
+        this.setState({
+            selectedUsers: [],
+            groupMessage: '',
+            valid: {
+                users: true,
+                message: true
+            }
+        });
+        this.queryForm.resetState();
+    }
+
+    checkGroupMessage() {
+        const groupMessage = this.groupMessageInput.value;
+        if (groupMessage.length > 0) {
+            this.setState({
+                groupMessage,
+                valid: {...this.state.valid, message: true}
+            });
+        }
     }
 
     renderUsersGroup(users, header, owner) {
@@ -36,18 +80,55 @@ class InfoGroupChatModal extends React.Component {
         users = users.sortBy((value, key) => key, (a, b) => {return parseInt(a) === owner ? -1 : (parseInt(b) === owner ? 1 : 0)});
         const merged_users = this.props.users.merge(this.props.users.get('extra')).delete('extra').delete('self');
         return (
-            <ul>
+            <div>
                 <label>{header}</label>
-                {users.map((user, user_id) => {
-                    return (
-                        <li key={user_id}>
-                            {merged_users.get(user_id.toString()).get('name') + (parseInt(user_id) === owner ? ' (owner)' : '')}
-                            {admin && parseInt(user_id) !== owner ? <span style={{fontSize: '10px', marginLeft: '5px', cursor: 'pointer'}} className='glyphicon glyphicon-remove' onClick={this.handleKick.bind(this, user_id)} /> : ''}
-                        </li>
-                    );
-                }).toArray()}
-            </ul>
+                <ul>
+                    {users.map((user, user_id) => {
+                        return (
+                            <li key={user_id}>
+                                {merged_users.get(user_id.toString()).get('name') + (parseInt(user_id) === owner ? ' (owner)' : '')}
+                                {admin && parseInt(user_id) !== owner ? <span style={{fontSize: '10px', marginLeft: '5px', cursor: 'pointer'}} className='glyphicon glyphicon-remove' onClick={this.handleKick.bind(this, user_id)} /> : ''}
+                            </li>
+                        );
+                    }).toArray()}
+                </ul>
+            </div>
         );
+    }
+
+    renderInviteMoreUsersUI(users) {
+        let activeUI = <div />;
+        if (this.state.selectedUsers.length > 0) {
+            activeUI = (
+                <div>
+                    <label>Message:</label>
+                    <div id='group-message' className={'modal-control' + (this.state.valid.message ? '' : ' error')}>
+                        <textarea
+                            onKeyDown={this.checkGroupMessage.bind(this)}
+                            onChange={this.checkGroupMessage.bind(this)}
+                            ref={input => this.groupMessageInput = input}
+                            value={this.state.groupMessage}
+                        />
+                    </div>
+                    <button className='chat-button modal-button' type='submit' disabled={false}>
+                        Invite
+                    </button>
+                </div>
+            );
+        }
+        return (
+            <form id='invite-more-form' onSubmit={this.handleInvite.bind(this)} autoComplete='off'>
+                <label>Invite more people:</label>
+                <UserQueryForm
+                    id='user-invite'
+                    users={users}
+                    onChange={this.userQueryChange.bind(this)}
+                    valid={this.state.valid.users}
+                    ref={queryForm => this.queryForm = queryForm}
+                />
+                {activeUI}
+            </form>
+        )
     }
 
     userQueryChange(users) {
@@ -68,7 +149,7 @@ class InfoGroupChatModal extends React.Component {
         const active_users = chat.get('users').filter(user => user.get('status') === 0);
         const pending_users = chat.get('users').filter(user => user.get('status') === 1);
         const declined_users = chat.get('users').filter(user => user.get('status') === 2);
-        const invitable_users = users.delete('self').delete('extra').delete(users.get('self').toString()).filter(user => !active_users.includes(user) && !pending_users.includes(user));
+        const invitable_users = users.delete('self').delete('extra').delete(users.get('self').toString()).filter((user, id) => !active_users.has(id) && !pending_users.has(id));
         return (
             <ReactModal
                 isOpen={this.props.showModal}
@@ -102,22 +183,7 @@ class InfoGroupChatModal extends React.Component {
                     {this.renderUsersGroup(declined_users, 'Declined users:', chat.get('owner'))}
                 </div>
                 <div className='group-chat-modal-footer'>
-                    <form id='invite-more-form' onSubmit={this.handleInvite.bind(this)} autoComplete='off'>
-                        <label>Invite more people:</label>
-                        <UserQueryForm
-                            id='user-invite'
-                            users={invitable_users}
-                            onChange={this.userQueryChange.bind(this)}
-                            valid={this.state.valid.users}
-                        />
-                        {
-                            this.state.selectedUsers.length > 0 ?
-                            <button className='chat-button modal-button' type='submit' disabled={false}>
-                                Invite
-                            </button> :
-                            ''
-                        }
-                    </form>
+                    {this.renderInviteMoreUsersUI(invitable_users)}
                 </div>
             </ReactModal>
         );

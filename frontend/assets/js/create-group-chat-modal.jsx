@@ -44,6 +44,7 @@ class CreateGroupChatModal extends React.Component {
         this.setState({
             groupName: '',
             groupMessage: '',
+            selectedUsers: [],
             valid: {
                 users: true,
                 name: true,
