@@ -142,7 +142,7 @@ class CreateGroupChatModal extends React.Component {
                         </div>
                     </div>
                     <div className='group-chat-modal-footer'>
-                        <button className='chat-button create-group-button' type='submit' disabled={false}>
+                        <button className='chat-button modal-button' type='submit' disabled={false}>
                             Create
                         </button>
                     </div>
