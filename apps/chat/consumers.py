@@ -6,9 +6,9 @@ from django.core.exceptions import ValidationError
 
 from channels.generic.websockets import JsonWebsocketConsumer
 
-from recruit.models import Connection
 from chat.models import Conversation, GroupInvite, Message, Participant
 from chat.utils import update_user_idle, update_user_presence
+from recruit.models import Connection
 
 User = get_user_model()
 
