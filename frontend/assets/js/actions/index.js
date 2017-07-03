@@ -78,9 +78,9 @@ export function kickUser(user_id) {
     }
 }
 
-export function inviteUser(user_id) {
+export function inviteUsers(payload) {
     return (dispatch, getState, {emit}) => {
-        emit(messageTypes.inviteUser, user_id);
+        emit(messageTypes.inviteUsers, payload);
     }
 }
 

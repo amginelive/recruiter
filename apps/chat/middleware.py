@@ -1,4 +1,4 @@
-from .utils import update_user_presence
+from chat.utils import update_user_presence
 
 
 class ActiveUserMiddleware:

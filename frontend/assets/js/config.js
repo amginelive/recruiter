@@ -14,7 +14,7 @@ const messageTypes = [
     'answerInvite',
     'leaveGroup',
     'kickUser',
-    'inviteUser',
+    'inviteUsers',
     'chatsUpdate'
 ].reduce((accum, msg) => {
     accum[ msg ] = msg;

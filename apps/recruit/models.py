@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from core.models import AbstractTimeStampedModel, optional
+from chat.models import Conversation, Participant
 from django_countries.fields import CountryField
 
 
@@ -85,6 +86,29 @@ class Connection(AbstractTimeStampedModel):
     connecter = models.ForeignKey('users.User', related_name='+', verbose_name=_('Connecter'))
     connectee = models.ForeignKey('users.User', related_name='+', verbose_name=_('Connectee'))
     connection_type = models.IntegerField(_('Connection Type'), choices=CONNECTION_TYPE_CHOICES)
+
+    def save(self, *args, **kwargs):
+        allowed_chat_types = (
+            Connection.CONNECTION_CANDIDATE_TO_AGENT_NETWORK,
+            Connection.CONNECTION_AGENT_TO_AGENT_NETWORK,
+            Connection.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER,
+        )
+        if not self.pk and self.connection_type in allowed_chat_types:
+            conversation = Conversation.objects \
+                .filter(conversation_type=Conversation.CONVERSATION_USER) \
+                .filter(users=self.connecter) \
+                .filter(users=self.connectee)
+            if not conversation.exists():
+                conversation = Conversation.objects.create()
+                Participant.objects.create(
+                    user=self.connecter,
+                    conversation=conversation,
+                )
+                Participant.objects.create(
+                    user=self.connectee,
+                    conversation=conversation,
+                )
+        return super(Connection, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = _('Connection')
