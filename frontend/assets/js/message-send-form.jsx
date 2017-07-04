@@ -43,7 +43,7 @@ class MessageForm extends React.Component {
         const submitDisabled = !this.state.valid;
         return (
             <form id='message-form' onSubmit={this.onSend.bind(this)}>
-                <input className='message-input'
+                <input className='chat-input message-input'
                        ref={input => this.textInput = input}
                        type='text'
                        placeholder='Say something nice'
