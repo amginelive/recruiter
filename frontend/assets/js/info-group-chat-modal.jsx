@@ -2,6 +2,7 @@ import React from 'react';
 import ReactModal from 'react-modal';
 
 import UserQueryForm from './user-query-form.jsx';
+import UserListItem from './user-list-item.jsx';
 
 
 class InfoGroupChatModal extends React.Component {
@@ -64,9 +65,11 @@ class InfoGroupChatModal extends React.Component {
 
     checkGroupMessage() {
         const groupMessage = this.groupMessageInput.value;
+        this.setState({
+            groupMessage
+        });
         if (groupMessage.length > 0) {
             this.setState({
-                groupMessage,
                 valid: {...this.state.valid, message: true}
             });
         }
@@ -80,18 +83,15 @@ class InfoGroupChatModal extends React.Component {
         users = users.sortBy((value, key) => key, (a, b) => {return parseInt(a) === owner ? -1 : (parseInt(b) === owner ? 1 : 0)});
         const merged_users = this.props.users.merge(this.props.users.get('extra')).delete('extra').delete('self');
         return (
-            <div>
+            <div className='modal-control'>
                 <label>{header}</label>
-                <ul>
-                    {users.map((user, user_id) => {
-                        return (
-                            <li key={user_id}>
-                                {merged_users.get(user_id.toString()).get('name') + (parseInt(user_id) === owner ? ' (owner)' : '')}
-                                {admin && parseInt(user_id) !== owner ? <span style={{fontSize: '10px', marginLeft: '5px', cursor: 'pointer'}} className='glyphicon glyphicon-remove' onClick={this.handleKick.bind(this, user_id)} /> : ''}
-                            </li>
-                        );
-                    }).toArray()}
-                </ul>
+                {users.map((user, user_id) => {
+                    let onAction = null;
+                    if (admin && parseInt(user_id) !== owner) {
+                        onAction = this.handleKick.bind(this, user_id);
+                    }
+                    return <UserListItem key={user_id} user={merged_users.get(user_id.toString()).toJS()} onAction={onAction} />;
+                }).toArray()}
             </div>
         );
     }
@@ -101,16 +101,17 @@ class InfoGroupChatModal extends React.Component {
         if (this.state.selectedUsers.length > 0) {
             activeUI = (
                 <div>
-                    <label>Message:</label>
                     <div id='group-message' className={'modal-control' + (this.state.valid.message ? '' : ' error')}>
+                        <label>Message:</label>
                         <textarea
+                            className='chat-input'
                             onKeyDown={this.checkGroupMessage.bind(this)}
                             onChange={this.checkGroupMessage.bind(this)}
                             ref={input => this.groupMessageInput = input}
                             value={this.state.groupMessage}
                         />
                     </div>
-                    <button className='chat-button modal-button' type='submit' disabled={false}>
+                    <button style={{marginTop: 20}} className='chat-button modal-button' type='submit' disabled={false}>
                         Invite
                     </button>
                 </div>
@@ -118,12 +119,12 @@ class InfoGroupChatModal extends React.Component {
         }
         return (
             <form id='invite-more-form' onSubmit={this.handleInvite.bind(this)} autoComplete='off'>
-                <label>Invite more people:</label>
                 <UserQueryForm
                     id='user-invite'
+                    label='Invite more people:'
                     users={users}
                     onChange={this.userQueryChange.bind(this)}
-                    valid={this.state.valid.users}
+                    valid={true}
                     ref={queryForm => this.queryForm = queryForm}
                 />
                 {activeUI}
@@ -173,13 +174,9 @@ class InfoGroupChatModal extends React.Component {
                     >
                     </span>
                 </div>
-                <div className='group-chat-modal-footer'>
+                <div className='group-chat-modal-body'>
                     {this.renderUsersGroup(active_users, 'Joined users:', chat.get('owner'))}
-                </div>
-                <div className='group-chat-modal-footer'>
                     {this.renderUsersGroup(pending_users, 'Pending invites:', chat.get('owner'))}
-                </div>
-                <div className='group-chat-modal-footer'>
                     {this.renderUsersGroup(declined_users, 'Declined users:', chat.get('owner'))}
                 </div>
                 <div className='group-chat-modal-footer'>

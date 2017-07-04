@@ -22,9 +22,11 @@ class CreateGroupChatModal extends React.Component {
 
     checkGroupMessage() {
         const groupMessage = this.groupMessageInput.value;
+        this.setState({
+            groupMessage
+        });
         if (groupMessage.length > 0) {
             this.setState({
-                groupMessage,
                 valid: {...this.state.valid, message: true}
             });
         }
@@ -32,9 +34,11 @@ class CreateGroupChatModal extends React.Component {
 
     checkGroupName() {
         const groupName = this.groupNameInput.value;
+        this.setState({
+            groupName
+        });
         if (groupName.length > 0) {
             this.setState({
-                groupName,
                 valid: {...this.state.valid, name: true}
             });
         }
@@ -115,16 +119,17 @@ class CreateGroupChatModal extends React.Component {
                 </div>
                 <form id='create-group-form' onSubmit={this.handleCreate.bind(this)} autoComplete='off'>
                     <div className='group-chat-modal-body'>
-                        <label>Add person:</label>
                         <UserQueryForm
                             id='user-search'
+                            label='Add person:'
                             users={this.props.users.delete('self').delete('extra').delete(this.props.users.get('self').toString())}
                             onChange={this.userQueryChange.bind(this)}
                             valid={this.state.valid.users}
                         />
-                        <label>Group name:</label>
                         <div id='group-name' className={'modal-control' + (this.state.valid.name ? '' : ' error')}>
+                            <label>Group name:</label>
                             <input
+                                className='chat-input'
                                 type='text'
                                 onKeyDown={this.checkGroupName.bind(this)}
                                 onChange={this.checkGroupName.bind(this)}
@@ -132,9 +137,10 @@ class CreateGroupChatModal extends React.Component {
                                 value={this.state.groupName}
                             />
                         </div>
-                        <label>Message:</label>
                         <div id='group-message' className={'modal-control' + (this.state.valid.message ? '' : ' error')}>
+                            <label>Message:</label>
                             <textarea
+                                className='chat-input'
                                 onKeyDown={this.checkGroupMessage.bind(this)}
                                 onChange={this.checkGroupMessage.bind(this)}
                                 ref={input => this.groupMessageInput = input}

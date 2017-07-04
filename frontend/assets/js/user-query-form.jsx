@@ -1,6 +1,8 @@
 import React from 'react';
 import { Scrollbars } from 'react-custom-scrollbars';
 
+import UserListItem from './user-list-item.jsx';
+
 
 class UserQueryForm extends React.Component {
     constructor(props) {
@@ -11,7 +13,7 @@ class UserQueryForm extends React.Component {
             selectedUsers: [],
             queryUsers: [],
             activeQueryIndex: 0,
-            queryUserDOMHeight: 20
+            queryUserDOMHeight: 30
         };
     }
 
@@ -100,6 +102,7 @@ class UserQueryForm extends React.Component {
         const {selectedUsers} = this.state;
         selectedUsers.splice(index, 1);
         this.setState(selectedUsers);
+        this.props.onChange(selectedUsers);
     }
 
     resetState() {
@@ -114,12 +117,14 @@ class UserQueryForm extends React.Component {
     render() {
         let usersQueryUI = '';
         if (this.state.queryUsers.length > 0) {
-            const height_max = 60;
+            const height_max = this.state.queryUserDOMHeight*5;
             const height = Math.min(this.state.queryUsers.length * this.state.queryUserDOMHeight, height_max);
             usersQueryUI = (
                 <div className='users-query-list' style={{height}}>
                     <Scrollbars ref={(scroll) => {this.scroll = scroll;}}
                                 style={{height: '100%'}}
+                                autoHide autoHideTimeout={1000}
+                                autoHideDuration={200}
                     >
                         {this.state.queryUsers.map((user, index) => {
                             return (
@@ -140,21 +145,20 @@ class UserQueryForm extends React.Component {
         if (this.state.selectedUsers.length > 0) {
             selectedUsersUI = (
                 <div>
-                    <label>Selected people:</label>
-                    <ul>
+                    <div className={'well' + (this.state.selectedUsers.length > 0 ? '' : ' hidden')}>
                         {this.state.selectedUsers.map((user, index) => {
-                            return (
-                                <li key={index}>{user.name}<span style={{fontSize: '10px', marginLeft: '5px', cursor: 'pointer'}} className='glyphicon glyphicon-remove' onClick={this.removeSelectedUser.bind(this, index)} /></li>
-                            );
+                            return <UserListItem key={index} user={user} onAction={this.removeSelectedUser.bind(this, index)} />;
                         })}
-                    </ul>
+                    </div>
                 </div>
             );
         }
         return (
             <div id={this.props.id} className={'user-query-container modal-control' + (this.props.valid ? '' : ' error')}>
+                <label>{this.props.label}</label>
                 <input
                     type='text'
+                    className='chat-input'
                     onKeyDown={this.handleKeyPress.bind(this)}
                     onChange={this.searchUsers.bind(this)}
                     ref={input => this.userSearchInput = input}
