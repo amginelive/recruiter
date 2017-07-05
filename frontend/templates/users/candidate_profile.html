@@ -56,7 +56,31 @@
                             {% endif %}
                         </div>
                         <div class="col-md-7">
-                            <h3><a href="{% if profile.cv %}{{ profile.cv.url }}{% endif %}" id="current_cv" {% if not profile.cv %}class="hidden"{% endif %}>Request my CV</a></h3>
+                            <h3>
+                                {% if profile.cv %}
+                                    {% if user != profile.user %}
+                                        {% if profile.settings.auto_cv_download %}
+                                            <a href="{{ profile.cv.url }}" id="current_cv">Download CV</a>
+                                        {% else %}
+                                            {% if not cv_request %}
+                                                <form action="{% url 'users:cv_request' profile.user.slug %}" method="POST" class="request-cv-form">
+                                                    {% csrf_token %}
+                                                    <div class="hidden">{{ cv_request_form.as_p }}</div>
+                                                    <button class="btn btn-primary">Request CV</button>
+                                                </form>
+                                            {% elif cv_request.status == cv_request.STATUS_PENDING %}
+                                                <button class="btn btn-primary" disabled="disabled">CV Download Waiting for Approval</button>
+                                            {% elif cv_request.status == cv_request.STATUS_DECLINED %}
+                                                <button class="btn btn-primary" disabled="disabled">CV Download Request Declined</button>
+                                            {% elif cv_request.status == cv_request.STATUS_APPROVED %}
+                                                <a href="{{ profile.cv.url }}" id="current_cv">Download CV</a>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% else %}
+                                        <a href="{{ profile.cv.url }}" id="current_cv">Download CV</a>
+                                    {% endif %}
+                                {% endif %}
+                            </h3>
                             {% if user == profile.user %}
                                 <form action="{% url 'users:profile_cv_upload' %}" id="cv_upload_form" method="post" role="form" enctype="multipart/form-data" class="cv_form hidden text-center">
                                     {% csrf_token %}

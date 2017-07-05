@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.contrib.humanize.templatetags.humanize import naturaltime
-from django.db.models import Count
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.template.defaultfilters import date
@@ -32,6 +31,8 @@ from chat.models import (
     Conversation,
     Message,
 )
+from users.models import CVRequest
+from users.forms import CVRequestForm
 
 
 User = get_user_model()
@@ -251,3 +252,28 @@ class TrackingAPIView(LoginRequiredMixin, View, JSONResponseMixin):
         return self.render_json_response({'data': data})
 
 tracking = TrackingAPIView.as_view()
+
+
+class CVRequestUpdateView(LoginRequiredMixin, UpdateView, JSONResponseMixin):
+    """
+    View for the CV Request.
+    """
+    model = CVRequest
+    form_class = CVRequestForm
+
+    def get_object(self):
+        return CVRequest.objects.get(uuid=self.kwargs.get('uuid'))
+
+    def form_valid(self, form):
+        form.save()
+        return self.render_json_response({
+            'success': True,
+        })
+
+    def form_invalid(self, form):
+        return self.render_json_response({
+            'success': False,
+            'errors': form.errors,
+        })
+
+cv_request_update = CVRequestUpdateView.as_view()

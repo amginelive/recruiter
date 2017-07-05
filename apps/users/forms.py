@@ -11,7 +11,9 @@ from PIL import Image
 from .models import (
     Agent,
     Candidate,
+    CandidateSettings,
     CandidateSkill,
+    CVRequest,
     UserNote,
 )
 from recruit.models import (
@@ -287,3 +289,40 @@ class UserNoteForm(forms.ModelForm):
         user_note.save()
 
         return user_note
+
+
+class CandidateSettingsForm(forms.ModelForm):
+    """
+    Form for CandidateSettings.
+    """
+
+    class Meta:
+        model = CandidateSettings
+        fields = ('auto_cv_download',)
+
+
+class CVRequestForm(forms.ModelForm):
+    """
+    Form for CandidateSettings.
+    """
+
+    class Meta:
+        model = CVRequest
+        fields = ('status',)
+
+    def __init__(self, *args, **kargs):
+        super(CVRequestForm, self).__init__(*args, **kargs)
+        if not self.instance.pk:
+            initial = self.initial
+            self.candidate = initial.get('candidate')
+            self.requested_by = initial.get('requested_by')
+
+    def save(self, *args, **kargs):
+        cv_request = super(CVRequestForm, self).save(commit=False)
+
+        if not self.instance.pk:
+            cv_request.candidate = self.candidate
+            cv_request.requested_by = self.requested_by
+        cv_request.save()
+
+        return cv_request

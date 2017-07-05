@@ -1,6 +1,7 @@
 import itertools
 import logging
 import os
+import uuid
 
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
@@ -385,3 +386,45 @@ class CandidateSkill(AbstractTimeStampedModel):
 
     def __str__(self):
         return self.skill.name
+
+
+class CandidateSettings(AbstractTimeStampedModel):
+    """
+    Model for Candidate Settings.
+    """
+    candidate = models.OneToOneField('users.Candidate', related_name='settings', verbose_name=_('Candidate'))
+    auto_cv_download = models.BooleanField(_('Automatic Download of CV?'), default=False)
+
+    class Meta:
+        verbose_name = _('Candidate Settings')
+        verbose_name_plural = _('Candidate Settings')
+
+    def __str__(self):
+        return self.candidate.user.get_full_name()
+
+
+class CVRequest(AbstractTimeStampedModel):
+    """
+    Model for CV Request.
+    """
+
+    STATUS_PENDING = 0
+    STATUS_APPROVED = 1
+    STATUS_DECLINED = 2
+    STATUS_CHOICES = (
+        (STATUS_PENDING, 'Pending'),
+        (STATUS_APPROVED, 'Approved'),
+        (STATUS_DECLINED, 'Declined'),
+    )
+
+    candidate = models.ForeignKey('users.Candidate', related_name='cv_requests', verbose_name=_('Candidate'))
+    requested_by = models.ForeignKey('users.User', related_name='cv_requests', verbose_name=_('User'))
+    uuid = models.UUIDField(_('Automatic Download of CV?'), default=uuid.uuid4, editable=False)
+    status = models.IntegerField(_('Status'), choices=STATUS_CHOICES, default=STATUS_PENDING)
+
+    class Meta:
+        verbose_name = _('CV Request')
+        verbose_name_plural = _('CV Requests')
+
+    def __str__(self):
+        return self.candidate.user.get_full_name()

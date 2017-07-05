@@ -1612,3 +1612,16 @@ section#my-applications .job-applications-table {
     margin: 0px !important;
 }
 
+section#settings .settings {
+    margin-top: 30px;
+}
+
+section#settings .settings-form {
+    margin-top: 30px;
+}
+
+.cv-request-card {
+    border:1px
+    solid #dfdfdf;
+    padding:15px;
+}

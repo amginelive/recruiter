@@ -3,13 +3,15 @@ from django.contrib.postgres.search import (
     SearchQuery,
     SearchVector,
 )
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import (
+    CreateView,
     DetailView,
     TemplateView,
+    UpdateView,
     View,
 )
 
@@ -18,13 +20,17 @@ from braces.views import LoginRequiredMixin
 from .forms import (
     AgentUpdateForm,
     CandidatePhotoUploadForm,
-    CandidateUpdateForm,
     CandidateProfileDetailUpdateForm,
+    CandidateUpdateForm,
+    CandidateSettingsForm,
+    CVRequestForm,
 )
 from .mixins import CandidateRequiredMixin
 from .models import (
     Agent,
     Candidate,
+    CandidateSettings,
+    CVRequest,
     UserNote,
 )
 from .utils import get_profile_completeness
@@ -155,6 +161,12 @@ class CandidateProfileView(LoginRequiredMixin, DetailView):
         context['candidate_form'] = CandidateUpdateForm(instance=profile)
         context['connection_request'] = ConnectionRequest
 
+        if not profile.settings.auto_cv_download:
+            context['cv_request_form'] = CVRequestForm()
+            context['cv_request'] = CVRequest.objects\
+                .filter(requested_by=self.request.user, candidate=profile)\
+                .first()
+
         if self.request.user.account_type == User.ACCOUNT_AGENT:
             messages = Message.objects\
             .filter(conversation__users=profile.user)\
@@ -271,4 +283,50 @@ class SettingsView(LoginRequiredMixin, TemplateView):
     """
     template_name = 'users/settings.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(SettingsView, self).get_context_data(**kwargs)
+
+        if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
+            context['form'] = CandidateSettingsForm(instance=self.request.user.candidate.settings)
+
+        return context
 settings = SettingsView.as_view()
+
+
+class SettingsUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    View for the Settings page.
+    """
+    model = CandidateSettings
+    form_class = CandidateSettingsForm
+    success_url = reverse_lazy('users:settings')
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponseRedirect(self.success_url)
+
+    def get_object(self):
+        return self.request.user.candidate.settings
+
+settings_update = SettingsUpdateView.as_view()
+
+
+class CVRequestView(LoginRequiredMixin, CreateView):
+    """
+    View for the CV Request.
+    """
+    model = CVRequest
+    form_class = CVRequestForm
+
+    def get_success_url(self):
+        return reverse_lazy('users:candidate_profile', kwargs={'slug': self.kwargs.get('slug')})
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponseRedirect(self.success_url)
+
+    def get_initial(self):
+        return {
+            'candidate': User.objects.get(slug=self.kwargs.get('slug')).candidate,
+            'requested_by': self.request.user,
+        }
+
+cv_request = CVRequestView.as_view()
