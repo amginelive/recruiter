@@ -70,11 +70,11 @@
                                         {% endif %}
 
                                         {% if current_agent_connection %}
-                                            <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Connected</button>
+                                            <button class="btn btn-primary btn-xs add-connection {% if user == current_agent.user %}hidden{% endif %}" disabled="disabled">Connected</button>
                                         {% elif current_agent_connection_request %}
-                                            <button class="btn btn-primary btn-xs add-connection" disabled="disabled">Awaiting Network Approval</button>
+                                            <button class="btn btn-primary btn-xs add-connection {% if user == current_agent.user %}hidden{% endif %}" disabled="disabled">Awaiting Network Approval</button>
                                         {% else %}
-                                            <button class="btn btn-primary btn-xs add-connection">Add as Network</button>
+                                            <button class="btn btn-primary btn-xs add-connection {% if user == current_agent.user %}hidden{% endif %}">Add as Network</button>
                                         {% endif %}
                                     </form>
                                 </div>
@@ -262,10 +262,14 @@
         $(this).attr('data-has-connection-request', current_agent_has_connection_request);
         $(this).tooltip('hide');
 
-        if ($('.authenticated-user').html() == agent_staff_pk)
+        if ($('.authenticated-user').html() == agent_staff_pk) {
             $('#photo_upload_btn').removeClass('hidden')
-        else
+            $('.add-connection').addClass('hidden')
+        }
+        else {
             $('#photo_upload_btn').addClass('hidden')
+            $('.add-connection').removeClass('hidden')
+        }
 
         $('#id_note_to').val(agent_staff_pk);
         $.ajax({
