@@ -15,7 +15,7 @@ from .models import (
     UserReferral,
 )
 from core.forms import NumberMultipleSelectField
-from core.utils import send_email
+from core.utils import send_email_template
 from users.models import Candidate
 
 
@@ -120,11 +120,11 @@ class ConnectionInviteForm(forms.ModelForm):
                     connection_invite.pk = connection_invites.first().pk
             connection_invite.save()
 
-            send_email(
-                _('Invitation, SquareBalloon'),
-                [connection_invite.connectee_email,],
-                'recruit/email/connection_invitation',
-                {
+            send_email_template(
+                subject=_('Invitation, SquareBalloon'),
+                template='recruit/email/connection_invitation.html',
+                recipient=[connection_invite.connectee_email,],
+                data={
                     'connection_invite': connection_invite,
                     'user': User,
                 },

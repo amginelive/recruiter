@@ -14,7 +14,6 @@ from django_countries.fields import CountryField
 
 from core.models import AbstractTimeStampedModel, optional
 from core.utils import get_upload_path
-from libs.tools import random_string_gen
 
 
 class Company(AbstractTimeStampedModel):
@@ -93,28 +92,16 @@ class CompanyInvitation(AbstractTimeStampedModel):
     """
     Model for Company Invitation.
     """
-    sent_by = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='+', verbose_name=_('Sent By'), **optional)
-    sent_to = models.EmailField(_('Email of recipient'))
-    sent_to_user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='+', verbose_name=_('Sent To'), **optional)
-    company = models.ForeignKey('companies.Company', on_delete=models.CASCADE, related_name='+', verbose_name=_('Company'))
-    invite_key = models.CharField(_('Invitation key'), max_length=30, unique=True)
+    inviter = models.ForeignKey('users.Agent', related_name='+', verbose_name=_('Inviter'))
+    invitee_email = models.EmailField(_('Invitee Email'))
+    uuid = models.UUIDField(_('Request Invitation key'), default=uuid.uuid4, editable=False)
 
     class Meta:
         verbose_name = _('Company Invitation')
         verbose_name_plural = _('Company Invitations')
 
     def __str__(self):
-        return '%s %s' % (self.sent_by, self.sent_to)
-
-    def save(self, *args, **kwargs):
-
-        if not self.pk:
-            # create unique key
-            self.invite_key = random_string_gen(12, 18)
-            while CompanyInvitation.objects.filter(invite_key=self.invite_key).exists():
-                self.invite_key = random_string_gen(12, 18)
-
-        super(CompanyInvitation, self).save(*args, **kwargs)
+        return str(self.uuid)
 
 
 class CompanyRequestInvitation(AbstractTimeStampedModel):
@@ -131,38 +118,3 @@ class CompanyRequestInvitation(AbstractTimeStampedModel):
 
     def __str__(self):
         return self.user.get_full_name()
-
-
-def post_save_invitation(sender, instance, created, **kwargs):
-    """
-    Signal for sending an email invitation.
-    """
-    if created and instance.sent_to:
-        msg_plain = render_to_string(
-            'companies/email/company_invitation.txt',
-            {
-                'sender_name': instance.sent_by.get_full_name,
-                'invite_key': instance.invite_key,
-                'company': instance.sent_by.agent.company.name
-            }
-        )
-        msg_html = render_to_string(
-            'companies/email/company_invitation.html',
-            {
-                'sender_name': instance.sent_by.get_full_name,
-                'invite_key': instance.invite_key,
-                'company': instance.sent_by.agent.company.name
-            }
-        )
-        send_mail(
-            _('Recruiter Invitation, SquareBalloon'),
-            msg_plain,
-            settings.NOREPLY_EMAIL,
-            [instance.sent_to,],
-            html_message=msg_html,
-            fail_silently=False
-        )
-        del msg_plain
-        del msg_html
-
-post_save.connect(post_save_invitation, sender=CompanyInvitation)
