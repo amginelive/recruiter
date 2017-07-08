@@ -16,6 +16,7 @@ from .models import (
     CVRequest,
     UserNote,
 )
+from companies.models import CompanyInvitation
 from recruit.models import (
     Connection,
     ConnectionInvite,
@@ -85,11 +86,11 @@ class CustomSignupForm(forms.Form):
             if user.account_type == User.ACCOUNT_CANDIDATE:
                 Candidate.objects.create(**data)
             elif user.account_type == User.ACCOUNT_AGENT:
-                Agent.objects.create(**data)
+                agent = Agent.objects.create(**data)
 
-            # save connection
+            invite_type = request.GET.get('invite_type')
             uuid = request.GET.get('uuid')
-            if uuid:
+            if invite_type == 'connection':
                 connection_invitation = ConnectionInvite.objects.filter(uuid=uuid)
                 if connection_invitation.exists():
                     connection_invitation = connection_invitation.first()
@@ -99,6 +100,12 @@ class CustomSignupForm(forms.Form):
                         connection_type=connection_invitation.connection_type
                     )
                     connection_invitation.delete()
+            elif invite_type == 'company':
+                company_invitation = CompanyInvitation.objects.filter(uuid=uuid)
+                if company_invitation.exists():
+                    agent.company = company_invitation.first().inviter.company
+                    agent.save()
+                    company_invitation.delete()
 
 
 class CandidateUpdateForm(forms.ModelForm):

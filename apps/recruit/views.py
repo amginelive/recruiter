@@ -42,7 +42,6 @@ from companies.models import (
     Company,
     CompanyRequestInvitation,
 )
-from users.forms import CVRequestForm
 from users.mixins import (
     AgentRequiredMixin,
     CandidateRequiredMixin,

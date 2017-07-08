@@ -85,40 +85,19 @@ class CompanyUpdateView(AgentRequiredMixin, View):
 company_update = CompanyUpdateView.as_view()
 
 
-class CompanyInviteView(AgentRequiredMixin, View):
+class CompanyInviteView(AgentRequiredMixin, CreateView):
     """
     View for inviting user to the company.
     """
+    model = CompanyInvitation
+    form_class = CompanyInvitationForm
     template_name = 'companies/company_invite.html'
 
-    def get(self, request, **kwargs):
-        if (request.user.account_type == User.ACCOUNT_AGENT and
-            request.user.agent.company.owner == request.user.agent):
+    def get_initial(self):
+        return {'inviter': self.request.user.agent}
 
-            return render(request, self.template_name, {})
-        else:
-            raise Http404('You are not allowed to access this page')
-
-    def post(self, request, **kwards):
-        form = []
-        success = False
-
-        if request.user.account_type == User.ACCOUNT_AGENT:
-            form = CompanyInvitationForm(request.POST)
-            # create invitation
-            if form.is_valid():
-                invitation = CompanyInvitation.objects.create(
-                    sent_to=form.cleaned_data['email'],
-                    sent_by=request.user,
-                    company=request.user.agent.company
-                )
-                if invitation.pk > 0:
-                    success = True
-
-        return render(request, self.template_name, {
-            'form': form,
-            'success': success
-        })
+    def get_success_url(self):
+        return reverse_lazy('companies:company_detail', kwargs={'slug': self.request.user.agent.company.slug})
 
 company_invite = CompanyInviteView.as_view()
 

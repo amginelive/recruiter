@@ -3,7 +3,7 @@ from django.contrib.postgres.search import (
     SearchQuery,
     SearchVector,
 )
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.core.urlresolvers import reverse_lazy
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
