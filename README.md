@@ -37,3 +37,16 @@ SSH on private server and run the following commands there:
 $ docker pull squareballoon.com:5000/recruiter
 $ sudo systemctl restart recruiter
 ```
+
+
+### Running Tests ###
+
+Build Webpack bundle:
+```
+./node_modules/.bin/webpack --watch --progress --config webpack.prod.config.js --colors
+```
+
+Running tests:
+```
+./manage.py test
+```
