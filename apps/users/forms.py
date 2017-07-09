@@ -84,7 +84,8 @@ class CustomSignupForm(forms.Form):
                 'phone': self.cleaned_data['phone']
             }
             if user.account_type == User.ACCOUNT_CANDIDATE:
-                Candidate.objects.create(**data)
+                candidate = Candidate.objects.create(**data)
+                CandidateSettings.objects.create(candidate=candidate)
             elif user.account_type == User.ACCOUNT_AGENT:
                 agent = Agent.objects.create(**data)
 
