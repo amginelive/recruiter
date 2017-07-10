@@ -1,4 +1,7 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import (
+    get_user_model,
+    hashers,
+)
 from django.core.urlresolvers import reverse
 
 from django_dynamic_fixture import G
@@ -12,6 +15,7 @@ from recruit.models import (
     Skill,
 )
 from users.models import (
+    Agent,
     Candidate,
     UserNote,
     CVRequest,
@@ -195,20 +199,23 @@ class ProfileViewTests(BaseTest):
     def test_candidate_profile_update(self):
         self.client.login(username=self.user_candidate.email, password='candidate')
 
-        response = self.client.post(reverse('users:profile_update'), {
-            'phone': '+639771234567',
-            'title': 'title',
-            'job_type': Candidate.JOB_TYPE_CONTRACT,
-            'experience': 10,
-            'city': 'city',
-            'country': 'PH',
-            'desired_city': 'desired city',
-            'desired_country': 'PH',
-            'willing_to_relocate': True,
-            'status': Candidate.STATUS_LOOKING_FOR_CONTRACT,
-            'in_contract_status': Candidate.IN_CONTRACT_STATUS_OPEN,
-            'out_contract_status': Candidate.OUT_CONTRACT_STATUS_LOOKING,
-        })
+        response = self.client.post(
+            reverse('users:profile_update'),
+            {
+                'phone': '+639771234567',
+                'title': 'title',
+                'job_type': Candidate.JOB_TYPE_CONTRACT,
+                'experience': 10,
+                'city': 'city',
+                'country': 'PH',
+                'desired_city': 'desired city',
+                'desired_country': 'PH',
+                'willing_to_relocate': True,
+                'status': Candidate.STATUS_LOOKING_FOR_CONTRACT,
+                'in_contract_status': Candidate.IN_CONTRACT_STATUS_OPEN,
+                'out_contract_status': Candidate.OUT_CONTRACT_STATUS_LOOKING,
+            }
+        )
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('users:profile_update'))
@@ -222,3 +229,59 @@ class ProfileViewTests(BaseTest):
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('users:profile_update'))
+
+
+class SearchViewTest(BaseTest):
+
+    def setUp(self):
+        super(SearchViewTest, self).setUp()
+
+    def test_candidate_search(self):
+        self.client.login(username=self.user_candidate.email, password='candidate')
+        user = G(
+            User,
+            email='candidate2@candidate.com',
+            first_name='candidate2',
+            last_name='candidate2',
+            password=hashers.make_password('candidate2'),
+            account_type=User.ACCOUNT_CANDIDATE
+        )
+        candidate = G(
+            Candidate,
+            user=user
+        )
+
+        response = self.client.get(
+            reverse('users:candidate_search'),
+            {'search': 'candidate2'}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context.get('search'), 'candidate2')
+        self.assertIn(candidate, response.context.get('candidates'))
+        self.assertEqual(response.context.get('connection_request'), ConnectionRequest)
+
+    def test_agent_search(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+        user = G(
+            User,
+            email='agent2@agent.com',
+            first_name='agent2',
+            last_name='agent2',
+            password=hashers.make_password('agent2'),
+            account_type=User.ACCOUNT_AGENT
+        )
+        agent = G(
+            Agent,
+            user=user
+        )
+
+        response = self.client.get(
+            reverse('users:agent_search'),
+            {'search': 'agent2'}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context.get('search'), 'agent2')
+        self.assertIn(agent, response.context.get('agents'))
+        self.assertEqual(response.context.get('connection_request'), ConnectionRequest)
