@@ -124,16 +124,22 @@ class CandidateProfileView(LoginRequiredMixin, DetailView):
         context = super(CandidateProfileView, self).get_context_data(*args, **kwargs)
         profile = self.get_object()
 
+        is_connected = True
         if self.request.user == profile.user:
             context['profile_candidate_form'] = CandidateProfileDetailUpdateForm(instance=profile)
+        else:
+            # for requesting cv download
+            if not profile.settings.auto_cv_download:
+                context['cv_request_form'] = CVRequestForm()
+                context['cv_request'] = CVRequest.objects\
+                    .filter(requested_by=self.request.user, candidate=profile)\
+                    .first()
 
-        context['user_note'] = UserNote
-        context['user_notes'] = UserNote.objects\
-            .filter(note_by=self.request.user, note_to=profile.user)\
-            .order_by('-created_at')
+            context['user_note'] = UserNote
+            context['user_notes'] = UserNote.objects\
+                .filter(note_by=self.request.user, note_to=profile.user)\
+                .order_by('-created_at')
 
-        is_connected = True
-        if self.request.user != profile.user:
             is_connected = Connection.objects.filter(
                 (Q(connecter=self.request.user) & Q(connectee=profile.user)) |
                 (Q(connecter=profile.user) & Q(connectee=self.request.user))
@@ -161,17 +167,11 @@ class CandidateProfileView(LoginRequiredMixin, DetailView):
         context['candidate_form'] = CandidateUpdateForm(instance=profile)
         context['connection_request'] = ConnectionRequest
 
-        if not profile.settings.auto_cv_download:
-            context['cv_request_form'] = CVRequestForm()
-            context['cv_request'] = CVRequest.objects\
-                .filter(requested_by=self.request.user, candidate=profile)\
-                .first()
-
         if self.request.user.account_type == User.ACCOUNT_AGENT:
             messages = Message.objects\
-            .filter(conversation__users=profile.user)\
-            .filter(conversation__conversation_type=Conversation.CONVERSATION_USER)\
-            .order_by('created_at')
+                .filter(conversation__users=profile.user)\
+                .filter(conversation__conversation_type=Conversation.CONVERSATION_USER)\
+                .order_by('created_at')
 
             sent = messages.filter(author=self.request.user)
             context['first_contact_sent'] = sent.first()

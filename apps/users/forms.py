@@ -113,7 +113,7 @@ class CandidateUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Candidate
-        exclude = ('user', 'date_updated', 'photo', 'cv', 'connections')
+        exclude = ('user', 'date_updated', 'photo', 'cv', 'connections', 'skills',)
 
 
 class CandidateProfileDetailUpdateForm(forms.ModelForm):

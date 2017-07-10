@@ -3,6 +3,7 @@ from django.contrib.auth import (
     hashers,
 )
 from django.test import TestCase
+from django.test.client import Client
 
 from django_dynamic_fixture import G
 
@@ -10,6 +11,7 @@ from companies.models import Company
 from users.models import (
     Agent,
     Candidate,
+    CandidateSettings,
 )
 
 
@@ -27,8 +29,13 @@ class BaseTest(TestCase):
         )
         self.candidate = G(
             Candidate,
-            user=self.user_candidate,
+            user=self.user_candidate
         )
+        self.candidate_settings = G(
+            CandidateSettings,
+            candidate=self.candidate
+        )
+
 
         self.company = G(
             Company,
@@ -48,3 +55,5 @@ class BaseTest(TestCase):
         )
         self.company.owner = self.agent
         self.company.save()
+
+        self.client = Client()
