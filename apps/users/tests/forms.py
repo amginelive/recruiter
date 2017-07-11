@@ -7,8 +7,9 @@ from recruit.models import (
     Skill,
 )
 from users.forms import (
-    CandidateUpdateForm,
     AgentUpdateForm,
+    CandidateUpdateForm,
+    CandidateSettingsForm,
 )
 from users.models import (
     Candidate,
@@ -46,6 +47,19 @@ class ProfileFormTests(BaseTest):
     def test_agent_update_form(self):
         form = AgentUpdateForm(data={
             'phone': '+639771234567',
+        })
+
+        self.assertTrue(form.is_valid())
+
+
+class SettingsFormTests(BaseTest):
+
+    def setUp(self):
+        super(SettingsFormTests, self).setUp()
+
+    def test_candidate_settings_form(self):
+        form = CandidateSettingsForm(data={
+            'auto_cv_download': True,
         })
 
         self.assertTrue(form.is_valid())

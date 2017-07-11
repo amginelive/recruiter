@@ -285,3 +285,22 @@ class SearchViewTest(BaseTest):
         self.assertEqual(response.context.get('search'), 'agent2')
         self.assertIn(agent, response.context.get('agents'))
         self.assertEqual(response.context.get('connection_request'), ConnectionRequest)
+
+
+class SettingsViewTests(BaseTest):
+
+    def setUp(self):
+        super(SettingsViewTests, self).setUp()
+
+    def test_candidate_settings_update(self):
+        self.client.login(username=self.user_candidate.email, password='candidate')
+
+        response = self.client.post(
+            reverse('users:settings_update'),
+            {
+                'auto_cv_download': True,
+            }
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('users:settings'))
