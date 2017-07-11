@@ -304,3 +304,26 @@ class SettingsViewTests(BaseTest):
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('users:settings'))
+
+
+class CVRequestViewTests(BaseTest):
+
+    def setUp(self):
+        super(CVRequestViewTests, self).setUp()
+
+    def test_cv_request(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        response = self.client.post(
+            reverse('users:cv_request', kwargs={'slug': self.user_candidate.slug}),
+            {
+                'status': CVRequest.STATUS_PENDING,
+            }
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('users:candidate_profile', kwargs={'slug': self.user_candidate.slug}))
+
+        cv_request = CVRequest.objects.filter(candidate=self.candidate, requested_by=self.user_agent)
+
+        self.assertTrue(cv_request.exists())

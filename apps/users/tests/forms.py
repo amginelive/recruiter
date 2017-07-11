@@ -10,9 +10,11 @@ from users.forms import (
     AgentUpdateForm,
     CandidateUpdateForm,
     CandidateSettingsForm,
+    CVRequestForm,
 )
 from users.models import (
     Candidate,
+    CVRequest,
 )
 
 
@@ -63,3 +65,25 @@ class SettingsFormTests(BaseTest):
         })
 
         self.assertTrue(form.is_valid())
+
+
+class CVRequestFormTests(BaseTest):
+    def setUp(self):
+        super(CVRequestFormTests, self).setUp()
+
+    def test_cv_request_form(self):
+        form = CVRequestForm(
+            data={
+                'status': CVRequest.STATUS_PENDING,
+            },
+            initial={
+                'candidate': self.candidate,
+                'requested_by': self.user_agent,
+            }
+        )
+
+        self.assertTrue(form.is_valid())
+
+        cv_request = form.save()
+
+        self.assertEqual(cv_request, CVRequest.objects.filter(candidate=self.candidate, requested_by=self.user_agent).first())
