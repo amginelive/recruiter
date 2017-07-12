@@ -11,7 +11,12 @@ from django_dynamic_fixture import G
 from PIL import Image
 
 from core.tests import BaseTest
-from users.models import UserNote
+from recruit.models import Skill
+from users.models import (
+    Candidate,
+    CandidateSkill,
+    UserNote,
+)
 
 
 User = get_user_model()
@@ -192,3 +197,58 @@ class UserNoteAPITests(BaseTest):
 
         self.assertTrue(payload.get('success'))
         self.assertFalse(user_note.exists())
+
+
+class ProfileAPITests(BaseTest):
+
+    def setUp(self):
+        super(ProfileAPITests, self).setUp()
+
+    def test_valid_candidate_profile_detail_update(self):
+        self.client.login(username=self.user_candidate.email, password='candidate')
+
+        response = self.client.post(
+            reverse('users:candidate_profile_detail_update', kwargs={'pk': self.candidate.pk}),
+            {
+                'experience': 10,
+                'city': 'city',
+                'country': 'PH',
+                'desired_city': 'city',
+                'desired_country': 'PH',
+                'willing_to_relocate': True,
+                'status': Candidate.STATUS_LOOKING_FOR_CONTRACT,
+                'in_contract_status': Candidate.IN_CONTRACT_STATUS_OPEN,
+                'out_contract_status': Candidate.OUT_CONTRACT_STATUS_LOOKING,
+                'form-TOTAL_FORMS': '1',
+                'form-INITIAL_FORMS': '0',
+                'form-MAX_NUM_FORMS': '',
+                'form-0-skill': 'skill 1',
+                'form-0-experience': 10,
+            }
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        payload = json.loads(response.content)
+
+        self.assertTrue(payload.get('success'))
+
+        skill = Skill.objects.filter(name='skill 1')
+        candidate_skill = CandidateSkill.objects.filter(skill=skill, candidate=self.candidate)
+
+        self.assertTrue(skill.exists())
+        self.assertTrue(candidate_skill.exists())
+
+    def test_invalid_candidate_profile_detail_update(self):
+        self.client.login(username=self.user_candidate.email, password='candidate')
+
+        response = self.client.post(
+            reverse('users:candidate_profile_detail_update', kwargs={'pk': self.candidate.pk}),
+            {}
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        payload = json.loads(response.content)
+
+        self.assertFalse(payload.get('success'))

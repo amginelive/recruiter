@@ -15,6 +15,7 @@ from users.forms import (
     AgentPhotoUploadForm,
     CandidateCVUploadForm,
     CandidatePhotoUploadForm,
+    CandidateProfileDetailUpdateForm,
     CandidateUpdateForm,
     CandidateSettingsForm,
     CVRequestForm,
@@ -22,6 +23,7 @@ from users.forms import (
 )
 from users.models import (
     Candidate,
+    CandidateSkill,
     CVRequest,
     UserNote,
 )
@@ -61,6 +63,42 @@ class ProfileFormTests(BaseTest):
         })
 
         self.assertTrue(form.is_valid())
+
+    def test_valid_candidate_profile_update_form(self):
+        form = CandidateProfileDetailUpdateForm(
+            instance=self.candidate,
+            data={
+                'experience': 10,
+                'city': 'city',
+                'country': 'PH',
+                'desired_city': 'city',
+                'desired_country': 'PH',
+                'willing_to_relocate': True,
+                'status': Candidate.STATUS_LOOKING_FOR_CONTRACT,
+                'in_contract_status': Candidate.IN_CONTRACT_STATUS_OPEN,
+                'out_contract_status': Candidate.OUT_CONTRACT_STATUS_LOOKING,
+                'form-TOTAL_FORMS': '1',
+                'form-INITIAL_FORMS': '0',
+                'form-MAX_NUM_FORMS': '',
+                'form-0-skill': 'skill 1',
+                'form-0-experience': 10,
+            }
+        )
+
+        self.assertTrue(form.is_valid())
+
+        form.save()
+
+        skill = Skill.objects.filter(name='skill 1')
+        candidate_skill = CandidateSkill.objects.filter(skill=skill, candidate=self.candidate)
+
+        self.assertTrue(skill.exists())
+        self.assertTrue(candidate_skill.exists())
+
+    def test_invalid_candidate_profile_update_form(self):
+        form = CandidateProfileDetailUpdateForm(data={})
+
+        self.assertFalse(form.is_valid())
 
 
 class SettingsFormTests(BaseTest):
