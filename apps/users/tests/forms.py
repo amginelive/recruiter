@@ -1,6 +1,10 @@
+from tempfile import NamedTemporaryFile
+
 from django.contrib.auth import get_user_model
+from django.core.files import File
 
 from django_dynamic_fixture import G
+from PIL import Image
 
 from core.tests import BaseTest
 from recruit.models import (
@@ -8,6 +12,9 @@ from recruit.models import (
 )
 from users.forms import (
     AgentUpdateForm,
+    AgentPhotoUploadForm,
+    CandidateCVUploadForm,
+    CandidatePhotoUploadForm,
     CandidateUpdateForm,
     CandidateSettingsForm,
     CVRequestForm,
@@ -87,3 +94,53 @@ class CVRequestFormTests(BaseTest):
         cv_request = form.save()
 
         self.assertEqual(cv_request, CVRequest.objects.filter(candidate=self.candidate, requested_by=self.user_agent).first())
+
+
+class FileUploadFormTests(BaseTest):
+
+    def setUp(self):
+        super(FileUploadFormTests, self).setUp()
+
+        image = Image.new('RGB', size=(10, 10))
+        file = NamedTemporaryFile(suffix='.jpg')
+        image.save(file)
+        self.image = File(open(file.name, 'rb'))
+
+    def test_candidate_photo_upload_form(self):
+        form = CandidatePhotoUploadForm(
+            data={
+                'x': 0,
+                'y': 0,
+                'width': 10,
+                'height': 10,
+            },
+            files={
+                'photo': self.image,
+            }
+        )
+
+        self.assertTrue(form.is_valid())
+
+    def test_agent_photo_upload_form(self):
+        form = AgentPhotoUploadForm(
+            data={
+                'x': 0,
+                'y': 0,
+                'width': 10,
+                'height': 10,
+            },
+            files={
+                'photo': self.image,
+            }
+        )
+
+        self.assertTrue(form.is_valid())
+
+    def test_candidate_cv_upload_form(self):
+        form = CandidateCVUploadForm(
+            files={
+                'cv': self.image,
+            }
+        )
+
+        self.assertTrue(form.is_valid())

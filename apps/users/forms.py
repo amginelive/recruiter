@@ -219,7 +219,7 @@ class CandidatePhotoUploadForm(forms.ModelForm):
 
     class Meta:
         model = Candidate
-        fields = ['photo', 'x', 'y', 'width', 'height', ]
+        fields = ['photo', 'x', 'y', 'width', 'height',]
         widgets = {
             'photo': forms.FileInput(attrs={'id': 'photo_upload'})
         }
@@ -254,7 +254,7 @@ class AgentPhotoUploadForm(forms.ModelForm):
 
     class Meta:
         model = Agent
-        fields = ['photo', 'x', 'y', 'width', 'height', ]
+        fields = ['photo', 'x', 'y', 'width', 'height',]
         widgets = {
             'photo': forms.FileInput(attrs={'id': 'photo_upload'})
         }
