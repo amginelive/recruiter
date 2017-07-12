@@ -11,6 +11,7 @@ from django_dynamic_fixture import G
 from PIL import Image
 
 from core.tests import BaseTest
+from users.models import UserNote
 
 
 User = get_user_model()
@@ -87,3 +88,107 @@ class FileUploadAPITests(BaseTest):
         payload = json.loads(response.content)
         self.assertTrue(payload.get('success'))
         self.assertEqual(payload.get('cv'), self.candidate.cv.url)
+
+
+class UserNoteAPITests(BaseTest):
+
+    def setUp(self):
+        super(UserNoteAPITests, self).setUp()
+
+    def test_valid_create_user_note(self):
+        self.client.login(username=self.user_candidate.email, password='candidate')
+
+        response = self.client.post(
+            reverse('users:user_note_create'),
+            {
+                'note_to': self.user_agent.pk,
+                'text': 'test note',
+                'type': UserNote.TYPE_TEXT,
+            }
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        user_note = UserNote.objects.filter(note_to=self.user_agent, note_by=self.user_candidate).first()
+        payload = json.loads(response.content)
+
+        self.assertTrue(payload.get('success'))
+        self.assertEqual(payload.get('data').get('pk'), user_note.pk)
+
+    def test_invalid_create_user_note(self):
+        self.client.login(username=self.user_candidate.email, password='candidate')
+
+        response = self.client.post(
+            reverse('users:user_note_create'),
+            {}
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        payload = json.loads(response.content)
+
+        self.assertFalse(payload.get('success'))
+
+    def test_valid_update_user_note(self):
+        self.client.login(username=self.user_candidate.email, password='candidate')
+
+        user_note = G(
+            UserNote,
+            note_by=self.user_candidate,
+            note_to=self.user_agent
+        )
+
+        response = self.client.post(
+            reverse('users:user_note_update', kwargs={'pk': user_note.pk}),
+            {
+                'note_to': self.user_agent.pk,
+                'text': 'test note',
+                'type': UserNote.TYPE_TEXT,
+            }
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        payload = json.loads(response.content)
+
+        self.assertTrue(payload.get('success'))
+        self.assertEqual(payload.get('data').get('pk'), user_note.pk)
+
+    def test_invalid_update_user_note(self):
+        self.client.login(username=self.user_candidate.email, password='candidate')
+
+        user_note = G(
+            UserNote,
+            note_by=self.user_candidate,
+            note_to=self.user_agent
+        )
+
+        response = self.client.post(
+            reverse('users:user_note_update', kwargs={'pk': user_note.pk}),
+            {}
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        payload = json.loads(response.content)
+
+        self.assertFalse(payload.get('success'))
+
+    def test_delete_user_note(self):
+        self.client.login(username=self.user_candidate.email, password='candidate')
+
+        user_note = G(
+            UserNote,
+            note_by=self.user_candidate,
+            note_to=self.user_agent
+        )
+
+        response = self.client.post(reverse('users:user_note_delete', kwargs={'pk': user_note.pk}))
+
+        self.assertEqual(response.status_code, 200)
+
+        user_note = UserNote.objects.filter(note_to=self.user_agent, note_by=self.user_candidate)
+        payload = json.loads(response.content)
+
+        self.assertTrue(payload.get('success'))
+        self.assertFalse(user_note.exists())

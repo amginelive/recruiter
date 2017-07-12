@@ -18,10 +18,12 @@ from users.forms import (
     CandidateUpdateForm,
     CandidateSettingsForm,
     CVRequestForm,
+    UserNoteForm,
 )
 from users.models import (
     Candidate,
     CVRequest,
+    UserNote,
 )
 
 
@@ -144,3 +146,73 @@ class FileUploadFormTests(BaseTest):
         )
 
         self.assertTrue(form.is_valid())
+
+
+class UserNoteFormTests(BaseTest):
+
+    def setUp(self):
+        super(UserNoteFormTests, self).setUp()
+
+    def test_valid_user_note_form_create(self):
+        form = UserNoteForm(
+            data={
+                'note_to': self.user_agent.pk,
+                'text': 'test note',
+                'type': UserNote.TYPE_TEXT,
+            },
+            initial={
+                'user': self.user_candidate,
+            }
+        )
+
+        self.assertTrue(form.is_valid())
+
+        user_note = form.save()
+
+        self.assertTrue(user_note)
+
+    def test_invalid_user_note_form_create(self):
+        form = UserNoteForm(
+            data={},
+            initial={
+                'user': self.user_candidate,
+            }
+        )
+
+        self.assertFalse(form.is_valid())
+
+    def test_valid_user_note_form_update(self):
+        user_note = G(
+            UserNote,
+            note_by=self.user_candidate,
+            note_to=self.user_agent
+        )
+
+        form = UserNoteForm(
+            instance=user_note,
+            data={
+                'note_to': self.user_agent.pk,
+                'text': 'test note',
+                'type': UserNote.TYPE_TEXT,
+            }
+        )
+
+        self.assertTrue(form.is_valid())
+
+        user_note = form.save()
+
+        self.assertTrue(user_note)
+
+    def test_invalid_user_note_form_update(self):
+        user_note = G(
+            UserNote,
+            note_by=self.user_candidate,
+            note_to=self.user_agent
+        )
+
+        form = UserNoteForm(
+            instance=user_note,
+            data={}
+        )
+
+        self.assertFalse(form.is_valid())
