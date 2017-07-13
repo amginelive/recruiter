@@ -210,12 +210,12 @@ class TrackingAPIView(LoginRequiredMixin, View, JSONResponseMixin):
     View for returning the tracking details for a user.
     """
     def get(self, request, *args, **kwargs):
-        agent_user = User.objects.get(pk=self.kwargs.get('pk'))
+        user = User.objects.get(pk=self.kwargs.get('pk'))
 
-        user_notes = UserNote.objects.filter(note_to=agent_user, note_by=self.request.user).order_by('-created_at')
+        user_notes = UserNote.objects.filter(note_to=user, note_by=self.request.user).order_by('-created_at')
 
         messages = Message.objects\
-            .filter(conversation__users=agent_user)\
+            .filter(conversation__users=user)\
             .filter(conversation__conversation_type=Conversation.CONVERSATION_USER)\
             .order_by('created_at')
 

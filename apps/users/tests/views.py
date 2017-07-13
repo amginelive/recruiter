@@ -6,6 +6,11 @@ from django.core.urlresolvers import reverse
 
 from django_dynamic_fixture import G
 
+from chat.models import (
+    Conversation,
+    Message,
+    Participant,
+)
 from core.tests import BaseTest
 from companies.models import CompanyInvitation
 from recruit.models import (
@@ -188,6 +193,34 @@ class ProfileViewTests(BaseTest):
     def test_candidate_profile_other(self):
         self.client.login(username=self.user_agent.email, password='agent')
 
+        conversation = G(
+            Conversation,
+            owner=self.user_agent,
+            conversation_type=Conversation.CONVERSATION_USER
+        )
+
+        Participant.objects.create(
+            status=Participant.PARTICIPANT_ACCEPTED,
+            user=self.user_agent,
+            conversation=conversation
+        )
+        Participant.objects.create(
+            status=Participant.PARTICIPANT_ACCEPTED,
+            user=self.user_candidate,
+            conversation=conversation
+        )
+
+        message_agent = G(
+            Message,
+            author=self.user_agent,
+            conversation=conversation
+        )
+        message_candidate = G(
+            Message,
+            author=self.user_candidate,
+            conversation=conversation
+        )
+
         response = self.client.get(reverse('users:candidate_profile', kwargs={'slug': self.user_candidate.slug}))
 
         self.assertEqual(response.status_code, 200)
@@ -195,6 +228,9 @@ class ProfileViewTests(BaseTest):
         self.assertEqual(response.context.get('user_note'), UserNote)
         self.assertIn(self.user_note, response.context.get('user_notes'))
         self.assertTrue(response.context.get('is_connected'))
+        self.assertEqual(response.context.get('first_contact_sent'), message_agent)
+        self.assertEqual(response.context.get('last_message_sent'), message_agent)
+        self.assertEqual(response.context.get('last_message_received'), message_candidate)
 
     def test_candidate_profile_update(self):
         self.client.login(username=self.user_candidate.email, password='candidate')
@@ -291,6 +327,21 @@ class SettingsViewTests(BaseTest):
 
     def setUp(self):
         super(SettingsViewTests, self).setUp()
+
+    def test_candidate_settings_page(self):
+        self.client.login(username=self.user_candidate.email, password='candidate')
+
+        response = self.client.get(reverse('users:settings'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('form', response.context)
+
+    def test_agent_settings_page(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        response = self.client.get(reverse('users:settings'))
+
+        self.assertEqual(response.status_code, 200)
 
     def test_candidate_settings_update(self):
         self.client.login(username=self.user_candidate.email, password='candidate')
