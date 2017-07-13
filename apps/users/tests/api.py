@@ -15,6 +15,7 @@ from recruit.models import Skill
 from users.models import (
     Candidate,
     CandidateSkill,
+    CVRequest,
     UserNote,
 )
 
@@ -252,3 +253,76 @@ class ProfileAPITests(BaseTest):
         payload = json.loads(response.content)
 
         self.assertFalse(payload.get('success'))
+
+    def test_tracking_api(self):
+        self.client.login(username=self.user_candidate.email, password='candidate')
+
+        user_note = G(
+            UserNote,
+            note_to=self.user_agent,
+            note_by=self.user_candidate
+        )
+
+        response = self.client.get(reverse('users:tracking', kwargs={'pk': self.user_agent.pk}))
+
+        self.assertEqual(response.status_code, 200)
+
+        payload = json.loads(response.content)
+
+        self.assertTrue(payload.get('data').get('user_notes'))
+        self.assertEqual(payload.get('data').get('user_notes')[0].get('pk'), user_note.pk)
+
+
+class CVRequestAPITests(BaseTest):
+
+    def setUp(self):
+        super(CVRequestAPITests, self).setUp()
+
+    def test_valid_update_cv_request_api(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        cv_request = G(
+            CVRequest,
+            candidate=self.candidate,
+            requested_by=self.user_agent,
+            status=CVRequest.STATUS_PENDING
+        )
+
+        response = self.client.post(
+            reverse('users:cv_request_update', kwargs={'uuid': cv_request.uuid}),
+            {
+                'status': CVRequest.STATUS_APPROVED,
+            }
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        cv_request.refresh_from_db()
+        payload = json.loads(response.content)
+
+        self.assertTrue(payload.get('success'))
+        self.assertEqual(cv_request.status, CVRequest.STATUS_APPROVED)
+
+    def test_invalid_update_cv_request_api(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        cv_request = G(
+            CVRequest,
+            candidate=self.candidate,
+            requested_by=self.user_agent,
+            status=CVRequest.STATUS_PENDING
+        )
+
+        response = self.client.post(
+            reverse('users:cv_request_update', kwargs={'uuid': cv_request.uuid}),
+            {}
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        cv_request.refresh_from_db()
+        payload = json.loads(response.content)
+
+        self.assertFalse(payload.get('success'))
+        self.assertTrue(payload.get('errors'))
+        self.assertEqual(cv_request.status, CVRequest.STATUS_PENDING)
