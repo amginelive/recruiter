@@ -52,6 +52,12 @@ class CompanyViewTests(BaseTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context.get('company'), self.company)
 
+
+class CompanyInviteViewTests(BaseTest):
+
+    def setUp(self):
+        super(CompanyInviteViewTests, self).setUp()
+
     def test_invalid_update_company(self):
         self.client.login(username=self.user_agent.email, password='agent')
 
@@ -62,3 +68,34 @@ class CompanyViewTests(BaseTest):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context.get('form').errors)
+
+    def test_valid_invite_company(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        response = self.client.post(
+            reverse('companies:company_invite'),
+            {
+                'invitee_email': 'agent2@agent.com',
+            }
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('companies:company_detail', kwargs={'slug': self.company.slug}))
+
+        company_invitation = CompanyInvitation.objects.filter(invitee_email='agent2@agent.com')
+
+        self.assertTrue(company_invitation.exists())
+
+    def test_invalid_invite_company(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        response = self.client.post(
+            reverse('companies:company_invite'),
+            {}
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        company_invitation = CompanyInvitation.objects.all()
+
+        self.assertFalse(company_invitation.exists())

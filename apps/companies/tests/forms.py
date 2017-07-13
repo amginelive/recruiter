@@ -11,9 +11,9 @@ from PIL import Image
 from core.tests import BaseTest
 from companies.forms import (
     CompanyUpdateForm,
+    CompanyInvitationForm,
 )
 from companies.models import (
-    Company,
     CompanyInvitation,
 )
 
@@ -70,6 +70,53 @@ class CompanyFormTests(BaseTest):
             instance=self.company,
             data={},
             files={}
+        )
+
+        self.assertFalse(form.is_valid())
+
+
+class CompanyInviteFormTests(BaseTest):
+
+    def setUp(self):
+        super(CompanyInviteFormTests, self).setUp()
+
+    def test_valid_invite_company(self):
+        form = CompanyInvitationForm(
+            initial={
+                'inviter': self.agent,
+            },
+            data={
+                'invitee_email': 'agent2@agent.com',
+            }
+        )
+
+        self.assertTrue(form.is_valid())
+
+        company_invitation = form.save()
+        company_invitation = CompanyInvitation.objects.filter(invitee_email='agent2@agent.com')
+
+        self.assertEquals(company_invitation, company_invitation)
+
+    def test_invalid_invite_company_invalid_domain(self):
+        form = CompanyInvitationForm(
+            initial={
+                'inviter': self.agent,
+            },
+            data={
+                'invitee_email': 'agent2@agent2.com',
+            }
+        )
+
+        self.assertFalse(form.is_valid())
+
+    def test_invalid_invite_company_duplicate_user_email(self):
+        form = CompanyInvitationForm(
+            initial={
+                'inviter': self.agent,
+            },
+            data={
+                'invitee_email': 'agent@agent.com',
+            }
         )
 
         self.assertFalse(form.is_valid())
