@@ -292,6 +292,21 @@ class SettingsViewTests(BaseTest):
     def setUp(self):
         super(SettingsViewTests, self).setUp()
 
+    def test_candidate_settings_page(self):
+        self.client.login(username=self.user_candidate.email, password='candidate')
+
+        response = self.client.get(reverse('users:settings'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('form', response.context)
+
+    def test_agent_settings_page(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        response = self.client.get(reverse('users:settings'))
+
+        self.assertEqual(response.status_code, 200)
+
     def test_candidate_settings_update(self):
         self.client.login(username=self.user_candidate.email, password='candidate')
 
