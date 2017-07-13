@@ -45,14 +45,14 @@ class BaseTest(TestCase):
         )
         self.user_agent = G(
             User,
+            first_name='agent',
+            last_name='agent',
             email='agent@agent.com',
             password=hashers.make_password('agent'),
             account_type=User.ACCOUNT_AGENT
         )
         self.agent = G(
             Agent,
-            first_name='agent',
-            last_name='agent',
             user=self.user_agent,
             company=self.company
         )

@@ -10,6 +10,11 @@ from django.core.urlresolvers import reverse
 from django_dynamic_fixture import G
 from PIL import Image
 
+from chat.models import (
+    Conversation,
+    Message,
+    Participant,
+)
 from core.tests import BaseTest
 from recruit.models import Skill
 from users.models import (
@@ -263,15 +268,51 @@ class ProfileAPITests(BaseTest):
             note_by=self.user_candidate
         )
 
+        conversation = G(
+            Conversation,
+            owner=self.user_agent,
+            conversation_type=Conversation.CONVERSATION_USER
+        )
+
+        Participant.objects.create(
+            status=Participant.PARTICIPANT_ACCEPTED,
+            user=self.user_agent,
+            conversation=conversation
+        )
+        Participant.objects.create(
+            status=Participant.PARTICIPANT_ACCEPTED,
+            user=self.user_candidate,
+            conversation=conversation
+        )
+
+        message_agent = G(
+            Message,
+            author=self.user_agent,
+            conversation=conversation
+        )
+        message_candidate = G(
+            Message,
+            author=self.user_candidate,
+            conversation=conversation
+        )
+
         response = self.client.get(reverse('users:tracking', kwargs={'pk': self.user_agent.pk}))
 
         self.assertEqual(response.status_code, 200)
 
         payload = json.loads(response.content)
+        data = payload.get('data')
 
-        self.assertTrue(payload.get('data').get('user_notes'))
-        self.assertEqual(payload.get('data').get('user_notes')[0].get('pk'), user_note.pk)
+        user_notes = data.get('user_notes')
 
+        self.assertTrue(user_notes)
+        self.assertEqual(user_notes[0].get('pk'), user_note.pk)
+
+        auto_tracking = data.get('auto_tracking')
+
+        self.assertEqual(auto_tracking.get('first_contact_sent'), message_agent.created_at.strftime('%d/%m/%y'))
+        self.assertEqual(auto_tracking.get('last_message_sent'), message_agent.created_at.strftime('%d/%m/%y'))
+        self.assertEqual(auto_tracking.get('last_message_received'), message_candidate.created_at.strftime('%d/%m/%y'))
 
 class CVRequestAPITests(BaseTest):
 
