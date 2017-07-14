@@ -50,3 +50,12 @@ Running tests:
 ```
 ./manage.py test
 ```
+
+
+### Current deploy scheme ###
+
+Deploy consists of 4 services running: Postgres, Redis, Jenkins, and our application Recruiter.
+Postgres, Redis and Jenkins are all being managed by Systemd init service.
+There are 3 custom unit files under `/etc/systemd/system/` directory for those 3 services.
+Recruiter application is managed by Jenkins service, whole Jenkins service is itself running inside Docker container to which Docker socket is passed through to allow controlling other Docker containers, such as starting recruiter application or making database backups.
+Postgres and Jenkins containers each got a data volume which contains persistent data, files can be found under `/var/lib/docker/volumes/` directory.
