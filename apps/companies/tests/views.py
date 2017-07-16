@@ -1,6 +1,9 @@
 from tempfile import NamedTemporaryFile
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import (
+    get_user_model,
+    hashers,
+)
 from django.core.files import File
 from django.core.urlresolvers import reverse
 
@@ -12,6 +15,7 @@ from companies.models import (
     Company,
     CompanyInvitation,
 )
+from users.models import Agent
 
 
 User = get_user_model()
@@ -34,7 +38,7 @@ class CompanyViewTests(BaseTest):
             reverse('companies:company_update'),
             {
                 'name': 'agent',
-                'domain': 'agent@agent.com',
+                'domain': 'agent.com',
                 'overview': 'agent',
                 'description': 'agent',
                 'logo': self.image,
@@ -52,6 +56,98 @@ class CompanyViewTests(BaseTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context.get('company'), self.company)
 
+    def test_invald_update_company(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        response = self.client.post(
+            reverse('companies:company_update'),
+            {}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context.get('form').errors)
+
+    def test_valid_create_company(self):
+        user = G(
+            User,
+            first_name='agent2',
+            last_name='agent2',
+            email='agent2@agent2.com',
+            password=hashers.make_password('agent2'),
+            account_type=User.ACCOUNT_AGENT
+        )
+        agent = G(
+            Agent,
+            user=user,
+            company=None
+        )
+        self.client.login(username=user.email, password='agent2')
+
+        response = self.client.post(
+            reverse('companies:company_create'),
+            {
+                'name': 'agent2',
+                'domain': 'agent2.com',
+                'city': 'agent2',
+                'country': 'PH',
+            }
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('recruit:dashboard'))
+
+        agent.refresh_from_db()
+        company = Company.objects.filter(domain='agent2.com')
+
+        self.assertTrue(company.exists())
+        self.assertEqual(agent.company, company.first())
+
+    def test_invalid_create_company(self):
+        user = G(
+            User,
+            first_name='agent2',
+            last_name='agent2',
+            email='agent2@agent2.com',
+            password=hashers.make_password('agent2'),
+            account_type=User.ACCOUNT_AGENT
+        )
+        agent = G(
+            Agent,
+            user=user,
+            company=None
+        )
+        self.client.login(username=user.email, password='agent2')
+
+        response = self.client.post(
+            reverse('companies:company_create'),
+            {}
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        company = Company.objects.filter(agents=agent)
+
+        self.assertFalse(company.exists())
+
+    def test_create_company_agent_with_company(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        response = self.client.post(
+            reverse('companies:company_create'),
+            {
+                'name': 'agent2',
+                'domain': 'agent2.com',
+                'city': 'agent2',
+                'country': 'PH',
+            }
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('recruit:dashboard'))
+
+        company = Company.objects.filter(domain='agent2.com')
+
+        self.assertFalse(company.exists())
 
 class CompanyInviteViewTests(BaseTest):
 
