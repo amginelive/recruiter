@@ -149,7 +149,7 @@ class CompanyViewTests(BaseTest):
 
         self.assertFalse(company.exists())
 
-    def test_company_pending(self):
+    def test_company_pending_page(self):
         user = G(
             User,
             first_name='agent2',
@@ -169,7 +169,7 @@ class CompanyViewTests(BaseTest):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_company_pending_with_company(self):
+    def test_company_pending_with_company_page(self):
         self.client.login(username=self.user_agent.email, password='agent')
 
         response = self.client.get(reverse('companies:company_pending'))
@@ -224,3 +224,11 @@ class CompanyInviteViewTests(BaseTest):
         company_invitation = CompanyInvitation.objects.all()
 
         self.assertFalse(company_invitation.exists())
+
+    def test_company_invite_success_page(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        response = self.client.get(reverse('companies:company_invite_success'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context.get('company'), self.company)
