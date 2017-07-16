@@ -149,6 +149,35 @@ class CompanyViewTests(BaseTest):
 
         self.assertFalse(company.exists())
 
+    def test_company_pending(self):
+        user = G(
+            User,
+            first_name='agent2',
+            last_name='agent2',
+            email='agent2@agent2.com',
+            password=hashers.make_password('agent2'),
+            account_type=User.ACCOUNT_AGENT
+        )
+        G(
+            Agent,
+            user=user,
+            company=None
+        )
+        self.client.login(username=user.email, password='agent2')
+
+        response = self.client.get(reverse('companies:company_pending'))
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_company_pending_with_company(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        response = self.client.get(reverse('companies:company_pending'))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('recruit:dashboard'))
+
+
 class CompanyInviteViewTests(BaseTest):
 
     def setUp(self):
