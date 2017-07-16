@@ -99,6 +99,7 @@ class CompanyFormTests(BaseTest):
 
         self.assertFalse(form.is_valid())
 
+
 class CompanyInviteFormTests(BaseTest):
 
     def setUp(self):
