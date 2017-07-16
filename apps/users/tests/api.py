@@ -55,8 +55,8 @@ class FileUploadAPITests(BaseTest):
         self.assertEqual(response.status_code, 200)
 
         self.candidate.refresh_from_db()
-
         payload = json.loads(response.content)
+
         self.assertTrue(payload.get('success'))
         self.assertEqual(payload.get('image'), self.candidate.photo.url)
 
@@ -77,8 +77,8 @@ class FileUploadAPITests(BaseTest):
         self.assertEqual(response.status_code, 200)
 
         self.agent.refresh_from_db()
-
         payload = json.loads(response.content)
+
         self.assertTrue(payload.get('success'))
         self.assertEqual(payload.get('image'), self.agent.photo.url)
 
@@ -95,8 +95,8 @@ class FileUploadAPITests(BaseTest):
         self.assertEqual(response.status_code, 200)
 
         self.candidate.refresh_from_db()
-
         payload = json.loads(response.content)
+
         self.assertTrue(payload.get('success'))
         self.assertEqual(payload.get('cv'), self.candidate.cv.url)
 

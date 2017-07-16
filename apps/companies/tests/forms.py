@@ -5,7 +5,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files import File
 
-from django_dynamic_fixture import G
 from PIL import Image
 
 from core.tests import BaseTest
