@@ -171,10 +171,12 @@ class CompanyDetailView(LoginRequiredMixin, DetailView):
         context['photo_form'] = AgentPhotoUploadForm
         context['invitation_requests'] = CompanyRequestInvitation.objects.filter(company=company)
         context['current_agent'] = current_agent
+
         context['user_note'] = UserNote
         context['user_notes'] = UserNote.objects\
             .filter(note_by=self.request.user, note_to=current_agent.user)\
             .order_by('-created_at')
+
         context['current_agent_connection'] = Connection.objects.filter(
             (Q(connectee=self.request.user) & Q(connecter=current_agent.user)) |
             (Q(connectee=current_agent.user) & Q(connecter=self.request.user))

@@ -195,7 +195,6 @@ class ProfileViewTests(BaseTest):
 
         conversation = G(
             Conversation,
-            owner=self.user_agent,
             conversation_type=Conversation.CONVERSATION_USER
         )
 
