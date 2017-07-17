@@ -233,7 +233,6 @@ class CompanyViewTests(BaseTest):
 
         conversation = G(
             Conversation,
-            owner=self.user_candidate,
             conversation_type=Conversation.CONVERSATION_USER
         )
 
@@ -322,7 +321,6 @@ class CompanyViewTests(BaseTest):
 
         conversation = G(
             Conversation,
-            owner=self.user_candidate,
             conversation_type=Conversation.CONVERSATION_USER
         )
 

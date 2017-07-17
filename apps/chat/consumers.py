@@ -119,14 +119,7 @@ class ChatServer(JsonWebsocketConsumer):
             self.message.reply_channel.send({'close': True})
             return
 
-        connections = Connection.objects \
-            .filter(Q(connecter=message.user) |
-                    Q(connectee=message.user)) \
-            .filter(connection_type__in=(
-                Connection.CONNECTION_CANDIDATE_TO_AGENT_NETWORK,
-                Connection.CONNECTION_AGENT_TO_AGENT_NETWORK if
-                    self.message.user.account_type == User.ACCOUNT_AGENT else
-                    Connection.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER))
+        connections = Connection.objects.filter(Q(connecter=message.user) | Q(connectee=message.user))
         user_list = [
             next(filter(lambda user: user != self.message.user,
                         connection.users))

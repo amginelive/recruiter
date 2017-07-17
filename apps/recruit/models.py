@@ -2,6 +2,7 @@ import uuid
 
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from core.models import AbstractTimeStampedModel, optional
@@ -88,26 +89,22 @@ class Connection(AbstractTimeStampedModel):
     connection_type = models.IntegerField(_('Connection Type'), choices=CONNECTION_TYPE_CHOICES)
 
     def save(self, *args, **kwargs):
-        allowed_chat_types = (
-            Connection.CONNECTION_CANDIDATE_TO_AGENT_NETWORK,
-            Connection.CONNECTION_AGENT_TO_AGENT_NETWORK,
-            Connection.CONNECTION_CANDIDATE_TO_CANDIDATE_TEAM_MEMBER,
-        )
-        if not self.pk and self.connection_type in allowed_chat_types:
-            conversation = Conversation.objects \
-                .filter(conversation_type=Conversation.CONVERSATION_USER) \
-                .filter(users=self.connecter) \
-                .filter(users=self.connectee)
-            if not conversation.exists():
-                conversation = Conversation.objects.create()
-                Participant.objects.create(
+        if not self.pk:
+            conversation = Conversation.objects.create()
+            Participant.objects.bulk_create([
+                Participant(
                     user=self.connecter,
                     conversation=conversation,
-                )
-                Participant.objects.create(
+                    created_at=timezone.now(),
+                    updated_at=timezone.now()
+                ),
+                Participant(
                     user=self.connectee,
                     conversation=conversation,
-                )
+                    created_at=timezone.now(),
+                    updated_at=timezone.now()
+                ),
+            ])
         return super(Connection, self).save(*args, **kwargs)
 
     class Meta:
@@ -115,7 +112,7 @@ class Connection(AbstractTimeStampedModel):
         verbose_name_plural = _('Connections')
 
     def __str__(self):
-        return self.connectee.get_full_name()
+        return '{}, {}'.format(self.connecter.get_full_name(), self.connectee.get_full_name())
 
     @property
     def users(self):

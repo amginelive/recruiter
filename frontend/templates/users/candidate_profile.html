@@ -113,7 +113,7 @@
                                 <div class="form-group">
                                     <label class="control-label" for="id_experience">{{ profile_candidate_form.experience.label }}</label>
                                     <div class=" ">
-                                        <input type="number" name="experience" value="{{ profile_candidate_form.experience.value }}" class=" form-control" id="id_experience" value="{{ profile_candidate_form.experience.value }}">
+                                        <input type="number" name="experience" class=" form-control" id="id_experience" value="{{ profile_candidate_form.experience.value|default_if_none:"" }}">
                                     </div>
                                     <div class="experience_error error orange-text"></div>
                                 </div>
@@ -139,7 +139,7 @@
                                             <div class="col-md-4">
                                                 <label class="control-label" for="id_form-{{ forloop.counter0 }}-experience">Experience(years)</label>
                                                 <div class=" ">
-                                                    <input type="number" name="form-{{ forloop.counter0 }}-experience" class="form-control experience-field" id="id_form-{{ forloop.counter0 }}-experience" value="{{ form.experience.value }}">
+                                                    <input type="number" name="form-{{ forloop.counter0 }}-experience" class="form-control experience-field" id="id_form-{{ forloop.counter0 }}-experience" value="{{ form.experience.value|default_if_none:"" }}">
                                                 </div>
                                                 <div class="experience_{{ forloop.counter0 }}_error error orange-text"></div>
                                             </div>
