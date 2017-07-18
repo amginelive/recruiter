@@ -354,3 +354,22 @@ class SearchViewTests(BaseTest):
         self.assertIn('Davao', response.context.get('filters'))
         self.assertIn('PH', response.context.get('filters'))
         self.assertIn('test', response.context.get('search'))
+
+
+class JobPostViewTests(BaseTest):
+
+    def setUp(self):
+        super(JobPostViewTests, self).setUp()
+
+        self.job_post = G(
+            JobPost,
+            posted_by=self.agent
+        )
+
+    def test_job_post_list_page(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        response = self.client.get(reverse('recruit:job_post_list'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(self.job_post, response.context.get('job_posts'))
