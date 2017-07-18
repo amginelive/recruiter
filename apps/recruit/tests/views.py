@@ -11,7 +11,9 @@ from core.tests import BaseTest
 from recruit.models import (
     Connection,
     ConnectionRequest,
+    JobPost,
     JobReferral,
+    Skill,
     UserReferral,
 )
 from users.models import (
@@ -284,3 +286,71 @@ class IndexViewTests(BaseTest):
 
         self.assertIsNone(agent.company)
         self.assertTrue(company_request_invitation.exists())
+
+
+class SearchViewTests(BaseTest):
+
+    def setUp(self):
+        super(SearchViewTests, self).setUp()
+
+        self.skill = G(Skill)
+
+    def test_search_candidate(self):
+        self.candidate.city = 'Davao'
+        self.candidate.country = 'PH'
+        self.candidate.save()
+
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        response = self.client.get(
+            reverse('recruit:search'),
+            {
+                'search': 'candidate',
+                'filters': 'Davao,PH',
+            }
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertIn('Philippines', response.context.get('countries'))
+        self.assertIn('Davao', response.context.get('cities'))
+
+        self.assertEqual(response.context.get('connection_request'), ConnectionRequest)
+        self.assertIn(self.skill, response.context.get('skills'))
+
+        self.assertIn(self.candidate, response.context.get('results'))
+        self.assertIn('Davao', response.context.get('filters'))
+        self.assertIn('PH', response.context.get('filters'))
+        self.assertIn('candidate', response.context.get('search'))
+
+    def test_search_job_post(self):
+        job_post = G(
+            JobPost,
+            posted_by=self.agent,
+            title='test',
+            city='Davao',
+            country='PH'
+        )
+
+        self.client.login(username=self.user_candidate.email, password='candidate')
+
+        response = self.client.get(
+            reverse('recruit:search'),
+            {
+                'search': 'test',
+                'filters': 'Davao,PH',
+            }
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertIn('Philippines', response.context.get('countries'))
+        self.assertIn('Davao', response.context.get('cities'))
+
+        self.assertEqual(response.context.get('connection_request'), ConnectionRequest)
+        self.assertIn(self.skill, response.context.get('skills'))
+
+        self.assertIn(job_post, response.context.get('results'))
+        self.assertIn('Davao', response.context.get('filters'))
+        self.assertIn('PH', response.context.get('filters'))
+        self.assertIn('test', response.context.get('search'))
