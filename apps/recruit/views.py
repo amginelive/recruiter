@@ -162,13 +162,13 @@ class SearchView(LoginRequiredMixin, TemplateView):
                     search_query = SearchQuery(item)
                 search_query |= SearchQuery(item)
 
-            # generate additioanl SearchQuery item from search
+            # generate additional SearchQuery item from search
             for index, item in enumerate(search_list):
                 if not search_query:
                     search_query = SearchQuery(item)
                 search_query |= SearchQuery(item)
 
-            # job posts seatch
+            # job posts search
             if self.request.user.account_type == User.ACCOUNT_CANDIDATE:
                 results = JobPost.objects\
                     .annotate(search=SearchVector('title', 'skills__name', 'city', 'country'))\
@@ -186,17 +186,21 @@ class SearchView(LoginRequiredMixin, TemplateView):
             context['job_referral_form'] = JobReferralForm(initial={'candidate': self.request.user.candidate})
         elif self.request.user.account_type == User.ACCOUNT_AGENT:
             model = Candidate
+
         # list the cities and countries that can be filtered
         countries_search = model.objects.all().distinct('country').values_list('country', flat=True)
         cities_search = model.objects.all().distinct('city').values_list('city', flat=True)
 
-        context['connection_request'] = ConnectionRequest
         context['countries'] = [dict(countries).get(country) for country in countries_search if dict(countries).get(country)]
         context['cities'] = set([city.title() for city in cities_search])
+
+        context['connection_request'] = ConnectionRequest
         context['skills'] = Skill.objects.all()
+
         context['results'] = results
         context['filters'] = filters.split(',') if filters else []
         context['search'] = search
+
         return context
 
 search = SearchView.as_view()
