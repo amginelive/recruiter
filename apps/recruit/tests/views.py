@@ -361,6 +361,8 @@ class JobPostViewTests(BaseTest):
     def setUp(self):
         super(JobPostViewTests, self).setUp()
 
+        self.skill = G(Skill)
+
         self.job_post = G(
             JobPost,
             posted_by=self.agent
@@ -373,3 +375,11 @@ class JobPostViewTests(BaseTest):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(self.job_post, response.context.get('job_posts'))
+
+    def test_job_post_detail_page(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        response = self.client.get(reverse('recruit:job_post_detail', kwargs={'uuid': self.job_post.uuid}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.job_post, response.context.get('job_post'))
