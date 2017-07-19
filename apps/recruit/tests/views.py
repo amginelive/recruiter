@@ -451,3 +451,18 @@ class JobPostViewTests(BaseTest):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context.get('form').errors)
+
+    def test_invalid_job_post_delete(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        response = self.client.post(
+            reverse('recruit:job_post_delete', kwargs={'uuid': self.job_post.uuid}),
+            {}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('recruit:job_post_list'))
+
+        job_post = JobPost.objects.filter(uuid=self.job_post.uuid)
+
+        self.assertFalse(job_post.exists())
