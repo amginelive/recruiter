@@ -417,3 +417,37 @@ class JobPostViewTests(BaseTest):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context.get('form').errors)
+
+    def test_valid_job_post_update(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        response = self.client.post(
+            reverse('recruit:job_post_update', kwargs={'uuid': self.job_post.uuid}),
+            {
+                'title': 'test',
+                'description': 'test',
+                'contract': 'test',
+                'city': 'test',
+                'country': 'PH',
+                'skills': [self.skill],
+            }
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('recruit:job_post_list'))
+
+        job_post = JobPost.objects.filter(title='test')
+
+        self.assertTrue(job_post.exists())
+        self.assertEqual(job_post.first(), self.job_post)
+
+    def test_invalid_job_post_update(self):
+        self.client.login(username=self.user_agent.email, password='agent')
+
+        response = self.client.post(
+            reverse('recruit:job_post_update', kwargs={'uuid': self.job_post.uuid}),
+            {}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context.get('form').errors)

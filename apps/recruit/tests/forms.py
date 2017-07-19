@@ -7,6 +7,7 @@ from recruit.forms import (
     JobPostForm,
 )
 from recruit.models import (
+    JobPost,
     Skill,
 )
 
@@ -20,6 +21,11 @@ class JobPostFormTests(BaseTest):
         super(JobPostFormTests, self).setUp()
 
         self.skill = G(Skill)
+
+        self.job_post = G(
+            JobPost,
+            posted_by=self.agent
+        )
 
     def test_valid_create_job_post_form(self):
         form = JobPostForm(
@@ -47,6 +53,33 @@ class JobPostFormTests(BaseTest):
             initial={
                 'agent': self.agent,
             },
+            data={}
+        )
+
+        self.assertFalse(form.is_valid())
+
+    def test_valid_update_job_post_form(self):
+        form = JobPostForm(
+            instance=self.job_post,
+            data={
+                'title': 'test',
+                'description': 'test',
+                'contract': 'test',
+                'city': 'test',
+                'country': 'PH',
+                'skills': [self.skill],
+            }
+        )
+
+        self.assertTrue(form.is_valid())
+
+        job_post = form.save()
+
+        self.assertTrue(job_post)
+
+    def test_invalid_update_job_post_form(self):
+        form = JobPostForm(
+            instance=self.job_post,
             data={}
         )
 
