@@ -25,6 +25,7 @@ class MessageForm extends React.Component {
         }
 
         this.props.actions.sendMessage(this.state.message);
+        this.textInput.focus();
         this.setState({valid: false, message: ''});
     }
 
