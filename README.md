@@ -5,7 +5,7 @@ Recruiter is an application for finding jobs and hiring employees.
 
 ### Building local Docker image ###
 
-To start build - run in the project directory:
+#To start build - run in the project directory:
 ```
 $ docker-compose build
 ```
